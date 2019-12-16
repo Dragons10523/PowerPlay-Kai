@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -13,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
 public class ProtoConfig {
     public DcMotor frontRight, frontLeft, rearRight, rearLeft, ramp1, ramp2, lift, horizontal;
+    public DcMotorEx frontRightEx, frontLeftEx, rearRightEx, rearLeftEx;
     public DistanceSensor left, right, rear, front, cameraDis;
     public Servo leftClaw, rightClaw, blockIntake;
     public CRServo intake1, intake2;
@@ -53,5 +55,11 @@ public class ProtoConfig {
         leftClaw = hwmap.get(Servo.class, "leftClaw");
         rightClaw = hwmap.get(Servo.class, "rightClaw");
         leftClaw.setDirection(Servo.Direction.REVERSE);
+    }
+    public void initDcMotorEx(HardwareMap hwmap){
+        frontRightEx = hwmap.get(DcMotorEx.class, "frontRight");
+        rearRightEx = hwmap.get(DcMotorEx.class, "rearRight");
+        frontLeftEx = hwmap.get(DcMotorEx.class, "frontLeft");
+        rearLeftEx = hwmap.get(DcMotorEx.class, "rearLeft");
     }
 }
