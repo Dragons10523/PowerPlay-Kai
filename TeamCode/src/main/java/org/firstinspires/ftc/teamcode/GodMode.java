@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -12,7 +13,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.INTRINSIC;
-
+@TeleOp(name = "GOD-MODE")
 public class GodMode extends OpMode {
 
     private Localization localization;
@@ -26,7 +27,7 @@ public class GodMode extends OpMode {
     @Override
     public void init() {
         localization = new Localization();
-        localization.initialize();
+        localization.initialize(hardwareMap);
         ramp1 = localization.bahumut.ramp1;
         ramp2 = localization.bahumut.ramp2;
         lift = localization.bahumut.lift;
@@ -69,7 +70,7 @@ public class GodMode extends OpMode {
         telemetry.addData("ServoLeft", leftClaw.getPosition());
         telemetry.addData("ServoRight", rightClaw.getPosition());
         telemetry.addData("Speed", (speed * 100) + "%");
-        telemetry.addData("frontLazer", localization.frontDis);
+        telemetry.addData("frontLazer", Math.round(localization.frontDis));
         telemetry.addData("leftLazer", localization.leftDis);
         telemetry.addData("rightLazer", localization.rightDis);
         telemetry.addData("rearLazer", localization.rearDis);

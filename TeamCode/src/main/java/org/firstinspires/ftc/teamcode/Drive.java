@@ -68,10 +68,10 @@ public class Drive extends OpMode {
             telemetry.addData("Relativity", "FIELD");
             double a = getAngle();
             telemetry.addData("Angle", a);
-            funcs.absoluteMove(gamepad1.left_stick_y * speed, gamepad1.left_stick_x * speed, Math.toRadians(a), gamepad1.right_stick_x * speed);
+            funcs.absoluteMove(gamepad1.left_stick_y * speed, gamepad1.left_stick_x * speed, Math.toRadians(a), -gamepad1.right_stick_x * speed);
         } else {
             telemetry.addData("Relativity", "ROBOT");
-            funcs.joystickMove(gamepad1.left_stick_y * speed, gamepad1.left_stick_x * speed, gamepad1.right_stick_x * speed);
+            funcs.joystickMove(gamepad1.left_stick_y * speed, gamepad1.left_stick_x * speed, -gamepad1.right_stick_x * speed);
         }
 
         robot.ramp1.setPower(gamepad1.right_trigger - gamepad1.left_trigger);

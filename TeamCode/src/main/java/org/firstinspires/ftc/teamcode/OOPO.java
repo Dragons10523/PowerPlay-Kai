@@ -2,15 +2,16 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 public class OOPO {
-    public DcMotor fl, fr, rr, rl;
+    public DcMotorEx fl, fr, rr, rl;
 
-    public OOPO(DcMotor FL, DcMotor FR, DcMotor RR, DcMotor RL){
+    public OOPO(DcMotorEx FL, DcMotorEx FR, DcMotorEx RR, DcMotorEx RL){
         fl = FL;fr = FR;rr = RR;rl = RL;
     }
 

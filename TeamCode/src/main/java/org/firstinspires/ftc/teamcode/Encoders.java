@@ -2,13 +2,14 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public class Encoders{
-    static final double COUNTS_ROTATION = 560;
-    static final double WHEEL_DIAMETER = 3.0;
-    public DcMotor frontRight, frontLeft, rearRight, rearLeft;
+    public static final double COUNTS_ROTATION = 560;
+    public static final double WHEEL_DIAMETER = 3.0;
+    public DcMotorEx frontRight, frontLeft, rearRight, rearLeft;
 
-    public Encoders(DcMotor fr, DcMotor fl, DcMotor rr, DcMotor rl){
+    public Encoders(DcMotorEx fr, DcMotorEx fl, DcMotorEx rr, DcMotorEx rl){
         frontRight = fr;
         frontLeft = fl;
         rearRight = rr;
@@ -32,16 +33,16 @@ public class Encoders{
     }
 
     public double getInches(){
-        double frontRightInch = Math.abs((2*Math.PI)*WHEEL_DIAMETER*(frontRight.getCurrentPosition()/COUNTS_ROTATION));
-        double rearRightInch = Math.abs((2*Math.PI)*WHEEL_DIAMETER*(frontRight.getCurrentPosition()/COUNTS_ROTATION));
-        double frontLeftInch = Math.abs((2*Math.PI)*WHEEL_DIAMETER*(frontRight.getCurrentPosition()/COUNTS_ROTATION));
-        double rearLeftInch = Math.abs((2*Math.PI)*WHEEL_DIAMETER*(frontRight.getCurrentPosition()/COUNTS_ROTATION));
+        double frontRightInch = Math.abs((Math.PI)*WHEEL_DIAMETER*(frontRight.getCurrentPosition()/COUNTS_ROTATION));
+        double rearRightInch = Math.abs((Math.PI)*WHEEL_DIAMETER*(frontRight.getCurrentPosition()/COUNTS_ROTATION));
+        double frontLeftInch = Math.abs((Math.PI)*WHEEL_DIAMETER*(frontRight.getCurrentPosition()/COUNTS_ROTATION));
+        double rearLeftInch = Math.abs((Math.PI)*WHEEL_DIAMETER*(frontRight.getCurrentPosition()/COUNTS_ROTATION));
 
         return (frontLeftInch + rearLeftInch + frontRightInch + rearRightInch)/4;
     }
 
     public double getTicks(){
 
-        return (frontLeft.getCurrentPosition() + frontRight.getCurrentPosition() + rearLeft.getCurrentPosition() + rearRight.getCurrentPosition())/4;
+        return Math.abs(frontLeft.getCurrentPosition());
     }
 }

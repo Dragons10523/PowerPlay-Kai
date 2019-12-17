@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.content.Context;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -66,14 +69,14 @@ public class Localization extends LinearOpMode {
     public double angleError = 0;
     BNO055IMU.Parameters gyrometers;
     //Global variables for speed and error
-    public static double speed = 0.4;
+    public static double speed = 0.75;
     public double thresh = 1.5;
 
     public Servo leftClaw, rightClaw;
 
     @Override
     public void runOpMode() {
-        initialize();
+        initialize(hardwareMap);
         waitForStart();
 
         while (!isStopRequested()) {
@@ -94,23 +97,6 @@ public class Localization extends LinearOpMode {
         double Xdiff = Math.abs(Xdest - X);
         encode.resetEncoders();
         double inches = encode.getInches();
-
-        if (Ydest > Y) {
-            while (!isStopRequested() && inches < Ydiff) {
-                inches = encode.getInches();
-                funcs.absMove(90, speed, getAngle());
-            }
-            funcs.stopNow();
-        } else {
-            while (!isStopRequested() && inches < Ydiff) {
-                inches = encode.getInches();
-                funcs.absMove(270, speed, getAngle());
-            }
-            funcs.stopNow();
-        }
-        encode.resetEncoders();
-        inches = encode.getInches();
-        Xdiff = Xdiff * 2;
         if (Xdest > X) {
             while (!isStopRequested() && inches < Xdiff) {
                 inches = encode.getInches();
@@ -124,9 +110,28 @@ public class Localization extends LinearOpMode {
             }
             funcs.stopNow();
         }
+
+        encode.resetEncoders();
+        inches = encode.getInches();
+        if (Ydest > Y) {
+            while (!isStopRequested() && inches < Ydiff) {
+                inches = encode.getInches();
+                funcs.absMove(90, speed, getAngle());
+            }
+            funcs.stopNow();
+        } else {
+            while (!isStopRequested() && inches < Ydiff) {
+                inches = encode.getInches();
+                funcs.absMove(270, speed, getAngle());
+            }
+            funcs.stopNow();
+        }
+
     }
 
-    public void gotoCoordinates(double Xdest, double Ydest, boolean turn) {
+
+
+    /*public void gotoCoordinates(double Xdest, double Ydest, boolean turn) {
         //the fucking finale :O
         updatePosition();
         if (turn) {
@@ -151,7 +156,7 @@ public class Localization extends LinearOpMode {
             gotoCordX(X, Xdest);
         }
         funcs.stopNow();
-    }
+    }*/
 
     public void turnToAngle(double dest, boolean left) {
         double angle = getAngle();
@@ -167,32 +172,9 @@ public class Localization extends LinearOpMode {
                 angle = 360 - Math.abs(angle);
             }
             if (!left) {
-                funcs.move(0, 0, -0.25);
+                funcs.move(0, 0, -0.35);
             } else {
-                funcs.move(0, 0, 0.25);
-            }
-        }
-
-        funcs.stopNow();
-    }
-
-    public void turnToAngle(double dest) {
-        double angle = getAngle();
-        double thresha = 0.6;
-        if (angle < 0) {
-            angle = 360 - Math.abs(angle);
-        }
-
-        while (angle < dest - thresha || angle > dest + thresha) {
-            angle = getAngle();
-
-            if (angle < 0) {
-                angle = 360 - Math.abs(angle);
-            }
-            if (dest > angle) {
-                funcs.move(0, 0, -speed / 1.25);
-            } else {
-                funcs.move(0, 0, speed / 1.25);
+                funcs.move(0, 0, 0.35);
             }
         }
 
@@ -272,15 +254,12 @@ public class Localization extends LinearOpMode {
 
         for (int i = 0; i < 4; i++) {
             if (values[i] > 300) {
+
                 enabled[i] = false;
             }
         }
-        if ((enabled[2] && enabled[1]) && !isStopRequested()) {
-            corner = Corner.RedDepot;
-            Localization.X = -72 + values[2];
-            Localization.Y = 72 - values[1];
-            ;
-        } else if (enabled[2] && enabled[0]) {
+
+        if (enabled[2] && enabled[0]) {
             corner = Corner.BlueDepot;
             Localization.X = -72 + values[2];
             Localization.Y = -72 + values[0];
@@ -292,7 +271,11 @@ public class Localization extends LinearOpMode {
             corner = Corner.RedTri;
             Localization.X = 72 - values[3];
             Localization.Y = -72 + values[0];
-        } else {
+        } else if ((enabled[2] && enabled[1]) && !isStopRequested()) {
+            corner = Corner.RedDepot;
+            Localization.X = -72 + values[2];
+            Localization.Y = 72 - values[1];
+        }else {
             for (int i = 0; i < 5; i++) {
                 if (enabled[i]) {
                     if (i == 1 || i == 2) {
@@ -331,7 +314,7 @@ public class Localization extends LinearOpMode {
         Y = Ytemp;
     }
 }
-    public void findRotationY() {
+    /*public void findRotationY() {
         switch (corner) {
             case RedDepot:
             case BlueDepot:
@@ -355,16 +338,16 @@ public class Localization extends LinearOpMode {
                 turnToAngle(90);
                 break;
         }
-    }
+    }*/
 
-    public void initialize(){
+    public void initialize(HardwareMap hwmap){
         float phoneYRotate;
         float phoneZRotate = 0;
         VuforiaLocalizer vuforia;
 
 
         bahumut = new ProtoConfig();
-        bahumut.init(hardwareMap);
+        bahumut.init(hwmap);
         funcs = new OOPO(bahumut.frontLeft, bahumut.frontRight, bahumut.rearRight, bahumut.rearLeft);
         encode = new Encoders(bahumut.frontRight, bahumut.frontLeft, bahumut.rearRight, bahumut.rearLeft);
         encode.resetEncoders();
@@ -376,10 +359,7 @@ public class Localization extends LinearOpMode {
         leftClaw = bahumut.leftClaw;
         rightClaw = bahumut.rightClaw;
 
-
-
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("camera1", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = "AQkCE3T/////AAABmacf2GUqlUiet5GB5KP6epRTyl96EqEA9gcG1VI99J81/l4NkkwX6Nx/L7BTIL+1Z3R7yorhZ4YW1N6InBS7l7o8rKNgpbwWzBkfh3Unneq6h5xeyhbILzENlxNOVSibrronjr5199YlL3+PbMazXySVa5mnY2hXXO9CXcuv/pfEyCblbkFchA3D+Ngpkpg8CSbpkXeM6aKgGEXsnBZO7xUtE8p71aFIew1Coez3KBM5n12hoov/SdKC3O6GAcbMTX3A9wVZgACfXmw4F4Skgm/QjcfG9dOH0w7Wj3Ne6haXCVS13A2uYecamReSZZyT+BatU5nfh9t4KjRtgKGf/SMAJLIoBcbdYxBqiTmyG3WN";
 
@@ -477,7 +457,7 @@ public class Localization extends LinearOpMode {
         gyrometers.calibrationDataFile = "BNO055IMUCalibration.json";
         gyrometers.loggingEnabled = true;
         gyrometers.loggingTag = "IMU";
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu = hwmap.get(BNO055IMU.class, "imu");
         imu.initialize(gyrometers);
         byte AXIS_MAP_CONFIG_BYTE = 0x6; //This is what to write to the AXIS_MAP_CONFIG register to swap x and z axes
         byte AXIS_MAP_SIGN_BYTE = 0x1; //This is what to write to the AXIS_MAP_SIGN register to negate the z axis

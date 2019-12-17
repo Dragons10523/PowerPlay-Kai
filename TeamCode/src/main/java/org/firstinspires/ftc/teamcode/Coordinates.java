@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class Coordinates extends Localization {
     @Override
     public void runOpMode(){
-        initialize();
+        initialize(hardwareMap);
         waitForStart();
 
         while (!isStopRequested()) {
