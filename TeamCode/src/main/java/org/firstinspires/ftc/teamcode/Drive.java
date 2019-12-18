@@ -30,8 +30,7 @@ public class Drive extends OpMode {
 
     @Override
     public void init() {
-        robot = new ProtoConfig();
-        robot.init(hardwareMap);
+        robot = new ProtoConfig(hardwareMap);
         funcs = new OOPO(robot.frontLeft, robot.frontRight, robot.rearRight, robot.rearLeft);
         blockintake = robot.blockIntake;
         leftClaw = robot.leftClaw;
@@ -87,9 +86,7 @@ public class Drive extends OpMode {
         telemetry.update();
     }
     @Override
-    public void stop(){
-        lol.cancel(true);
-    }
+    public void stop(){  lol.cancel(true); }
     private double getAngle(){
         return imu.getAngularOrientation(INTRINSIC, ZYX, DEGREES).firstAngle +angleError;
     }

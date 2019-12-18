@@ -18,12 +18,6 @@ public class AutnomousBlue extends Localization {
         telemetry.update();
         sleep(5000);
         moveWithEncoder(50, 35);
-        if(getAngle() < 0-0.2){
-            while(getAngle()<0-0.2){
-                funcs.absMove(0,0.20,0.25);
-            }
-            funcs.stopNow();
-        }
         rightClaw.setPosition(0.75);
         leftClaw.setPosition(0.75);
         sleep(1500);

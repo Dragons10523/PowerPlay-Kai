@@ -288,8 +288,7 @@ public class Localization extends LinearOpMode {
         VuforiaLocalizer vuforia;
 
 
-        bahumut = new ProtoConfig();
-        bahumut.init(hwmap);
+        bahumut = new ProtoConfig(hwmap);
         funcs = new OOPO(bahumut.frontLeft, bahumut.frontRight, bahumut.rearRight, bahumut.rearLeft);
         encode = new Encoders(bahumut.frontRight, bahumut.frontLeft, bahumut.rearRight, bahumut.rearLeft);
         encode.resetEncoders();

@@ -25,10 +25,7 @@ public class EncoderDrive extends OpMode {
     private int goal = 24;
     @Override
     public void init() {
-        ProtoConfig robot
-                = new ProtoConfig();
-        robot.init(hardwareMap);
-        funcs = new OOPO(robot.frontLeft,robot.frontRight,robot.rearRight,robot.rearLeft);
+        ProtoConfig robot = new ProtoConfig(hardwareMap);funcs = new OOPO(robot.frontLeft,robot.frontRight,robot.rearRight,robot.rearLeft);
         encode = new Encoders(robot.frontRight,robot.frontLeft, robot.rearRight, robot.rearLeft);
 
         encode.resetEncoders();
