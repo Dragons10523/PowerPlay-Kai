@@ -35,44 +35,42 @@ public class Localization extends LinearOpMode {
     }
 
     //Vuforia parameters
-    public static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
-    public static final boolean PHONE_IS_PORTRAIT = false;
-    public static final float mmPerInch = 25.4f;
-    public static final float mmTargetHeight = (6) * mmPerInch;
-    public static final float halfField = 72 * mmPerInch;
-    public static final float quadField = 36 * mmPerInch;
-    public OpenGLMatrix lastLocation = null;
-    public float phoneXRotate = 0;
-    public boolean targetVisible = false;
-    public List<VuforiaTrackable> allTrackables;
-    public String currentTrackable = null;
-    public VuforiaTrackables targetsSkyStone = null;
+    static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
+    static final boolean PHONE_IS_PORTRAIT = false;
+    static final float mmPerInch = 25.4f;
+    static final float mmTargetHeight = (6) * mmPerInch;
+    static final float halfField = 72 * mmPerInch;
+    static final float quadField = 36 * mmPerInch;
+    float phoneXRotate = 0;
+    boolean targetVisible = false;
+    List<VuforiaTrackable> allTrackables;
+    VuforiaTrackables targetsSkyStone = null;
 
     //Laser distance sensors
-    public static final double rightLaserThresh = 7;
-    public static final double rearLaserThresh = 7;
-    public static final double frontLaserThresh = 5;
-    public static DistanceSensor front, right, left, rear, cameraDis;
+    static final double rightLaserThresh = 7;
+    static final double rearLaserThresh = 7;
+    static final double frontLaserThresh = 5;
+    static DistanceSensor front, right, left, rear, cameraDis;
     double frontDis, rightDis, leftDis, rearDis, cameraDisDis;
     //global variables for localization and mecanums
-    public static double X = 0, Y = 0;
-    public static double stoneX = 0, stoneY = 0;
-    public static boolean stoneVisible = false;
-    public Corner corner = Corner.RedDepot;
-    public OOPO funcs;
-    public Encoders encode;
-    public boolean XVisible = true;
-    public boolean YVisible = true;
-    public ProtoConfig bahumut;
+    static double X = 0, Y = 0;
+    static double stoneX = 0, stoneY = 0;
+    static boolean stoneVisible = false;
+    private Corner corner = Corner.RedDepot;
+    OOPO funcs;
+    Encoders encode;
+    boolean XVisible = true;
+    boolean YVisible = true;
+    ProtoConfig bahumut;
     //Gyroscope variables
-    public BNO055IMU imu;
-    public double angleError = 0;
+    BNO055IMU imu;
+    double angleError = 0;
     BNO055IMU.Parameters gyrometers;
     //Global variables for speed and error
-    public static double speed = 0.75;
-    public double thresh = 1.5;
+    static double speed = 0.75;
+    double thresh = 1.5;
 
-    public Servo leftClaw, rightClaw;
+    Servo leftClaw, rightClaw;
 
     @Override
     public void runOpMode() {
@@ -92,7 +90,7 @@ public class Localization extends LinearOpMode {
         targetsSkyStone.deactivate();
     }
 
-    public void moveWithEncoder(double Xdest, double Ydest) {
+    void moveWithEncoder(double Xdest, double Ydest) {
         double Ydiff = Math.abs(Ydest - Y);
         double Xdiff = Math.abs(Xdest - X);
         encode.resetEncoders();
@@ -129,36 +127,7 @@ public class Localization extends LinearOpMode {
 
     }
 
-
-
-    /*public void gotoCoordinates(double Xdest, double Ydest, boolean turn) {
-        //the fucking finale :O
-        updatePosition();
-        if (turn) {
-            findRotationY();
-        }
-
-        while ((!(Y > Ydest - thresh && Y < Ydest + thresh) || !YVisible) && !isStopRequested()) {
-            updatePosition();
-            telemetry.addData("Pos (in)", "{X, Y} = %.1f, %.1f", X, Y);
-            telemetry.update();
-            gotoCordY(Y, Ydest);
-        }
-        funcs.stopNow();
-        updatePosition();
-        if (turn) {
-            findRotationX();
-        }
-        while ((!(X > Xdest - thresh && X < Xdest + thresh) || !XVisible) && !isStopRequested()) {
-            updatePosition();
-            telemetry.addData("Pos (in)", "{X, Y} = %.1f, %.1f", X, Y);
-            telemetry.update();
-            gotoCordX(X, Xdest);
-        }
-        funcs.stopNow();
-    }*/
-
-    public void turnToAngle(double dest, boolean left) {
+    void turnToAngle(double dest, boolean left) {
         double angle = getAngle();
         double thresha = 0.5;
         if (angle < 0) {
@@ -180,28 +149,29 @@ public class Localization extends LinearOpMode {
 
         funcs.stopNow();
     }
+    void turnToAngle(double dest) {
+        double angle = getAngle();
+        double thresha = 0.5;
+        if (angle < 0) {
+            angle = 360 - Math.abs(angle);
+        }
 
-    public void gotoCordX(double X, double Xdest) {
-        if (X > Xdest + thresh) {
-            funcs.absMove(180, speed, getAngle());
-        } else if (X < Xdest - thresh) {
-            funcs.absMove(0, speed, getAngle());
+        while(angle < dest-thresha || angle > dest+thresha && opModeIsActive()){
+            if(angle < dest-thresha){
+                funcs.absMove(0,0, -0.35);
+            }
+            else if(angle > dest+thresha){
+                funcs.absMove(0,0,0.35);
+            }
+            funcs.stopNow();
         }
     }
 
-    public void gotoCordY(double Y, double Ydest) {
-        if (Y < Ydest + thresh) {
-            funcs.absMove(270, speed, getAngle());
-        } else if (Y > Ydest - thresh) {
-            funcs.absMove(90, speed, getAngle());
-        }
-    }
-
-    public double getAngle() {
+    double getAngle() {
         return imu.getAngularOrientation(INTRINSIC, ZYX, DEGREES).firstAngle + angleError;
     }
 
-    public void updatePosition() {
+    void updatePosition() {
         frontDis = front.getDistance(DistanceUnit.INCH) + frontLaserThresh;
         rightDis = right.getDistance(DistanceUnit.INCH) + rightLaserThresh;
         leftDis = left.getDistance(DistanceUnit.INCH) + rightLaserThresh;
@@ -254,7 +224,6 @@ public class Localization extends LinearOpMode {
 
         for (int i = 0; i < 4; i++) {
             if (values[i] > 300) {
-
                 enabled[i] = false;
             }
         }
@@ -303,44 +272,17 @@ public class Localization extends LinearOpMode {
             }
         }
 
-    if(Math.abs(X)>70)
-
-    {
-        X = Xtemp;
-    }
-    if(Math.abs(Y)>70)
-
-    {
-        Y = Ytemp;
-    }
-}
-    /*public void findRotationY() {
-        switch (corner) {
-            case RedDepot:
-            case BlueDepot:
-                turnToAngle(0);
-                break;
-            case RedTri:
-            case BlueTri:
-                turnToAngle(180);
-                break;
+        if(Math.abs(X)>70)
+        {
+            X = Xtemp;
+        }
+        if(Math.abs(Y)>70)
+        {
+            Y = Ytemp;
         }
     }
 
-    public void findRotationX() {
-        switch (corner) {
-            case RedDepot:
-            case BlueTri:
-                turnToAngle(270);
-                break;
-            case BlueDepot:
-            case RedTri:
-                turnToAngle(90);
-                break;
-        }
-    }*/
-
-    public void initialize(HardwareMap hwmap){
+    void initialize(HardwareMap hwmap){
         float phoneYRotate;
         float phoneZRotate = 0;
         VuforiaLocalizer vuforia;
