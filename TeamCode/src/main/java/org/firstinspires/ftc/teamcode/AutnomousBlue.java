@@ -18,6 +18,22 @@ public class AutnomousBlue extends Localization {
         telemetry.update();
         sleep(5000);
         moveWithEncoder(50, 35);
+
+        boolean leftLimit = !bahumut.limitLeft.getState();
+        boolean rightLimit = !bahumut.limitRight.getState();
+
+        while(!leftLimit && opModeIsActive()){
+            funcs.absMove(0,0, 0.4);
+            leftLimit = !bahumut.limitLeft.getState();
+        }
+        funcs.stopNow();
+
+        while(!rightLimit && opModeIsActive()){
+            funcs.absMove(0,0, -0.4);
+            rightLimit = !bahumut.limitRight.getState();
+        }
+        funcs.stopNow();
+
         rightClaw.setPosition(0.75);
         leftClaw.setPosition(0.75);
         sleep(1500);

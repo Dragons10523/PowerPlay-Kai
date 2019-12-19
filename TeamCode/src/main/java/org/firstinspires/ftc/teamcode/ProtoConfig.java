@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -18,6 +19,7 @@ public class ProtoConfig {
     public DistanceSensor left, right, rear, front, cameraDis;
     public Servo leftClaw, rightClaw, blockIntake;
     public CRServo intake1, intake2;
+    DigitalChannel limitLeft, limitRight;
 
     private boolean reverseMotors = true;
 
@@ -46,6 +48,10 @@ public class ProtoConfig {
             rear = hwmap.get(DistanceSensor.class, "rearLazer");
             front = hwmap.get(DistanceSensor.class, "frontLazer");
             cameraDis = hwmap.get(DistanceSensor.class, "cameraLazer");
+            limitLeft = hwmap.get(DigitalChannel.class, "limitLeft");
+            limitRight = hwmap.get(DigitalChannel.class, "limitRight");
+            limitLeft.setMode(DigitalChannel.Mode.INPUT);
+            limitRight.setMode(DigitalChannel.Mode.INPUT);
         }catch (Exception e){
             Log.d("Config Error", e.getMessage());
         }

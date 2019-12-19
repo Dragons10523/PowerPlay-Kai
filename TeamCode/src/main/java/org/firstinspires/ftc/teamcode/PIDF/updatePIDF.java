@@ -20,8 +20,7 @@ public class updatePIDF extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        ProtoConfig config = new ProtoConfig();
-        config.init(hardwareMap);
+        ProtoConfig config = new ProtoConfig(hardwareMap);
         motors[0] = config.frontRight;
         motors[1] = config.frontLeft;
         motors[2] = config.rearRight;

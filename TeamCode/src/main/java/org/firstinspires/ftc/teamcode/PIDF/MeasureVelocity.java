@@ -13,8 +13,7 @@ import org.firstinspires.ftc.teamcode.ProtoConfig;
 public class MeasureVelocity extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        ProtoConfig config = new ProtoConfig();
-        config.init(hardwareMap);
+        ProtoConfig config = new ProtoConfig(hardwareMap);
 
         DcMotorEx[] motors = {config.frontLeft, config.frontRight,
                 config.rearLeft, config.rearRight
