@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.PIDF;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -10,7 +11,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import org.firstinspires.ftc.teamcode.ProtoConfig;
 
 @TeleOp(name = "UpdatePIDF")
-
+@Disabled
 public class updatePIDF extends LinearOpMode {
     final private static double P = 1.1294;
     final private static double I = 0.1129;

@@ -59,7 +59,7 @@ public class Localization extends LinearOpMode {
     static double stoneX = 0, stoneY = 0;
     static boolean stoneVisible = false;
     boolean choice = false;
-    private Corner corner = Corner.RedDepot;
+    Corner corner = Corner.RedDepot;
     OOPO funcs;
     Encoders encode;
     boolean XVisible = true;
@@ -147,16 +147,10 @@ public class Localization extends LinearOpMode {
     void turnToAngle(double dest, boolean left) {
         double angle = getAngle();
         double thresha = 0.6;
-        if (angle < 0) {
-            angle = 360 - Math.abs(angle);
-        }
 
         while (angle < dest - thresha || angle > dest + thresha) {
             angle = getAngle();
 
-            if (angle < 0) {
-                angle = 360 - Math.abs(angle);
-            }
             if (!left) {
                 funcs.move(0, 0, -0.35);
             } else {
@@ -169,16 +163,10 @@ public class Localization extends LinearOpMode {
     void turnToAngle(double dest, boolean left, double speed) {
         double angle = getAngle();
         double thresha = 0.5;
-        if (angle < 0) {
-            angle = 360 - Math.abs(angle);
-        }
 
         while (angle < dest - thresha || angle > dest + thresha) {
             angle = getAngle();
 
-            if (angle < 0) {
-                angle = 360 - Math.abs(angle);
-            }
             if (!left) {
                 funcs.move(90, speed, -0.35);
             } else {
@@ -192,23 +180,31 @@ public class Localization extends LinearOpMode {
     void turnToAngle(double dest) {
         double angle = getAngle();
         double thresha = 0.5;
-        if (angle < 0) {
-            angle = 360 - Math.abs(angle);
-        }
 
         while(angle < dest-thresha || angle > dest+thresha && opModeIsActive()){
             if(angle < dest-thresha){
-                funcs.absMove(0,0, -0.35);
+                funcs.move(0,0, -0.35);
             }
             else if(angle > dest+thresha){
-                funcs.absMove(0,0,0.35);
+                funcs.move(0,0,0.35);
             }
             funcs.stopNow();
         }
     }
 
     double getAngle() {
-        return imu.getAngularOrientation(INTRINSIC, ZYX, DEGREES).firstAngle + angleError;
+        double angle = imu.getAngularOrientation(INTRINSIC, ZYX, DEGREES).firstAngle + angleError;
+        double newAngle = 0;
+        if (angle < 0) {
+            newAngle = angle + 360 + 90;
+        } else if (angle > 0) {
+            newAngle = angle + 90;
+        }
+        else{
+            newAngle = 90;
+        }
+
+        return newAngle;
     }
 
     void updatePosition() {

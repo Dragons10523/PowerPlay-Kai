@@ -15,7 +15,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.INTRINSIC;
 
 @TeleOp(name="Encoder Drive Test")
-
+@Disabled
 public class EncoderDrive extends OpMode {
     private OOPO funcs;
     private Encoders encode;
