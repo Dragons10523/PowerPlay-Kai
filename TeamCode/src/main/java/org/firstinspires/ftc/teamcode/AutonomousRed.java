@@ -4,11 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@TeleOp(name = "BlueFoundation")
-public class AutnomousBlue extends Localization {
+@TeleOp(name = "RedFoundation")
+public class AutonomousRed extends Localization {
     @Override
     public void runOpMode(){
         initialize(hardwareMap);
+        setColor(Color.RED);
         if(left.getDistance(DistanceUnit.INCH) < 5 || right.getDistance(DistanceUnit.INCH) < 5){
             telemetry.addData("HEY", "Fix the F'in arms");
         }
@@ -23,7 +24,7 @@ public class AutnomousBlue extends Localization {
         telemetry.addData("X Y", X + " " + Y);
         telemetry.update();
         sleep(1000);
-        moveWithEncoder(50, 35);
+        moveWithEncoder(50, -35);
 
         boolean leftLimit = !leftLimitSwitch.getState();
 
@@ -37,14 +38,14 @@ public class AutnomousBlue extends Localization {
         leftClaw.setPosition(0.75);
         sleep(1500);
         updatePosition();
-        moveWithEncoder(X, 45);
+        moveWithEncoder(X, -45);
         sleep(1000);
-        turnToAngle(90, true, 0.4);
+        turnToAngle(270, false, 0.4);
 
         sleep(500);
 
-       rightClaw.setPosition(0);
-       leftClaw.setPosition(0);
+        rightClaw.setPosition(0);
+        leftClaw.setPosition(0);
 
         sleep(500);
         turnToAngle(0, false);
@@ -58,8 +59,8 @@ public class AutnomousBlue extends Localization {
         telemetry.addData("X Y", X + "   " + Y);
         telemetry.update();
 
-        moveWithEncoder(0, 39); //Closer to the middle
-        //moveWithEncoder(3, 64); //against the wall
+        //moveWithEncoder(0, -39); //Closer to the middle
+        moveWithEncoder(3, -64); //against the wall
 
         if(getAngle() > 1){
             choice = false; //turn right
@@ -68,7 +69,7 @@ public class AutnomousBlue extends Localization {
             choice = true; //turn left
         }
         else
-        turnToAngle(0, choice);
+            turnToAngle(0, choice);
         while(opModeIsActive());
 
     }

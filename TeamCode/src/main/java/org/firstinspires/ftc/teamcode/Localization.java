@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.content.Context;
-
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -33,6 +31,9 @@ public class Localization extends LinearOpMode {
     public enum Corner {
         BlueDepot, RedDepot, BlueTri, RedTri
     }
+    public enum Color {
+        RED, BLUE
+    }
 
     //Vuforia parameters
     static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
@@ -45,6 +46,7 @@ public class Localization extends LinearOpMode {
     boolean targetVisible = false;
     List<VuforiaTrackable> allTrackables;
     VuforiaTrackables targetsSkyStone = null;
+    Color color = Color.BLUE;
 
     //Laser distance sensors
     static final double rightLaserThresh = 7;
@@ -56,6 +58,7 @@ public class Localization extends LinearOpMode {
     static double X = 0, Y = 0;
     static double stoneX = 0, stoneY = 0;
     static boolean stoneVisible = false;
+    boolean choice = false;
     private Corner corner = Corner.RedDepot;
     OOPO funcs;
     Encoders encode;
@@ -69,6 +72,7 @@ public class Localization extends LinearOpMode {
     //Global variables for speed and error
     static double speed = 0.75;
     double thresh = 1.5;
+    DigitalChannel leftLimitSwitch;
 
     Servo leftClaw, rightClaw;
 
@@ -91,20 +95,30 @@ public class Localization extends LinearOpMode {
     }
 
     void moveWithEncoder(double Xdest, double Ydest) {
-        double Ydiff = Math.abs(Ydest - Y);
-        double Xdiff = Math.abs(Xdest - X);
+        double Ydiff = Math.abs(Math.abs(Ydest) - Math.abs(Y));
+        double Xdiff = Math.abs(Math.abs(Xdest) - Math.abs(X));
         encode.resetEncoders();
         double inches = encode.getInches();
+
+        double[] directions = {0, 180, 270, 90};
+
+        if(color == Color.BLUE) {
+            directions[0] = 180;
+            directions[1] = 0;
+            directions[2] = 90;
+            directions[3] = 270;
+        }
+
         if (Xdest > X) {
             while (!isStopRequested() && inches < Xdiff) {
                 inches = encode.getInches();
-                funcs.absMove(180, speed, getAngle());
+                funcs.absMove(directions[0], speed, getAngle());
             }
             funcs.stopNow();
         } else {
             while (!isStopRequested() && inches < Xdiff) {
                 inches = encode.getInches();
-                funcs.absMove(0, speed, getAngle());
+                funcs.absMove(directions[1], speed, getAngle());
             }
             funcs.stopNow();
         }
@@ -114,22 +128,25 @@ public class Localization extends LinearOpMode {
         if (Ydest > Y) {
             while (!isStopRequested() && inches < Ydiff) {
                 inches = encode.getInches();
-                funcs.absMove(90, speed, getAngle());
+                funcs.absMove(directions[2], speed, getAngle());
             }
             funcs.stopNow();
         } else {
             while (!isStopRequested() && inches < Ydiff) {
                 inches = encode.getInches();
-                funcs.absMove(270, speed, getAngle());
+                funcs.absMove(directions[3], speed, getAngle());
             }
             funcs.stopNow();
         }
 
     }
 
+
+
+
     void turnToAngle(double dest, boolean left) {
         double angle = getAngle();
-        double thresha = 0.5;
+        double thresha = 0.6;
         if (angle < 0) {
             angle = 360 - Math.abs(angle);
         }
@@ -149,6 +166,29 @@ public class Localization extends LinearOpMode {
 
         funcs.stopNow();
     }
+    void turnToAngle(double dest, boolean left, double speed) {
+        double angle = getAngle();
+        double thresha = 0.5;
+        if (angle < 0) {
+            angle = 360 - Math.abs(angle);
+        }
+
+        while (angle < dest - thresha || angle > dest + thresha) {
+            angle = getAngle();
+
+            if (angle < 0) {
+                angle = 360 - Math.abs(angle);
+            }
+            if (!left) {
+                funcs.move(90, speed, -0.35);
+            } else {
+                funcs.move(90, speed, 0.35);
+            }
+        }
+
+        funcs.stopNow();
+    }
+
     void turnToAngle(double dest) {
         double angle = getAngle();
         double thresha = 0.5;
@@ -172,7 +212,7 @@ public class Localization extends LinearOpMode {
     }
 
     void updatePosition() {
-        frontDis = front.getDistance(DistanceUnit.INCH) + frontLaserThresh;
+        frontDis = front.getDistance(DistanceUnit.INCH) +frontLaserThresh;
         rightDis = right.getDistance(DistanceUnit.INCH) + rightLaserThresh;
         leftDis = left.getDistance(DistanceUnit.INCH) + rightLaserThresh;
         rearDis = rear.getDistance(DistanceUnit.INCH) + rearLaserThresh;
@@ -203,16 +243,20 @@ public class Localization extends LinearOpMode {
         boolean[] enabled = {true, true, true, true};
         double rawangle = getAngle();
 
-        if (rawangle > -95 && rawangle < -85) {
+
+        if (rawangle > 80 && rawangle < 100) {
+            trueFront = leftDis;
+            trueRight = rearDis;
+            trueLeft = frontDis;
+            trueRear = rightDis;
+
+
+        } else if (rawangle > -95 && rawangle < -85) {
             trueFront = leftDis;
             trueRight = frontDis;
             trueLeft = leftDis;
             trueRear = rearDis;
-        } else if (rawangle > 85 && rawangle < 95) {
-            trueFront = rearDis;
-            trueRight = leftDis;
-            trueLeft = frontDis;
-            trueRear = leftDis;
+
         } else if (Math.abs(rawangle) > 175) {
             trueFront = leftDis;
             trueRight = leftDis;
@@ -221,15 +265,19 @@ public class Localization extends LinearOpMode {
         }
 
         double[] values = {trueFront, trueRear, trueRight, trueLeft};
-
         for (int i = 0; i < 4; i++) {
-            if (values[i] > 300) {
+            if (values[i] > 120) {
                 enabled[i] = false;
             }
         }
 
+        if(enabled[1] &&enabled[2]){
+            enabled[3] = false;
+        }
+        telemetry.addData("FrontLazer, RearLazer, RightLazer, LeftLazer", enabled[0] + " " + enabled[1] + " " + enabled[2]  + " " +  enabled[3]);
+
         if (enabled[2] && enabled[0]) {
-            corner = Corner.BlueDepot;
+            corner =Corner.BlueDepot ;
             Localization.X = -72 + values[2];
             Localization.Y = -72 + values[0];
         } else if ((enabled[3] && enabled[1])) {
@@ -242,10 +290,12 @@ public class Localization extends LinearOpMode {
             Localization.Y = -72 + values[0];
         } else if ((enabled[2] && enabled[1]) && !isStopRequested()) {
             corner = Corner.RedDepot;
-            Localization.X = -72 + values[2];
-            Localization.Y = 72 - values[1];
+            Localization.X = 72 - values[2];
+            Localization.Y = -72 + values[1];
         }else {
-            for (int i = 0; i < 5; i++) {
+            X = 15;
+            Y = 15;
+            /*for (int i = 0; i < 4; i++) {
                 if (enabled[i]) {
                     if (i == 1 || i == 2) {
                         Y = 72 - (values[1] + values[2]) / 2;
@@ -269,7 +319,7 @@ public class Localization extends LinearOpMode {
                         break;
                     }
                 }
-            }
+            }*/
         }
 
         if(Math.abs(X)>70)
@@ -299,6 +349,7 @@ public class Localization extends LinearOpMode {
         rear = bahumut.rear;
         leftClaw = bahumut.leftClaw;
         rightClaw = bahumut.rightClaw;
+        leftLimitSwitch = bahumut.limitLeft;
 
          VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
@@ -417,5 +468,12 @@ public class Localization extends LinearOpMode {
         angleError = -imu.getAngularOrientation(INTRINSIC, ZYX, DEGREES).firstAngle;
     }
 
+    public void setColor(Color c){
+        color = c;
+    }
+
+    public Color getColor() {
+        return color;
+    }
 }
 

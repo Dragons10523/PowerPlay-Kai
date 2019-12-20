@@ -66,6 +66,7 @@ public class GodMode extends OpMode {
         intake2.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
         lift.setPower(gamepad2.left_stick_y);
         horizontal.setPower(gamepad2.right_stick_y);
+
         telemetry.addData("X = ",localization.X + " Y = " + localization.Y);
         telemetry.addData("ServoLeft", leftClaw.getPosition());
         telemetry.addData("ServoRight", rightClaw.getPosition());
@@ -76,6 +77,9 @@ public class GodMode extends OpMode {
         telemetry.addData("rearLazer", localization.rearDis);
         telemetry.addData("cameraLazer", localization.cameraDisDis);
         telemetry.update();
+    }
+    double getAngle() {
+        return localization.imu.getAngularOrientation(INTRINSIC, ZYX, DEGREES).firstAngle + localization.angleError;
     }
 
     class buttonUpdates extends AsyncTask<Void, Void, Void>{
