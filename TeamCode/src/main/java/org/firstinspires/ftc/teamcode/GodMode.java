@@ -19,7 +19,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 public class GodMode extends OpMode {
 
     private Localization localization;
-    private OOPO.Relativity relative;
+    private MecanumDrive.Relativity relative;
     private DcMotor ramp1, ramp2, lift, horizontal;
     private CRServo intake1, intake2;
     private Servo leftClaw, rightClaw, blockintake;
@@ -52,7 +52,7 @@ public class GodMode extends OpMode {
     @Override
     public void loop() {
         localization.updatePosition();
-        if (relative == OOPO.Relativity.FIELD) {
+        if (relative == MecanumDrive.Relativity.FIELD) {
             telemetry.addData("Relativity", "FIELD");
             double a = localization.getAngle();
             telemetry.addData("Angle", a);
@@ -113,11 +113,11 @@ public class GodMode extends OpMode {
                 }
                 if(!gamepad1.y && lastY){
                     lastY = false;
-                    if(relative == OOPO.Relativity.ROBOT){
-                        relative = OOPO.Relativity.FIELD;
+                    if(relative == MecanumDrive.Relativity.ROBOT){
+                        relative = MecanumDrive.Relativity.FIELD;
                     }
                     else{
-                        relative = OOPO.Relativity.ROBOT;
+                        relative = MecanumDrive.Relativity.ROBOT;
                     }
                 }
                 else if(gamepad1.y){

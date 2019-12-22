@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Encoders;
-import org.firstinspires.ftc.teamcode.OOPO;
-import org.firstinspires.ftc.teamcode.ProtoConfig;
+import org.firstinspires.ftc.teamcode.HardwareConfig;
+import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
@@ -17,7 +17,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 @TeleOp(name="Encoder Drive Test")
 @Disabled
 public class EncoderDrive extends OpMode {
-    private OOPO funcs;
+    private MecanumDrive funcs;
     private Encoders encode;
     private double Inches = 0;
     double angleError;
@@ -25,7 +25,7 @@ public class EncoderDrive extends OpMode {
     private int goal = 24;
     @Override
     public void init() {
-        ProtoConfig robot = new ProtoConfig(hardwareMap);funcs = new OOPO(robot.frontLeft,robot.frontRight,robot.rearRight,robot.rearLeft);
+        HardwareConfig robot = new HardwareConfig(hardwareMap);funcs = new MecanumDrive(robot.frontLeft,robot.frontRight,robot.rearRight,robot.rearLeft);
         encode = new Encoders(robot.frontRight,robot.frontLeft, robot.rearRight, robot.rearLeft);
 
         encode.resetEncoders();

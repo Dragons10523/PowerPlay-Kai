@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.teamcode.OOPO.Relativity;
+
+import org.firstinspires.ftc.teamcode.MecanumDrive.Relativity;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
@@ -17,8 +17,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 @TeleOp(name = "TeleOP")
 public class Drive extends OpMode {
 
-    private ProtoConfig robot;
-    private OOPO funcs;
+    private HardwareConfig robot;
+    private MecanumDrive Mecanums;
     private static BNO055IMU imu;
     private static Relativity relative = Relativity.FIELD;
     private static double speed = 1;
@@ -26,40 +26,27 @@ public class Drive extends OpMode {
     private static Gamepad gp2;
     private AsyncTask lol;
     private static double angleError;
-    private Servo blockintake, leftClaw, rightClaw;
+    private static Servo blockintake, leftClaw, rightClaw;
 
     @Override
     public void init() {
-        robot = new ProtoConfig(hardwareMap);
-        funcs = new OOPO(robot.frontLeft, robot.frontRight, robot.rearRight, robot.rearLeft);
+        robot = new HardwareConfig(hardwareMap);
+
+        robot.initializeDriveTrain();
+        robot.initializeTools();
+
+        Mecanums = new MecanumDrive(new DriveTrain(robot.frontLeft, robot.frontRight, robot.rearRight, robot.rearLeft));
         blockintake = robot.blockIntake;
         leftClaw = robot.leftClaw;
         rightClaw = robot.rightClaw;
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
-        byte AXIS_MAP_CONFIG_BYTE = 0x6; //This is what to write to the AXIS_MAP_CONFIG register to swap x and z axes
-        byte AXIS_MAP_SIGN_BYTE = 0x1; //This is what to write to the AXIS_MAP_SIGN register to negate the z axis
-
-        imu.write8(BNO055IMU.Register.OPR_MODE,BNO055IMU.SensorMode.CONFIG.bVal & 0x0F);
-
-        ElapsedTime time = new ElapsedTime();
-        while(time.milliseconds()<100){telemetry.update();}
-        imu.write8(BNO055IMU.Register.AXIS_MAP_CONFIG,AXIS_MAP_CONFIG_BYTE & 0x0F);
-        imu.write8(BNO055IMU.Register.AXIS_MAP_SIGN,AXIS_MAP_SIGN_BYTE & 0x0F);
-        imu.write8(BNO055IMU.Register.OPR_MODE,BNO055IMU.SensorMode.IMU.bVal & 0x0F);
-        time.reset();
-        while(time.milliseconds()<100){telemetry.update();}
+        robot.initializeIMU();
+        imu = robot.imu;
 
         angleError = -imu.getAngularOrientation(INTRINSIC,ZYX,DEGREES).firstAngle;
         gp1 = gamepad1;
         gp2 = gamepad2;
-        lol = new buttonUpdates(parameters).execute();
+        lol = new buttonUpdates().execute();
     }
     @Override
     public void loop() {
@@ -67,10 +54,10 @@ public class Drive extends OpMode {
             telemetry.addData("Relativity", "FIELD");
             double a = getAngle();
             telemetry.addData("Angle", a);
-            funcs.absoluteMove(gamepad1.left_stick_y * speed, gamepad1.left_stick_x * speed, Math.toRadians(a), -gamepad1.right_stick_x * speed);
+            Mecanums.absoluteMove(gamepad1.left_stick_y * speed, gamepad1.left_stick_x * speed, Math.toRadians(a), -gamepad1.right_stick_x * speed);
         } else {
             telemetry.addData("Relativity", "ROBOT");
-            funcs.joystickMove(gamepad1.left_stick_y * speed, gamepad1.left_stick_x * speed, -gamepad1.right_stick_x * speed);
+            Mecanums.joystickMove(gamepad1.left_stick_y * speed, gamepad1.left_stick_x * speed, -gamepad1.right_stick_x * speed);
         }
 
         robot.ramp1.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
@@ -90,11 +77,9 @@ public class Drive extends OpMode {
     private double getAngle(){
         return imu.getAngularOrientation(INTRINSIC, ZYX, DEGREES).firstAngle +angleError;
     }
-    class buttonUpdates extends AsyncTask<Void, Void, Void>{
-        BNO055IMU.Parameters parameters;
-        buttonUpdates(BNO055IMU.Parameters para){
-            parameters = para;
-        }
+    static class buttonUpdates extends AsyncTask<Void, Void, Void>{
+
+
         @Override
         protected Void doInBackground(Void ... voids) {
             boolean lastX = false;
@@ -131,7 +116,6 @@ public class Drive extends OpMode {
                 }
                 if(!gamepad1.left_stick_button && lastLeftStick) {
                     lastLeftStick = false;
-                    Drive.imu.initialize(parameters);
                     angleError = -imu.getAngularOrientation(INTRINSIC, ZYX, DEGREES).firstAngle;
                 }
                 else if(gamepad1.left_stick_button){

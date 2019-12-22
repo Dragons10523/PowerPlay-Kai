@@ -2,13 +2,12 @@ package org.firstinspires.ftc.teamcode.PIDF;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
-import org.firstinspires.ftc.teamcode.ProtoConfig;
+import org.firstinspires.ftc.teamcode.HardwareConfig;
 
 @TeleOp(name = "UpdatePIDF")
 @Disabled
@@ -21,7 +20,7 @@ public class updatePIDF extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        ProtoConfig config = new ProtoConfig(hardwareMap);
+        HardwareConfig config = new HardwareConfig(hardwareMap);
         motors[0] = config.frontRight;
         motors[1] = config.frontLeft;
         motors[2] = config.rearRight;

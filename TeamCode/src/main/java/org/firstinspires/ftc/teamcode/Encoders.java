@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
@@ -9,11 +8,11 @@ public class Encoders{
     public static final double WHEEL_DIAMETER = 3.0;
     public DcMotorEx frontRight, frontLeft, rearRight, rearLeft;
 
-    public Encoders(DcMotorEx fr, DcMotorEx fl, DcMotorEx rr, DcMotorEx rl){
-        frontRight = fr;
-        frontLeft = fl;
-        rearRight = rr;
-        rearLeft = rl;
+    public Encoders(DriveTrain dt){
+        frontRight = dt.frontRight;
+        frontLeft = dt.frontLeft;
+        rearRight = dt.rearRight;
+        rearLeft = dt.rearLeft;
 
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

@@ -16,8 +16,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.YZX;
@@ -25,7 +27,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.INTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
-
+@Deprecated
 public class Localization extends LinearOpMode {
     //list of all the corners
     public enum Corner {
@@ -60,11 +62,11 @@ public class Localization extends LinearOpMode {
     static boolean stoneVisible = false;
     boolean choice = false;
     Corner corner = Corner.RedDepot;
-    OOPO funcs;
+    MecanumDrive funcs;
     Encoders encode;
     boolean XVisible = true;
     boolean YVisible = true;
-    ProtoConfig bahumut;
+    HardwareConfig bahumut;
     //Gyroscope variables
     BNO055IMU imu;
     double angleError = 0;
@@ -338,8 +340,8 @@ public class Localization extends LinearOpMode {
         VuforiaLocalizer vuforia;
 
 
-        bahumut = new ProtoConfig(hwmap);
-        funcs = new OOPO(bahumut.frontLeft, bahumut.frontRight, bahumut.rearRight, bahumut.rearLeft);
+        bahumut = new HardwareConfig(hwmap);
+        funcs = new MecanumDrive(bahumut.frontLeft, bahumut.frontRight, bahumut.rearRight, bahumut.rearLeft);
         encode = new Encoders(bahumut.frontRight, bahumut.frontLeft, bahumut.rearRight, bahumut.rearLeft);
         encode.resetEncoders();
         cameraDis = bahumut.cameraDis;

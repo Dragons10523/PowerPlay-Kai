@@ -1,18 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-
-public class OOPO {
+public class MecanumDrive {
     public DcMotorEx fl, fr, rr, rl;
 
-    public OOPO(DcMotorEx FL, DcMotorEx FR, DcMotorEx RR, DcMotorEx RL){
-        fl = FL;fr = FR;rr = RR;rl = RL;
+    public MecanumDrive(DriveTrain dt){
+        fl = dt.frontLeft;fr = dt.frontRight;rr = dt.rearRight;rl = dt.rearLeft;
     }
 
     public enum Relativity {
@@ -30,13 +24,6 @@ public class OOPO {
 
     }
 
-    public void move(double angle, double power){
-        double a = Math.toRadians(angle)- Math.PI/4;
-        fl.setPower(power * Math.sin(a));
-        rl.setPower(power * Math.cos(a));
-        fr.setPower(power * Math.cos(a));
-        rr.setPower(power * Math.sin(a));
-    }
     public void absMove(double angle, double power, double gyro){
         double a = Math.toRadians(angle)- Math.PI/4 + Math.toRadians(gyro);
         fl.setPower(power * Math.sin(a));
