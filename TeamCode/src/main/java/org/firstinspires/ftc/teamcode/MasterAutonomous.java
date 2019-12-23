@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name = "MasterAuto")
+@Disabled
 public class MasterAutonomous extends Localization {
     @Override
     public void runOpMode(){
@@ -52,7 +54,7 @@ public class MasterAutonomous extends Localization {
             updatePosition();
             moveWithEncoder(X, 45);
             sleep(1000);
-            turnToAngle(90, true, 0.4);
+            turnToAngle(180, true, 0.4);
 
             sleep(500);
 
@@ -60,7 +62,7 @@ public class MasterAutonomous extends Localization {
             leftClaw.setPosition(0);
 
             sleep(500);
-            turnToAngle(0, false);
+            turnToAngle(90, false);
             rightClaw.setPosition(0.5);
             leftClaw.setPosition(0.5);
             sleep(750);
@@ -81,7 +83,7 @@ public class MasterAutonomous extends Localization {
                 choice = true; //turn left
             }
             else
-                turnToAngle(0, choice);
+                turnToAngle(90, choice);
         }
 
         else{
@@ -109,7 +111,7 @@ public class MasterAutonomous extends Localization {
             updatePosition();
             moveWithEncoder(X, -45);
             sleep(1000);
-            turnToAngle(270, true, 0.4);
+            turnToAngle(0, true, 0.4);
 
             sleep(500);
 
@@ -117,7 +119,7 @@ public class MasterAutonomous extends Localization {
             leftClaw.setPosition(0);
 
             sleep(500);
-            turnToAngle(0, false);
+            turnToAngle(90, false);
             rightClaw.setPosition(0.5);
             leftClaw.setPosition(0.5);
             sleep(750);
@@ -138,7 +140,7 @@ public class MasterAutonomous extends Localization {
                 choice = true; //turn left
             }
             else
-                turnToAngle(0, choice);
+                turnToAngle(90, choice);
         }
 
     }

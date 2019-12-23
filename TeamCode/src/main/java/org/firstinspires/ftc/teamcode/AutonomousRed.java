@@ -17,8 +17,7 @@ public class AutonomousRed extends Localization {
         telemetry.update();
         waitForStart();
 
-        funcs.absMove(270, 0.45, getAngle());
-        sleep(500);
+
         funcs.stopNow();
 
         updatePosition();
@@ -33,13 +32,14 @@ public class AutonomousRed extends Localization {
             funcs.joystickMove(0,0, -0.1);
             leftLimit = !leftLimitSwitch.getState();
         }
+
         funcs.stopNow();
 
         rightClaw.setPosition(0.75);
         leftClaw.setPosition(0.75);
         sleep(1500);
         updatePosition();
-        moveWithEncoder(X, -45);
+        moveWithEncoder(X, -43);
         sleep(1000);
         turnToAngle(270, false, 0.4);
 
@@ -49,7 +49,7 @@ public class AutonomousRed extends Localization {
         leftClaw.setPosition(0);
 
         sleep(500);
-        turnToAngle(0, false);
+        turnToAngle(0, true, 0.35);
         rightClaw.setPosition(0.5);
         leftClaw.setPosition(0.5);
         sleep(750);
@@ -61,17 +61,8 @@ public class AutonomousRed extends Localization {
         telemetry.update();
 
         //moveWithEncoder(0, -39); //Closer to the middle
-        moveWithEncoder(3, -64); //against the wall
+        moveWithEncoder(0, -64); //against the wall
 
-        if(getAngle() > 1){
-            choice = false; //turn right
-        }
-        else if(getAngle() < -1){
-            choice = true; //turn left
-        }
-        else
-            turnToAngle(0, choice);
-        while(opModeIsActive());
 
     }
 }

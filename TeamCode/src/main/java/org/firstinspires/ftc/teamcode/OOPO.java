@@ -38,7 +38,7 @@ public class OOPO {
         rr.setPower(power * Math.sin(a));
     }
     public void absMove(double angle, double power, double gyro){
-        double a = Math.toRadians(angle)- Math.PI/2 + Math.toRadians(gyro);
+        double a = Math.toRadians(angle)- Math.PI/4 + Math.toRadians(gyro);
         fl.setPower(power * Math.sin(a));
         rl.setPower(power * Math.cos(a));
         fr.setPower(power * Math.cos(a));

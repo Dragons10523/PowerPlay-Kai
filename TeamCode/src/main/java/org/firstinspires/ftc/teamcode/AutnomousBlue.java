@@ -16,8 +16,7 @@ public class AutnomousBlue extends Localization {
         telemetry.update();
         waitForStart();
 
-        funcs.absMove(270, 0.45, getAngle());
-        sleep(500);
+
         funcs.stopNow();
 
         updatePosition();
@@ -44,11 +43,11 @@ public class AutnomousBlue extends Localization {
 
         sleep(500);
 
-       rightClaw.setPosition(0);
-       leftClaw.setPosition(0);
+        rightClaw.setPosition(0);
+        leftClaw.setPosition(0);
 
         sleep(500);
-        turnToAngle(0, false);
+        turnToAngle(0, false, 0.35);
         rightClaw.setPosition(0.5);
         leftClaw.setPosition(0.5);
         sleep(750);
@@ -61,16 +60,6 @@ public class AutnomousBlue extends Localization {
 
         moveWithEncoder(0, 39); //Closer to the middle
         //moveWithEncoder(3, 64); //against the wall
-
-        if(getAngle() > 1){
-            choice = false; //turn right
-        }
-        else if(getAngle() < -1){
-            choice = true; //turn left
-        }
-        else
-        turnToAngle(0, choice);
-        while(opModeIsActive());
 
     }
 }

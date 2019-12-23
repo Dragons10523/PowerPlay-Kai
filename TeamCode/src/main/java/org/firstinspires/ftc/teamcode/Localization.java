@@ -146,11 +146,17 @@ public class Localization extends LinearOpMode {
 
     void turnToAngle(double dest, boolean left) {
         double angle = getAngle();
-        double thresha = 0.6;
+        double thresha = 1.2;
+        if (angle < 0) {
+            angle = 360 - Math.abs(angle);
+        }
 
         while (angle < dest - thresha || angle > dest + thresha) {
             angle = getAngle();
 
+            if (angle < 0) {
+                angle = 360 - Math.abs(angle);
+            }
             if (!left) {
                 funcs.move(0, 0, -0.35);
             } else {
@@ -163,10 +169,16 @@ public class Localization extends LinearOpMode {
     void turnToAngle(double dest, boolean left, double speed) {
         double angle = getAngle();
         double thresha = 0.5;
+        if (angle < 0) {
+            angle = 360 - Math.abs(angle);
+        }
 
         while (angle < dest - thresha || angle > dest + thresha) {
             angle = getAngle();
 
+            if (angle < 0) {
+                angle = 360 - Math.abs(angle);
+            }
             if (!left) {
                 funcs.move(90, speed, -0.35);
             } else {
@@ -180,31 +192,23 @@ public class Localization extends LinearOpMode {
     void turnToAngle(double dest) {
         double angle = getAngle();
         double thresha = 0.5;
+        if (angle < 0) {
+            angle = 360 - Math.abs(angle);
+        }
 
         while(angle < dest-thresha || angle > dest+thresha && opModeIsActive()){
             if(angle < dest-thresha){
-                funcs.move(0,0, -0.35);
+                funcs.absMove(0,0, -0.35);
             }
             else if(angle > dest+thresha){
-                funcs.move(0,0,0.35);
+                funcs.absMove(0,0,0.35);
             }
             funcs.stopNow();
         }
     }
 
     double getAngle() {
-        double angle = imu.getAngularOrientation(INTRINSIC, ZYX, DEGREES).firstAngle + angleError;
-        double newAngle = 0;
-        if (angle < 0) {
-            newAngle = angle + 360 + 90;
-        } else if (angle > 0) {
-            newAngle = angle + 90;
-        }
-        else{
-            newAngle = 90;
-        }
-
-        return newAngle;
+        return imu.getAngularOrientation(INTRINSIC, ZYX, DEGREES).firstAngle + angleError;
     }
 
     void updatePosition() {
@@ -347,7 +351,7 @@ public class Localization extends LinearOpMode {
         rightClaw = bahumut.rightClaw;
         leftLimitSwitch = bahumut.limitLeft;
 
-         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         parameters.vuforiaLicenseKey = "AQkCE3T/////AAABmacf2GUqlUiet5GB5KP6epRTyl96EqEA9gcG1VI99J81/l4NkkwX6Nx/L7BTIL+1Z3R7yorhZ4YW1N6InBS7l7o8rKNgpbwWzBkfh3Unneq6h5xeyhbILzENlxNOVSibrronjr5199YlL3+PbMazXySVa5mnY2hXXO9CXcuv/pfEyCblbkFchA3D+Ngpkpg8CSbpkXeM6aKgGEXsnBZO7xUtE8p71aFIew1Coez3KBM5n12hoov/SdKC3O6GAcbMTX3A9wVZgACfXmw4F4Skgm/QjcfG9dOH0w7Wj3Ne6haXCVS13A2uYecamReSZZyT+BatU5nfh9t4KjRtgKGf/SMAJLIoBcbdYxBqiTmyG3WN";
 
@@ -472,4 +476,3 @@ public class Localization extends LinearOpMode {
         return color;
     }
 }
-
