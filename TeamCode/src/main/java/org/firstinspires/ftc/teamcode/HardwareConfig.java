@@ -61,7 +61,7 @@ public class HardwareConfig {
         distanceSensors[0] =    HWMAP.get(DistanceSensor.class, "leftLazer");
         distanceSensors[1] =    HWMAP.get(DistanceSensor.class, "rightLazer");
         distanceSensors[2] =    HWMAP.get(DistanceSensor.class, "rearLazer");
-        distanceSensors[3] =     HWMAP.get(DistanceSensor.class, "frontLazer");
+        distanceSensors[3] =    HWMAP.get(DistanceSensor.class, "frontLazer");
     }
 
     public void initializeLimitSwitches(){

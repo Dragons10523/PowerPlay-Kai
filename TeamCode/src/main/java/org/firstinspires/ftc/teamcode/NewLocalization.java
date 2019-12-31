@@ -24,10 +24,16 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 
 public class NewLocalization extends LinearOpMode {
 
+    final static double RobotWidth = 18;
+    final static double RobotHeight = 17;
+    final static double[] DistanceToEdge = {1, 1, 2, 1};
+
+
     DistanceSensor[] sensors;
 
     double X = 0, Y = 0;
-
+    BNO055IMU imu;
+    double angleError;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -35,16 +41,42 @@ public class NewLocalization extends LinearOpMode {
     }
 
     void updatePosition(){
-        double[] rawDistance = {0, 0, 0, 0};
+        double angle = getAngle();
+
+        Distance[] rawDistance = {new Distance(0), new Distance(0), new Distance(0), new Distance(0)};
         for(int i =0; i < sensors.length; i++){
-            rawDistance[i] = sensors[i].getDistance(DistanceUnit.INCH);
+            rawDistance[i].setDis(sensors[i].getDistance(DistanceUnit.INCH));
+            if(rawDistance[i].getDis() >= 80){
+                rawDistance[i].setEnable(false);
+            }
         }
+
+        double[] RobotDistance = {}
 
         final double lastX;
         final double lastY;
 
 
 
+
+
+    }
+
+    double getAngle(){
+        double ang = imu.getAngularOrientation(AxesReference.INTRINSIC, ZYX, AngleUnit.DEGREES).firstAngle + angleError;
+        double newangle = 0;
+
+        if(ang < 0 && ang > -90){
+            newangle = 90-Math.abs(ang);
+        }
+        else if(ang < -90){
+            newangle = 450 - Math.abs(ang);
+        }
+        else if(ang > 0){
+            newangle = 90 + Math.abs(ang);
+        }
+
+        return newangle;
     }
 
     void init(HardwareMap hwmap, boolean limitS){
@@ -70,9 +102,9 @@ public class NewLocalization extends LinearOpMode {
 
         robot.initializeIMU();
 
-        BNO055IMU imu = robot.imu;
+        imu = robot.imu;
 
-        double angleError = -imu.getAngularOrientation(AxesReference.INTRINSIC, ZYX, AngleUnit.DEGREES).firstAngle;
+        angleError = -imu.getAngularOrientation(AxesReference.INTRINSIC, ZYX, AngleUnit.DEGREES).firstAngle;
     }
 
 

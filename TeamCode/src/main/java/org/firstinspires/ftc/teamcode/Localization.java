@@ -110,7 +110,6 @@ public class Localization extends LinearOpMode {
             directions[2] = 90;
             directions[3] = 270;
         }
-
         if (Xdest > X) {
             while (!isStopRequested() && inches < Xdiff) {
                 inches = encode.getInches();
