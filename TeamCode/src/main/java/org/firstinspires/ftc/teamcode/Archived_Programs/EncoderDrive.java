@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.DriveTrain;
 import org.firstinspires.ftc.teamcode.Encoders;
 import org.firstinspires.ftc.teamcode.HardwareConfig;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
@@ -25,8 +26,10 @@ public class EncoderDrive extends OpMode {
     private int goal = 24;
     @Override
     public void init() {
-        HardwareConfig robot = new HardwareConfig(hardwareMap);funcs = new MecanumDrive(robot.frontLeft,robot.frontRight,robot.rearRight,robot.rearLeft);
-        encode = new Encoders(robot.frontRight,robot.frontLeft, robot.rearRight, robot.rearLeft);
+        HardwareConfig robot = new HardwareConfig(hardwareMap);
+        DriveTrain dt = new DriveTrain(robot.frontLeft, robot.frontRight, robot.rearRight, robot.rearLeft);
+        funcs = new MecanumDrive(dt);
+        encode = new Encoders(dt);
 
         encode.resetEncoders();
         Inches = encode.getInches();

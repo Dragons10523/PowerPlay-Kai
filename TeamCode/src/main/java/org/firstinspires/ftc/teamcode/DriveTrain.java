@@ -3,9 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public class DriveTrain {
-    DcMotorEx frontLeft, frontRight, rearLeft, rearRight;
+    public DcMotorEx frontLeft, frontRight, rearLeft, rearRight;
 
-    DriveTrain(DcMotorEx fl, DcMotorEx fr, DcMotorEx rl, DcMotorEx rr){
+    public DriveTrain(DcMotorEx fl, DcMotorEx fr, DcMotorEx rl, DcMotorEx rr){
         frontLeft   = fl;
         frontRight  = fr;
         rearLeft    = rl;

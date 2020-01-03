@@ -139,7 +139,6 @@ public class Localization extends LinearOpMode {
             }
             funcs.stopNow();
         }
-
     }
 
 
@@ -340,14 +339,14 @@ public class Localization extends LinearOpMode {
 
 
         bahumut = new HardwareConfig(hwmap);
-        funcs = new MecanumDrive(bahumut.frontLeft, bahumut.frontRight, bahumut.rearRight, bahumut.rearLeft);
-        encode = new Encoders(bahumut.frontRight, bahumut.frontLeft, bahumut.rearRight, bahumut.rearLeft);
+        DriveTrain dt= new DriveTrain(bahumut.frontLeft, bahumut.frontRight, bahumut.rearLeft, bahumut.rearRight);
+        funcs = new MecanumDrive(dt);
+        encode = new Encoders(dt);
         encode.resetEncoders();
-        cameraDis = bahumut.cameraDis;
-        front = bahumut.front;
-        right = bahumut.right;
-        left = bahumut.left;
-        rear = bahumut.rear;
+        front = bahumut.distanceSensors[0];
+        right = bahumut.distanceSensors[1];
+        left = bahumut.distanceSensors[2];
+        rear = bahumut.distanceSensors[3];
         leftClaw = bahumut.leftClaw;
         rightClaw = bahumut.rightClaw;
         leftLimitSwitch = bahumut.limitLeft;

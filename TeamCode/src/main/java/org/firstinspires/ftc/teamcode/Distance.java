@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 public class Distance {
-    static double dis = 0;
-    static boolean enable = true;
+     double dis = 0;
+     boolean enable = true;
     Distance(double d){
-        dis = 0;
+        this.dis = 0;
     }
     void disable(){
         enable = false;
@@ -13,10 +13,10 @@ public class Distance {
         enable = true;
     }
     void setDis(double d){
-        dis = d;
+        this.dis = d;
     }
     double getDis(){
-        return dis;
+        return this.dis;
     }
 
     void setEnable(boolean b){
