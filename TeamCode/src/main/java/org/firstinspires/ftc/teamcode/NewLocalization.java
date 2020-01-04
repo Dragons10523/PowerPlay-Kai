@@ -88,11 +88,9 @@ public class NewLocalization extends LinearOpMode {
         telemetry.addData("Rear", rawDistance[2].getDis());
 
         double[] distance = {rawDistance[0].getDis(), rawDistance[1].getDis(), rawDistance[2].getDis(), rawDistance[3].getDis()};
-
         double[] formattedDis = new double[4];
 
         for(int i = 0; i < distance.length; i++){
-
                 if(i != 2) {
                     formattedDis[i] = (distance[i] + distanceThresh[i]) * Math.cos(Math.toRadians(angleDif));
                     telemetry.addData("Sensor" + i, formattedDis[i]);
@@ -102,7 +100,6 @@ public class NewLocalization extends LinearOpMode {
                     formattedDis[i] = diagDis*Math.cos(Math.toRadians(angleDif)) + distance[i]*Math.cos(Math.toRadians(angleDif));;
                     telemetry.addData("Sensor" + i, formattedDis[i]);
                 }
-
         }
 
         final double lastX;
@@ -112,7 +109,22 @@ public class NewLocalization extends LinearOpMode {
         double X;
         double Y;
 
-        Y =
+        switch(aQuad){
+            case III:
+            case I:
+                Y = 72 - formattedDis[2] - formattedDis[3];
+                break;
+            case II:
+            case IV:
+                Y = 72 - formattedDis[1] - formattedDis[4];
+                break;
+        }
+
+        switch(aQuad){
+            case I:
+            case III:
+
+        }
 
 
 
