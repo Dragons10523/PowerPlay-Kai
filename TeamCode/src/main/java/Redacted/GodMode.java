@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package Redacted;
 
 import android.os.AsyncTask;
 
@@ -11,11 +11,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.MecanumDrive;
+
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.INTRINSIC;
 @TeleOp(name = "GOD-MODE")
 @Disabled
+@Deprecated
 public class GodMode extends OpMode {
 
     private Localization localization;
@@ -27,6 +30,7 @@ public class GodMode extends OpMode {
     private AsyncTask lol;
     private double speed = 1;
     @Override
+
     public void init() {
         localization = new Localization();
         localization.initialize(hardwareMap);

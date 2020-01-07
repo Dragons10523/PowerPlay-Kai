@@ -15,11 +15,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class HardwareConfig {
     //All Hardware Devices
     public DcMotorEx frontRight, frontLeft, rearRight, rearLeft, ramp1, ramp2, lift, horizontal;
-    DistanceSensor[] distanceSensors;
-    Servo leftClaw, rightClaw, blockIntake;
-    CRServo intake1, intake2;
-    DigitalChannel limitLeft;
-    BNO055IMU imu;
+    public DistanceSensor[] distanceSensors;
+    public Servo leftClaw, rightClaw, blockIntake;
+    public CRServo intake1, intake2;
+    public DigitalChannel limitLeft;
+    public BNO055IMU imu;
 
     HardwareMap HWMAP;
 

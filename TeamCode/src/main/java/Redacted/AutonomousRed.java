@@ -1,10 +1,13 @@
-package org.firstinspires.ftc.teamcode;
+package Redacted;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Autonomous(name = "RedFoundation")
+@Disabled
+@Deprecated
 public class AutonomousRed extends Localization {
     @Override
     public void runOpMode(){

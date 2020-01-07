@@ -1,10 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package Redacted;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name = "Coordinates")
 @Disabled
+@Deprecated
 public class Coordinates extends Localization {
     @Override
     public void runOpMode(){

@@ -1,9 +1,13 @@
-package org.firstinspires.ftc.teamcode;
+package Redacted;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Autonomous(name = "BluePark")
-public class BluePark extends Localization{
+@Disabled
+@Deprecated
+
+public class BluePark extends Localization {
     @Override
     public void runOpMode(){
         initialize(hardwareMap);

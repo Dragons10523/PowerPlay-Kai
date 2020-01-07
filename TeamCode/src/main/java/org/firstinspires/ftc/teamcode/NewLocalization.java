@@ -35,6 +35,7 @@ public class NewLocalization extends LinearOpMode {
     double X = 0, Y = 0;
     BNO055IMU imu;
     double angleError;
+    MecanumDrive mecanums;
 
     enum angleQuad{
         I,II,III,IV
@@ -91,14 +92,17 @@ public class NewLocalization extends LinearOpMode {
         double[] formattedDis = new double[4];
 
         for(int i = 0; i < distance.length; i++){
-                if(i != 2) {
+                if(i != 2 && distance[i] != 0) {
                     formattedDis[i] = (distance[i] + distanceThresh[i]) * Math.cos(Math.toRadians(angleDif));
                     telemetry.addData("Sensor" + i, formattedDis[i]);
                 }
-                else{
+                else if(distance[i] != 0){
                     double diagDis = 10.35;
                     formattedDis[i] = diagDis*Math.cos(Math.toRadians(angleDif)) + distance[i]*Math.cos(Math.toRadians(angleDif));;
                     telemetry.addData("Sensor" + i, formattedDis[i]);
+                }
+                else{
+                    formattedDis[i] = 0;
                 }
         }
 
@@ -106,28 +110,37 @@ public class NewLocalization extends LinearOpMode {
         final double lastY;
 
 
-        double X;
-        double Y;
+        double X = 0;
+        double Y = 0;
 
         switch(aQuad){
             case III:
             case I:
-                Y = 72 - formattedDis[2] - formattedDis[3];
+                Y = 72 - formattedDis[1] - formattedDis[0];
                 break;
             case II:
             case IV:
-                Y = 72 - formattedDis[1] - formattedDis[4];
+                Y = 72 - formattedDis[2] - formattedDis[3];
                 break;
         }
 
         switch(aQuad){
             case I:
+                X = isEnabled(formattedDis[2])*(72-formattedDis[2]) + isEnabled(formattedDis[3])*(-72+formattedDis[3]);
+                break;
             case III:
-
+                X = isEnabled(formattedDis[2])*(-72+formattedDis[2]) + isEnabled(formattedDis[3])*(72-formattedDis[3]);
+                break;
+            case II:
+                X =isEnabled(formattedDis[1])*(-72+formattedDis[1]) + isEnabled(formattedDis[0])*(72-formattedDis[1]);
+                break;
+            case IV:
+                X =isEnabled(formattedDis[1])*(72-formattedDis[1]) + isEnabled(formattedDis[0])*(-72+formattedDis[1]);
+                break;
         }
 
-
-
+        telemetry.addData("X", X);
+        telemetry.addData("Y", Y);
     }
 
     double getAngle(){
@@ -158,8 +171,8 @@ public class NewLocalization extends LinearOpMode {
             DigitalChannel limitSwitchh = robot.limitLeft;
         }
 
-        DriveTrain dt = new DriveTrain(robot.frontLeft, robot.frontRight, robot.rearRight, robot.rearLeft);
-        MecanumDrive mecanums = new MecanumDrive(dt);
+        DriveTrain dt = new DriveTrain(robot.frontLeft, robot.frontRight, robot.rearLeft, robot.rearRight);
+        mecanums = new MecanumDrive(dt);
         Encoders encoders = new Encoders(dt);
 
         encoders.resetEncoders();
@@ -176,5 +189,31 @@ public class NewLocalization extends LinearOpMode {
         angleError = -imu.getAngularOrientation(AxesReference.INTRINSIC, ZYX, AngleUnit.DEGREES).firstAngle;
     }
 
+
+    double isEnabled(double val){
+        if(val > 0) return 1;
+        else return 0;
+    }
+
+    void turnToAngle(double dest){
+        double currentAng = getAngle();
+        double thresh = 1.5;
+
+        while(currentAng < dest + thresh || currentAng > dest - thresh){
+            double speed = (-1.6/((Math.abs(currentAng-dest))+3))+0.45;
+            telemetry.addData("Angle", currentAng);
+            telemetry.addData("Speed", speed);
+            telemetry.update();
+            if(dest - currentAng > currentAng - dest){
+                mecanums.move(0, 0, speed);
+            }
+            else{
+                mecanums.move(0, 0, -speed);
+            }
+            currentAng = getAngle();
+        }
+        mecanums.stopNow();
+
+    }
 
 }
