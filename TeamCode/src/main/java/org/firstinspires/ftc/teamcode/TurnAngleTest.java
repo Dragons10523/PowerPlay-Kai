@@ -8,7 +8,7 @@ public class TurnAngleTest extends NewLocalization{
     public void runOpMode(){
         init(hardwareMap, false);
         waitForStart();
-        turnToAngle(180);
+        turnToAngle(270);
         telemetry.update();
     }
 }

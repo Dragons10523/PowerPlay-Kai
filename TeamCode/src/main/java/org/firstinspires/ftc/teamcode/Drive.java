@@ -19,14 +19,14 @@ public class Drive extends OpMode {
 
     private HardwareConfig robot;
     private MecanumDrive Mecanums;
-    private static BNO055IMU imu;
-    private static Relativity relative = Relativity.FIELD;
-    private static double speed = 1;
-    private static Gamepad gp1;
-    private static Gamepad gp2;
+    private BNO055IMU imu;
+    private Relativity relative = Relativity.FIELD;
+    private double speed = 1;
+    private Gamepad gp1;
+    private Gamepad gp2;
     private AsyncTask lol;
-    private static double angleError;
-    private static Servo blockintake, leftClaw, rightClaw;
+    private double angleError;
+    private Servo blockintake, leftClaw, rightClaw;
 
     @Override
     public void init() {
@@ -77,7 +77,7 @@ public class Drive extends OpMode {
     private double getAngle(){
         return imu.getAngularOrientation(INTRINSIC, ZYX, DEGREES).firstAngle +angleError;
     }
-    static class buttonUpdates extends AsyncTask<Void, Void, Void>{
+     class buttonUpdates extends AsyncTask<Void, Void, Void>{
 
 
         @Override
@@ -88,15 +88,15 @@ public class Drive extends OpMode {
             boolean lastA = false;
             boolean lastLeftBump = false;
             boolean lastRightBump = false;
-            Gamepad gamepad1 = Drive.gp1;
-            Gamepad gamepad2 = Drive.gp2;
-            while(true){
+            Gamepad gamepad1 = gp1;
+            Gamepad gamepad2 = gp2;
+            while(!this.isCancelled()){
                 if(!gamepad1.x && lastX){
                     lastX =false;
-                    if (Drive.speed == 1) {
-                        Drive.speed = 0.5;
+                    if (speed == 1) {
+                        speed = 0.5;
                     } else {
-                        Drive.speed = 1;
+                        speed = 1;
                     }
                 }
                 else if(gamepad1.x){
@@ -104,11 +104,11 @@ public class Drive extends OpMode {
                 }
                 if(!gamepad1.y && lastY){
                     lastY = false;
-                    if(Drive.relative == Relativity.ROBOT){
-                        Drive.relative = Relativity.FIELD;
+                    if(relative == Relativity.ROBOT){
+                        relative = Relativity.FIELD;
                     }
                     else{
-                        Drive.relative = Relativity.ROBOT;
+                        relative = Relativity.ROBOT;
                     }
                 }
                 else if(gamepad1.y){
@@ -159,6 +159,7 @@ public class Drive extends OpMode {
                     lastRightBump = true;
                 }
             }
+        return null;
         }
 
     }

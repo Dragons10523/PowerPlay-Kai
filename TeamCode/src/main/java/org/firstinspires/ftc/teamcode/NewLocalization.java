@@ -36,6 +36,7 @@ public class NewLocalization extends LinearOpMode {
     BNO055IMU imu;
     double angleError;
     MecanumDrive mecanums;
+    Encoders encoders;
 
     enum angleQuad{
         I,II,III,IV
@@ -132,10 +133,10 @@ public class NewLocalization extends LinearOpMode {
                 X = isEnabled(formattedDis[2])*(-72+formattedDis[2]) + isEnabled(formattedDis[3])*(72-formattedDis[3]);
                 break;
             case II:
-                X =isEnabled(formattedDis[1])*(-72+formattedDis[1]) + isEnabled(formattedDis[0])*(72-formattedDis[1]);
+                X =isEnabled(formattedDis[1])*(-72+formattedDis[1]) + isEnabled(formattedDis[0])*(72-formattedDis[0]);
                 break;
             case IV:
-                X =isEnabled(formattedDis[1])*(72-formattedDis[1]) + isEnabled(formattedDis[0])*(-72+formattedDis[1]);
+                X =isEnabled(formattedDis[1])*(72-formattedDis[1]) + isEnabled(formattedDis[0])*(-72+formattedDis[0]);
                 break;
         }
 
@@ -173,7 +174,7 @@ public class NewLocalization extends LinearOpMode {
 
         DriveTrain dt = new DriveTrain(robot.frontLeft, robot.frontRight, robot.rearLeft, robot.rearRight);
         mecanums = new MecanumDrive(dt);
-        Encoders encoders = new Encoders(dt);
+        encoders = new Encoders(dt);
 
         encoders.resetEncoders();
 
@@ -196,11 +197,14 @@ public class NewLocalization extends LinearOpMode {
     }
 
     void turnToAngle(double dest){
-        double currentAng = getAngle();
         double thresh = 1.5;
+        double currentAng = getAngle();
 
         while(currentAng < dest + thresh || currentAng > dest - thresh){
             double speed = (-1.6/((Math.abs(currentAng-dest))+3))+0.45;
+            if(speed < 0.05){
+                break;
+            }
             telemetry.addData("Angle", currentAng);
             telemetry.addData("Speed", speed);
             telemetry.update();
@@ -213,7 +217,57 @@ public class NewLocalization extends LinearOpMode {
             currentAng = getAngle();
         }
         mecanums.stopNow();
+    }
+    void turnToAngle(double dest, double power){
+        double thresh = 1.5;
+        double currentAng = getAngle();
 
+        while(currentAng < dest + thresh || currentAng > dest - thresh){
+            double speed = (-1.6/((Math.abs(currentAng-dest))+3))+0.45;
+            if(speed < 0.05){
+                break;
+            }
+            telemetry.addData("Angle", currentAng);
+            telemetry.addData("Speed", speed);
+            telemetry.update();
+            if(dest - currentAng > currentAng - dest){
+                mecanums.move(0, power, speed);
+            }
+            else{
+                mecanums.move(0, power, -speed);
+            }
+            currentAng = getAngle();
+        }
+        mecanums.stopNow();
+    }
+
+    void moveWithEncoder(double Xdest, double Ydest){
+        double Xdiff = 144 - Xdest - X;
+        double Ydiff = Math.abs(Ydest - Y);
+        encoders.resetEncoders();
+        double speed = 0.6;
+
+        double inches = encoders.getInches();
+        double Xdir = 0;
+        double Ydir = 90;
+
+        if(X < Xdest){
+            Xdir = 180;
+        }
+
+        if(Y < Ydest){
+            Ydir = 270;
+        }
+        while(opModeIsActive() && inches < Xdiff){
+            inches = encoders.getInches();
+            mecanums.absMove(Xdir, speed, getAngle());
+        }
+
+        while(opModeIsActive() && inches < Ydiff){
+            inches = encoders.getInches();
+            mecanums.absMove(Ydir, speed, getAngle());
+        }
+        mecanums.stopNow();
     }
 
 }
