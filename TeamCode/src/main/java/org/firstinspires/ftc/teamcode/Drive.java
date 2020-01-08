@@ -152,7 +152,7 @@ public class Drive extends OpMode {
                         rightClaw.setPosition(0);
                     }
                     else{
-                        rightClaw.setPosition(0.75);
+                        rightClaw.setPosition(0.85);
                     }
                 }
                 else if(gamepad1.right_bumper){

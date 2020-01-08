@@ -111,8 +111,8 @@ public class NewLocalization extends LinearOpMode {
         final double lastY;
 
 
-        double X = 0;
-        double Y = 0;
+         X = 0;
+         Y = 0;
 
         switch(aQuad){
             case III:
@@ -242,10 +242,16 @@ public class NewLocalization extends LinearOpMode {
     }
 
     void moveWithEncoder(double Xdest, double Ydest){
-        double Xdiff = 144 - Xdest - X;
+        double Xdiff = Math.abs(Math.abs(Xdest + 72) - Math.abs(X + 72));
         double Ydiff = Math.abs(Ydest - Y);
         encoders.resetEncoders();
         double speed = 0.6;
+
+
+        telemetry.clearAll();
+        telemetry.addData("Xdiff, Ydiff", Xdiff + "  " + Ydiff);
+        telemetry.update();
+        sleep(2000);
 
         double inches = encoders.getInches();
         double Xdir = 0;
