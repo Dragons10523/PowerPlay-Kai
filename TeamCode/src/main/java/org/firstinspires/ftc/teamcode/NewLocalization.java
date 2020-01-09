@@ -25,12 +25,11 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 @TeleOp(name="NewLocal")
 public class NewLocalization extends LinearOpMode {
 
-    final static double RobotWidth = 18;
-    final static double RobotHeight = 17;
     final static double[] distanceThresh ={7, 7, 0, 6.5};
 
 
     DistanceSensor[] sensors;
+    Servo rightClaw, leftClaw;
 
     double X = 0, Y = 0;
     BNO055IMU imu;
@@ -79,17 +78,15 @@ public class NewLocalization extends LinearOpMode {
 
         telemetry.addData("Angle Diff", angleDif);
 
-        Distance[] rawDistance = {new Distance(0), new Distance(0), new Distance(0), new Distance(0)};
+        double[] distance = new double[4];
         for(int i =0; i < sensors.length; i++){
-                rawDistance[i].setDis(sensors[i].getDistance(DistanceUnit.INCH));
-                telemetry.addData("RawDistance", rawDistance[i].getDis());
-                if (rawDistance[i].getDis() >= 80) {
-                    rawDistance[i].setDis(0);
+            distance[i] = sensors[i].getDistance(DistanceUnit.INCH);
+            if (distance[i] >= 80) {
+                distance[i] = 0;
             }
+            telemetry.addData("Real " + i, distance[i]);
         }
-        telemetry.addData("Rear", rawDistance[2].getDis());
 
-        double[] distance = {rawDistance[0].getDis(), rawDistance[1].getDis(), rawDistance[2].getDis(), rawDistance[3].getDis()};
         double[] formattedDis = new double[4];
 
         for(int i = 0; i < distance.length; i++){
@@ -106,9 +103,6 @@ public class NewLocalization extends LinearOpMode {
                     formattedDis[i] = 0;
                 }
         }
-
-        final double lastX;
-        final double lastY;
 
 
          X = 0;
@@ -166,6 +160,7 @@ public class NewLocalization extends LinearOpMode {
         robot.initializeDriveTrain();
         robot.initializeDistanceSensors();
         robot.initializeIMU();
+        robot.initializeServos();
         sensors = new DistanceSensor[4];
         if(limitS) {
             robot.initializeLimitSwitches();
@@ -180,8 +175,8 @@ public class NewLocalization extends LinearOpMode {
 
         System.arraycopy(robot.distanceSensors, 0, sensors, 0, robot.distanceSensors.length);
 
-        Servo leftClaw = robot.leftClaw;
-        Servo rightClaw = robot.rightClaw;
+        leftClaw = robot.leftClaw;
+        rightClaw = robot.rightClaw;
 
         robot.initializeIMU();
 
@@ -189,7 +184,6 @@ public class NewLocalization extends LinearOpMode {
 
         angleError = -imu.getAngularOrientation(AxesReference.INTRINSIC, ZYX, AngleUnit.DEGREES).firstAngle;
     }
-
 
     double isEnabled(double val){
         if(val > 0) return 1;
@@ -231,10 +225,10 @@ public class NewLocalization extends LinearOpMode {
             telemetry.addData("Speed", speed);
             telemetry.update();
             if(dest - currentAng > currentAng - dest){
-                mecanums.move(0, power, speed);
+                mecanums.move(270, power, speed);
             }
             else{
-                mecanums.move(0, power, -speed);
+                mecanums.move(270, power, -speed);
             }
             currentAng = getAngle();
         }
@@ -268,6 +262,7 @@ public class NewLocalization extends LinearOpMode {
             inches = encoders.getInches();
             mecanums.absMove(Xdir, speed, getAngle());
         }
+        encoders.resetEncoders();
 
         while(opModeIsActive() && inches < Ydiff){
             inches = encoders.getInches();

@@ -17,16 +17,22 @@ public class Autonomous extends NewLocalization {
 
         sleep(1000);
 
-        moveWithEncoder(50, 35);
+        moveWithEncoder(50, 30);
+        rightClaw.setPosition(0.85);
+        leftClaw.setPosition(0.75);
+
 
         updatePosition();
-
-        sleep(1000);
+        telemetry.addData("X Y", X + " " + Y);
+        telemetry.update();
+        sleep(2500);
 
         turnToAngle(180, 0.4);
-        sleep(500);
+        rightClaw.setPosition(0.85);
+        leftClaw.setPosition(0.75);
+        sleep(1000);
 
-        turnToAngle(90, 0.35);
+        turnToAngle(90);
 
         updatePosition();
 
@@ -35,7 +41,7 @@ public class Autonomous extends NewLocalization {
         telemetry.addData("X Y", X + "   " + Y);
         telemetry.update();
 
-        moveWithEncoder(0, 39);
+        moveWithEncoder(0, 55);
 
     }
 }

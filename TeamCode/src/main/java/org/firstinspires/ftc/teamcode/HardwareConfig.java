@@ -84,7 +84,9 @@ public class HardwareConfig {
 
         ramp1 =         HWMAP.get(DcMotorEx.class, "ramp1");
         ramp2 =         HWMAP.get(DcMotorEx.class, "ramp2");
+    }
 
+    public void initializeServos(){
         leftClaw =      HWMAP.get(Servo.class, "leftClaw");
         leftClaw.setDirection(Servo.Direction.REVERSE);
         rightClaw =     HWMAP.get(Servo.class, "rightClaw");

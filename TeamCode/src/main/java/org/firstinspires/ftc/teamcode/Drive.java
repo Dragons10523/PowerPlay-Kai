@@ -34,6 +34,7 @@ public class Drive extends OpMode {
 
         robot.initializeDriveTrain();
         robot.initializeTools();
+        robot.initializeServos();
 
         Mecanums = new MecanumDrive(new DriveTrain(robot.frontLeft, robot.frontRight, robot.rearLeft, robot.rearRight));
         blockintake = robot.blockIntake;
