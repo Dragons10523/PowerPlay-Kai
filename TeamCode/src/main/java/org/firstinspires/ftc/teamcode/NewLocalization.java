@@ -225,10 +225,10 @@ public class NewLocalization extends LinearOpMode {
             telemetry.addData("Speed", speed);
             telemetry.update();
             if(dest - currentAng > currentAng - dest){
-                mecanums.move(270, power, speed);
+                mecanums.move(90, power, speed);
             }
             else{
-                mecanums.move(270, power, -speed);
+                mecanums.move(90, power, -speed);
             }
             currentAng = getAngle();
         }
@@ -241,7 +241,6 @@ public class NewLocalization extends LinearOpMode {
         encoders.resetEncoders();
         double speed = 0.6;
 
-
         telemetry.clearAll();
         telemetry.addData("Xdiff, Ydiff", Xdiff + "  " + Ydiff);
         telemetry.update();
@@ -251,11 +250,11 @@ public class NewLocalization extends LinearOpMode {
         double Xdir = 0;
         double Ydir = 90;
 
-        if(X < Xdest){
+        if(Xdest > X){
             Xdir = 180;
         }
 
-        if(Y < Ydest){
+        if(Ydest < Y){
             Ydir = 270;
         }
         while(opModeIsActive() && inches < Xdiff){
@@ -264,6 +263,7 @@ public class NewLocalization extends LinearOpMode {
         }
         encoders.resetEncoders();
 
+        inches = encoders.getInches();
         while(opModeIsActive() && inches < Ydiff){
             inches = encoders.getInches();
             mecanums.absMove(Ydir, speed, getAngle());
