@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -23,9 +24,12 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
  * 3=left
  */
 @TeleOp(name="NewLocal")
+@Disabled
 public class NewLocalization extends LinearOpMode {
 
     final static double[] distanceThresh ={7, 7, 0, 6.5};
+
+    public Side side;
 
 
     DistanceSensor[] sensors;
@@ -40,10 +44,13 @@ public class NewLocalization extends LinearOpMode {
     enum angleQuad{
         I,II,III,IV
     }
+    enum Side{
+        RED, BLUE
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
-        init(hardwareMap, false);
+        init(hardwareMap, false, Side.BLUE);
         while(opModeIsActive()) {
             updatePosition();
             telemetry.update();
@@ -138,6 +145,97 @@ public class NewLocalization extends LinearOpMode {
         telemetry.addData("Y", Y);
     }
 
+    void updatePosition(int disable){
+        angleQuad aQuad;
+        double angle = getAngle();
+        double angleDif;
+        if(angle >= 45 && angle < 135){
+            angleDif = Math.abs(angle - 90);
+            aQuad = angleQuad.II;
+        }
+        else if(angle >= 135 && angle < 225){
+            angleDif = Math.abs(angle - 180);
+            aQuad = angleQuad.III;
+        }
+        else if(angle >= 225 && angle < 315){
+            angleDif = Math.abs(angle - 270);
+            aQuad = angleQuad.IV;
+        }
+        else{
+            aQuad = angleQuad.I;
+            if(angle >= 315){
+                angleDif = 360 - angle;
+            }
+            else{
+                angleDif = Math.abs(angle);
+            }
+        }
+
+        telemetry.addData("Angle Diff", angleDif);
+
+        double[] distance = new double[4];
+        for(int i =0; i < sensors.length; i++){
+            distance[i] = sensors[i].getDistance(DistanceUnit.INCH);
+            if (distance[i] >= 80) {
+                distance[i] = 0;
+            }
+            telemetry.addData("Real " + i, distance[i]);
+        }
+
+        distance[disable] = 0;
+
+        double[] formattedDis = new double[4];
+
+        for(int i = 0; i < distance.length; i++){
+            if(i != 2 && distance[i] != 0) {
+                formattedDis[i] = (distance[i] + distanceThresh[i]) * Math.cos(Math.toRadians(angleDif));
+                telemetry.addData("Sensor" + i, formattedDis[i]);
+            }
+            else if(distance[i] != 0){
+                double diagDis = 10.35;
+                formattedDis[i] = diagDis*Math.cos(Math.toRadians(angleDif)) + distance[i]*Math.cos(Math.toRadians(angleDif));;
+                telemetry.addData("Sensor" + i, formattedDis[i]);
+            }
+            else{
+                formattedDis[i] = 0;
+            }
+        }
+
+
+        switch(aQuad){
+            case III:
+            case I:
+                Y = 72 - formattedDis[1] - formattedDis[0];
+                break;
+            case II:
+            case IV:
+                Y = 72 - formattedDis[2] - formattedDis[3];
+                break;
+        }
+
+        switch(aQuad){
+            case I:
+                X = isEnabled(formattedDis[2])*(72-formattedDis[2]) + isEnabled(formattedDis[3])*(-72+formattedDis[3]);
+                break;
+            case III:
+                X = isEnabled(formattedDis[2])*(-72+formattedDis[2]) + isEnabled(formattedDis[3])*(72-formattedDis[3]);
+                break;
+            case II:
+                X =isEnabled(formattedDis[1])*(-72+formattedDis[1]) + isEnabled(formattedDis[0])*(72-formattedDis[0]);
+                break;
+            case IV:
+                X =isEnabled(formattedDis[1])*(72-formattedDis[1]) + isEnabled(formattedDis[0])*(-72+formattedDis[0]);
+                break;
+        }
+
+        if(side == Side.RED){
+            X = -X;
+        }
+
+        telemetry.addData("X", X);
+        telemetry.addData("Y", Y);
+    }
+
     double getAngle(){
         double ang = imu.getAngularOrientation(AxesReference.INTRINSIC, ZYX, AngleUnit.DEGREES).firstAngle + angleError;
         double newangle = 0;
@@ -155,7 +253,7 @@ public class NewLocalization extends LinearOpMode {
         return newangle;
     }
 
-    void init(HardwareMap hwmap, boolean limitS){
+    void init(HardwareMap hwmap, boolean limitS, Side s){
         HardwareConfig robot = new HardwareConfig(hwmap);
         robot.initializeDriveTrain();
         robot.initializeDistanceSensors();
@@ -183,6 +281,7 @@ public class NewLocalization extends LinearOpMode {
         imu = robot.imu;
 
         angleError = -imu.getAngularOrientation(AxesReference.INTRINSIC, ZYX, AngleUnit.DEGREES).firstAngle;
+        side = s;
     }
 
     double isEnabled(double val){
@@ -235,16 +334,13 @@ public class NewLocalization extends LinearOpMode {
         mecanums.stopNow();
     }
 
-    void moveWithEncoder(double Xdest, double Ydest){
+    void moveWithEncoder(double Xdest, double Ydest, boolean YthenX){
         double Xdiff = Math.abs(Math.abs(Xdest + 72) - Math.abs(X + 72));
         double Ydiff = Math.abs(Ydest - Y);
         encoders.resetEncoders();
         double speed = 0.6;
 
-        telemetry.clearAll();
-        telemetry.addData("Xdiff, Ydiff", Xdiff + "  " + Ydiff);
-        telemetry.update();
-        sleep(2000);
+
 
         double inches = encoders.getInches();
         double Xdir = 0;
@@ -257,16 +353,38 @@ public class NewLocalization extends LinearOpMode {
         if(Ydest < Y){
             Ydir = 270;
         }
-        while(opModeIsActive() && inches < Xdiff){
-            inches = encoders.getInches();
-            mecanums.absMove(Xdir, speed, getAngle());
-        }
-        encoders.resetEncoders();
 
-        inches = encoders.getInches();
-        while(opModeIsActive() && inches < Ydiff){
+        if(side == Side.RED){
+            Xdir = Math.abs(Xdir - 180);
+        }
+
+        if(YthenX) {
             inches = encoders.getInches();
-            mecanums.absMove(Ydir, speed, getAngle());
+            while (opModeIsActive() && inches < Ydiff) {
+                inches = encoders.getInches();
+                mecanums.absMove(Ydir, speed, getAngle());
+            }
+            encoders.resetEncoders();
+            inches = encoders.getInches();
+            while (opModeIsActive() && inches < Xdiff) {
+                inches = encoders.getInches();
+                mecanums.absMove(Xdir, speed, getAngle());
+            }
+
+
+        }
+        else{
+            while (opModeIsActive() && inches < Xdiff) {
+                inches = encoders.getInches();
+                mecanums.absMove(Xdir, speed, getAngle());
+            }
+            encoders.resetEncoders();
+
+            inches = encoders.getInches();
+            while (opModeIsActive() && inches < Ydiff) {
+                inches = encoders.getInches();
+                mecanums.absMove(Ydir, speed, getAngle());
+            }
         }
         mecanums.stopNow();
     }

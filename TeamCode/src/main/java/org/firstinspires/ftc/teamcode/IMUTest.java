@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 @TeleOp(name="IMUTEST")
+@Disabled
 public class IMUTest extends OpMode {
 
     BNO055IMU imu;
