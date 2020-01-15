@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "RedFoundBridge")
-public class RedFoundBridge extends NewLocalization {
+public class RedFoundBridge extends Localization {
     @Override
     public void runOpMode(){
         init(hardwareMap, false, Side.RED);
@@ -10,7 +10,7 @@ public class RedFoundBridge extends NewLocalization {
 
         mecanums.stopNow();
 
-        updatePosition(0);
+        updatePosition();
 
         telemetry.addData("X Y", X + " " + Y);
         telemetry.update();
@@ -32,7 +32,7 @@ public class RedFoundBridge extends NewLocalization {
         leftClaw.setPosition(0);
         sleep(250);
 
-        updatePosition(2);
+        updatePosition();
 
         sleep(200);
 

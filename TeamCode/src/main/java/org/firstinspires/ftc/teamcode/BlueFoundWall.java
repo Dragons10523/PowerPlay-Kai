@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "BlueFoundWall")
-public class BlueFoundWall extends NewLocalization {
+public class BlueFoundWall extends Localization {
     @Override
     public void runOpMode(){
         init(hardwareMap, false, Side.BLUE);
@@ -10,35 +10,25 @@ public class BlueFoundWall extends NewLocalization {
 
         mecanums.stopNow();
 
-        updatePosition(1);
+        updatePosition();
 
-        telemetry.addData("X Y", X + " " + Y);
-        telemetry.update();
-
-        sleep(250);
-
-        moveWithEncoder(55, 28, false);
+        moveWithEncoder(50, 28, false);
 
         rightClaw.setPosition(0.85);
         leftClaw.setPosition(0.75);
-
-        sleep(1500);
+        sleep(1000);
 
         updatePosition();
         moveWithEncoder(X, 40, false);
-        sleep(250);
+
         turnToAngle(180, 0.4);
         rightClaw.setPosition(0);
         leftClaw.setPosition(0);
-        sleep(250);
+        waitServo(rightClaw, 0);
+        waitServo(leftClaw, 0);
 
-        updatePosition(2);
+        updatePosition();
 
-        sleep(200);
-
-        telemetry.addData("X Y", X + "   " + Y);
-        telemetry.update();
-        sleep(500);
         moveWithEncoder(3, 65, false);
 
     }

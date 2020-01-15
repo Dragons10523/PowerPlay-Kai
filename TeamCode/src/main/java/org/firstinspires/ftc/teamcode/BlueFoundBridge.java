@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "BlueFoundBridge")
-public class BlueFoundBridge extends NewLocalization {
+public class BlueFoundBridge extends Localization {
     @Override
     public void runOpMode(){
         init(hardwareMap, false, Side.BLUE);
@@ -10,14 +10,14 @@ public class BlueFoundBridge extends NewLocalization {
 
         mecanums.stopNow();
 
-        updatePosition(1);
+        updatePosition();
 
         telemetry.addData("X Y", X + " " + Y);
         telemetry.update();
 
         sleep(250);
 
-        moveWithEncoder(55, 28, false);
+        moveWithEncoder(50, 28, false);
 
         rightClaw.setPosition(0.85);
         leftClaw.setPosition(0.75);

@@ -1,2 +1,3 @@
-include ':FtcRobotController'
+include ':FtcRobotController', 'com.github.dogecv:dogecv:2020.4-alpha'
 include ':TeamCode'
+project(':com.github.dogecv:dogecv:2020.4-alpha').projectDir = new File('DogeCV')

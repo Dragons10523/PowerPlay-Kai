@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name =  "TurnAngleTest")
 @Disabled
-public class TurnAngleTest extends NewLocalization{
+public class TurnAngleTest extends Localization {
     @Override
     public void runOpMode(){
         init(hardwareMap, false, Side.BLUE);

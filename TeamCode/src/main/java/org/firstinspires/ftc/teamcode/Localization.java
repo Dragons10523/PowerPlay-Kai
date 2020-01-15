@@ -23,19 +23,22 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
  * 2=rear
  * 3=left
  */
-@TeleOp(name="NewLocal")
+@TeleOp(name="Local Flag")
 @Disabled
-public class NewLocalization extends LinearOpMode {
+public class Localization extends LinearOpMode {
 
     final static double[] distanceThresh ={7, 7, 0, 6.5};
 
-    public Side side;
 
+    public static final double COUNTS_ROTATION = 560;
+    public static final double WHEEL_DIAMETER = 3.0;
+    public Side side;
 
     DistanceSensor[] sensors;
     Servo rightClaw, leftClaw;
 
     double X = 0, Y = 0;
+    boolean Xknown = true, Yknown = true;
     BNO055IMU imu;
     double angleError;
     MecanumDrive mecanums;
@@ -58,6 +61,7 @@ public class NewLocalization extends LinearOpMode {
     }
 
     void updatePosition(){
+        sleep(250);
         angleQuad aQuad;
         double angle = getAngle();
         double angleDif;
@@ -83,124 +87,28 @@ public class NewLocalization extends LinearOpMode {
             }
         }
 
-        telemetry.addData("Angle Diff", angleDif);
-
         double[] distance = new double[4];
         for(int i =0; i < sensors.length; i++){
-            distance[i] = sensors[i].getDistance(DistanceUnit.INCH);
+            distance[i] = getAvgDis(i);
             if (distance[i] >= 80) {
                 distance[i] = 0;
             }
-            telemetry.addData("Real " + i, distance[i]);
         }
-
-        double[] formattedDis = new double[4];
-
-        for(int i = 0; i < distance.length; i++){
-                if(i != 2 && distance[i] != 0) {
-                    formattedDis[i] = (distance[i] + distanceThresh[i]) * Math.cos(Math.toRadians(angleDif));
-                    telemetry.addData("Sensor" + i, formattedDis[i]);
-                }
-                else if(distance[i] != 0){
-                    double diagDis = 10.35;
-                    formattedDis[i] = diagDis*Math.cos(Math.toRadians(angleDif)) + distance[i]*Math.cos(Math.toRadians(angleDif));;
-                    telemetry.addData("Sensor" + i, formattedDis[i]);
-                }
-                else{
-                    formattedDis[i] = 0;
-                }
-        }
-
-
-         X = 0;
-         Y = 0;
-
-        switch(aQuad){
-            case III:
-            case I:
-                Y = 72 - formattedDis[1] - formattedDis[0];
-                break;
-            case II:
-            case IV:
-                Y = 72 - formattedDis[2] - formattedDis[3];
-                break;
-        }
-
-        switch(aQuad){
-            case I:
-                X = isEnabled(formattedDis[2])*(72-formattedDis[2]) + isEnabled(formattedDis[3])*(-72+formattedDis[3]);
-                break;
-            case III:
-                X = isEnabled(formattedDis[2])*(-72+formattedDis[2]) + isEnabled(formattedDis[3])*(72-formattedDis[3]);
-                break;
-            case II:
-                X =isEnabled(formattedDis[1])*(-72+formattedDis[1]) + isEnabled(formattedDis[0])*(72-formattedDis[0]);
-                break;
-            case IV:
-                X =isEnabled(formattedDis[1])*(72-formattedDis[1]) + isEnabled(formattedDis[0])*(-72+formattedDis[0]);
-                break;
-        }
-
-        telemetry.addData("X", X);
-        telemetry.addData("Y", Y);
-    }
-
-    void updatePosition(int disable){
-        angleQuad aQuad;
-        double angle = getAngle();
-        double angleDif;
-        if(angle >= 45 && angle < 135){
-            angleDif = Math.abs(angle - 90);
-            aQuad = angleQuad.II;
-        }
-        else if(angle >= 135 && angle < 225){
-            angleDif = Math.abs(angle - 180);
-            aQuad = angleQuad.III;
-        }
-        else if(angle >= 225 && angle < 315){
-            angleDif = Math.abs(angle - 270);
-            aQuad = angleQuad.IV;
-        }
-        else{
-            aQuad = angleQuad.I;
-            if(angle >= 315){
-                angleDif = 360 - angle;
-            }
-            else{
-                angleDif = Math.abs(angle);
-            }
-        }
-
-        telemetry.addData("Angle Diff", angleDif);
-
-        double[] distance = new double[4];
-        for(int i =0; i < sensors.length; i++){
-            distance[i] = sensors[i].getDistance(DistanceUnit.INCH);
-            if (distance[i] >= 80) {
-                distance[i] = 0;
-            }
-            telemetry.addData("Real " + i, distance[i]);
-        }
-
-        distance[disable] = 0;
 
         double[] formattedDis = new double[4];
 
         for(int i = 0; i < distance.length; i++){
             if(i != 2 && distance[i] != 0) {
                 formattedDis[i] = (distance[i] + distanceThresh[i]) * Math.cos(Math.toRadians(angleDif));
-                telemetry.addData("Sensor" + i, formattedDis[i]);
             }
             else if(distance[i] != 0){
                 double diagDis = 10.35;
                 formattedDis[i] = diagDis*Math.cos(Math.toRadians(angleDif)) + distance[i]*Math.cos(Math.toRadians(angleDif));;
-                telemetry.addData("Sensor" + i, formattedDis[i]);
             }
             else{
                 formattedDis[i] = 0;
             }
         }
-
 
         switch(aQuad){
             case III:
@@ -227,13 +135,12 @@ public class NewLocalization extends LinearOpMode {
                 X =isEnabled(formattedDis[1])*(72-formattedDis[1]) + isEnabled(formattedDis[0])*(-72+formattedDis[0]);
                 break;
         }
-
-        if(side == Side.RED){
-            X = -X;
+        if(Math.abs(X) == 72){
+            Xknown = false;
         }
-
-        telemetry.addData("X", X);
-        telemetry.addData("Y", Y);
+        if(Math.abs(Y) == 72){
+            Yknown = false;
+        }
     }
 
     double getAngle(){
@@ -249,7 +156,6 @@ public class NewLocalization extends LinearOpMode {
         else if(ang > 0){
             newangle = 90 + Math.abs(ang);
         }
-
         return newangle;
     }
 
@@ -337,56 +243,66 @@ public class NewLocalization extends LinearOpMode {
     void moveWithEncoder(double Xdest, double Ydest, boolean YthenX){
         double Xdiff = Math.abs(Math.abs(Xdest + 72) - Math.abs(X + 72));
         double Ydiff = Math.abs(Ydest - Y);
+        double XTicks = (Xdiff * COUNTS_ROTATION)/(Math.PI*WHEEL_DIAMETER);
+        double YTicks = (Ydiff * COUNTS_ROTATION)/(Math.PI*WHEEL_DIAMETER);
         encoders.resetEncoders();
-        double speed = 0.6;
+        double speed = 0.7;
 
-
-
-        double inches = encoders.getInches();
+        double ticks = encoders.getTicks();
         double Xdir = 0;
         double Ydir = 90;
 
         if(Xdest > X){
             Xdir = 180;
         }
-
         if(Ydest < Y){
             Ydir = 270;
         }
-
         if(side == Side.RED){
             Xdir = Math.abs(Xdir - 180);
         }
 
         if(YthenX) {
-            inches = encoders.getInches();
-            while (opModeIsActive() && inches < Ydiff) {
-                inches = encoders.getInches();
+            ticks = encoders.getTicks();
+            while (opModeIsActive() && ticks < YTicks) {
+                ticks = encoders.getTicks();
                 mecanums.absMove(Ydir, speed, getAngle());
             }
             encoders.resetEncoders();
-            inches = encoders.getInches();
-            while (opModeIsActive() && inches < Xdiff) {
-                inches = encoders.getInches();
+            ticks = encoders.getTicks();
+            while (opModeIsActive() && ticks < XTicks) {
+                ticks = encoders.getTicks();
                 mecanums.absMove(Xdir, speed, getAngle());
             }
-
-
         }
         else{
-            while (opModeIsActive() && inches < Xdiff) {
-                inches = encoders.getInches();
+            while (opModeIsActive() && ticks < XTicks) {
+                ticks = encoders.getTicks();
                 mecanums.absMove(Xdir, speed, getAngle());
             }
             encoders.resetEncoders();
 
-            inches = encoders.getInches();
-            while (opModeIsActive() && inches < Ydiff) {
-                inches = encoders.getInches();
+            ticks = encoders.getInches();
+            while (opModeIsActive() && ticks < YTicks) {
+                ticks = encoders.getTicks();
                 mecanums.absMove(Ydir, speed, getAngle());
             }
         }
         mecanums.stopNow();
     }
 
+    double getAvgDis(int index){
+        double iterations = 3;
+        double mean = 0;
+        for(int a = 0; a < iterations; a++){
+            mean += sensors[index].getDistance(DistanceUnit.INCH);
+        }
+        return mean/iterations;
+    }
+
+    void waitServo(Servo s, double dest){
+        while(Math.abs(s.getPosition() - dest) < 0.3 && opModeIsActive()){
+            telemetry.update();
+        }
+    }
 }

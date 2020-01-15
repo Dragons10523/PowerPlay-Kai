@@ -32,7 +32,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.INTRINSIC;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 @Deprecated
-public class Localization extends LinearOpMode {
+class Localization extends LinearOpMode {
     //list of all the corners
     public enum Corner {
         BlueDepot, RedDepot, BlueTri, RedTri
