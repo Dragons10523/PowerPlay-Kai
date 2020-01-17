@@ -24,9 +24,7 @@ public class BlueFoundWall extends Localization {
         turnToAngle(180, 0.4);
         rightClaw.setPosition(0);
         leftClaw.setPosition(0);
-        waitServo(rightClaw, 0);
-        waitServo(leftClaw, 0);
-
+        sleep(1000);
         updatePosition();
 
         moveWithEncoder(3, 65, false);

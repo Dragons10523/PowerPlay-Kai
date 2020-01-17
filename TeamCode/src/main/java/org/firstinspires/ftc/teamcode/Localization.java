@@ -9,9 +9,13 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 
@@ -24,7 +28,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
  * 3=left
  */
 @TeleOp(name="Local Flag")
-@Disabled
+
 public class Localization extends LinearOpMode {
 
     final static double[] distanceThresh ={7, 7, 0, 6.5};
@@ -38,6 +42,8 @@ public class Localization extends LinearOpMode {
     Servo rightClaw, leftClaw;
 
     double X = 0, Y = 0;
+    VuforiaLocalizer vuforia;
+    VuforiaTrackable stoneTarget;
     boolean Xknown = true, Yknown = true;
     BNO055IMU imu;
     double angleError;
@@ -50,12 +56,31 @@ public class Localization extends LinearOpMode {
     enum Side{
         RED, BLUE
     }
+    public void initVuforia(){
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
+        parameters.vuforiaLicenseKey = "AQkCE3T/////AAABmacf2GUqlUiet5GB5KP6epRTyl96EqEA9gcG1VI99J81/l4NkkwX6Nx/L7BTIL+1Z3R7yorhZ4YW1N6InBS7l7o8rKNgpbwWzBkfh3Unneq6h5xeyhbILzENlxNOVSibrronjr5199YlL3+PbMazXySVa5mnY2hXXO9CXcuv/pfEyCblbkFchA3D+Ngpkpg8CSbpkXeM6aKgGEXsnBZO7xUtE8p71aFIew1Coez3KBM5n12hoov/SdKC3O6GAcbMTX3A9wVZgACfXmw4F4Skgm/QjcfG9dOH0w7Wj3Ne6haXCVS13A2uYecamReSZZyT+BatU5nfh9t4KjRtgKGf/SMAJLIoBcbdYxBqiTmyG3WN";
+
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+
+        VuforiaTrackables trackables = this.vuforia.loadTrackablesFromAsset("Skystone");
+
+        stoneTarget = trackables.get(0);
+        stoneTarget.setName("Stoner");
+
+        trackables.activate();
+    }
     @Override
     public void runOpMode() throws InterruptedException {
         init(hardwareMap, false, Side.BLUE);
         while(opModeIsActive()) {
             updatePosition();
+            telemetry.addData("X",X);
+            telemetry.addData("Y", Y);
             telemetry.update();
         }
     }
@@ -245,8 +270,10 @@ public class Localization extends LinearOpMode {
         double Ydiff = Math.abs(Ydest - Y);
         double XTicks = (Xdiff * COUNTS_ROTATION)/(Math.PI*WHEEL_DIAMETER);
         double YTicks = (Ydiff * COUNTS_ROTATION)/(Math.PI*WHEEL_DIAMETER);
+
+
         encoders.resetEncoders();
-        double speed = 0.7;
+        double speed = 0.75;
 
         double ticks = encoders.getTicks();
         double Xdir = 0;
@@ -298,11 +325,5 @@ public class Localization extends LinearOpMode {
             mean += sensors[index].getDistance(DistanceUnit.INCH);
         }
         return mean/iterations;
-    }
-
-    void waitServo(Servo s, double dest){
-        while(Math.abs(s.getPosition() - dest) < 0.3 && opModeIsActive()){
-            telemetry.update();
-        }
     }
 }

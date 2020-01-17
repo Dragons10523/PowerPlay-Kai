@@ -5,7 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.vuforia.TrackableResult;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaRelicRecovery;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaSkyStone;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
@@ -29,21 +31,26 @@ public class VuforiaDetect extends LinearOpMode {
 
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
-        VuforiaTrackables targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
 
-        VuforiaTrackable stoneTarget = targetsSkyStone.get(0);
-        stoneTarget.setName("Stone Target");
+        VuforiaTrackables trackables = this.vuforia.loadTrackablesFromAsset("Skystone");
+
+        VuforiaTrackable stoneTarget = trackables.get(0);
+        stoneTarget.setName("Stoner");
+
+        trackables.activate();
 
 
-        stoneTarget.getTrackables().activate();
+
 
 
         while(opModeIsActive()){
-            if(((VuforiaTrackableDefaultListener)stoneTarget.getListener()).isVisible()){
-                telemetry.addData("Visible Target", "true");
+            RelicRecoveryVuMark target = RelicRecoveryVuMark.from(stoneTarget);
+
+            if(target == RelicRecoveryVuMark.from(stoneTarget)){
+                telemetry.addData("Visible", "true");
             }
             else{
-                telemetry.addData("Visible Target", "false");
+                telemetry.addData("Visible", "false");
             }
             telemetry.update();
         }
