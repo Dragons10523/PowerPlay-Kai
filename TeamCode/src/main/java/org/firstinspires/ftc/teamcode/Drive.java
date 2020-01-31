@@ -61,10 +61,10 @@ public class Drive extends OpMode {
             Mecanums.joystickMove(gamepad1.left_stick_y * speed, gamepad1.left_stick_x * speed, -gamepad1.right_stick_x * speed);
         }
 
-        robot.ramp1.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
-        robot.ramp2.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
-        robot.intake1.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
-        robot.intake2.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
+        robot.ramp1.setPower((gamepad1.right_trigger + gamepad2.right_trigger) - (gamepad2.left_trigger + gamepad1.left_trigger ));
+        robot.ramp2.setPower((gamepad1.right_trigger + gamepad2.right_trigger) - (gamepad2.left_trigger + gamepad1.left_trigger ));
+        robot.intake1.setPower((gamepad1.right_trigger + gamepad2.right_trigger) - (gamepad2.left_trigger + gamepad1.left_trigger ));
+        robot.intake2.setPower((gamepad1.right_trigger + gamepad2.right_trigger) - (gamepad2.left_trigger + gamepad1.left_trigger ));
         robot.lift.setPower(gamepad2.left_stick_y);
         robot.horizontal.setPower(gamepad2.right_stick_y);
 

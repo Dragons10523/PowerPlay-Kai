@@ -10,7 +10,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 @TeleOp(name="IMUTEST")
-@Disabled
 public class IMUTest extends OpMode {
 
     BNO055IMU imu;

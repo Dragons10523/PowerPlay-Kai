@@ -22,7 +22,6 @@ public class MecanumDrive {
         rr.setPower(power * Math.sin(robotAngle) + rightX);
         fl.setPower(power * Math.sin(robotAngle) - rightX);
         rl.setPower(power * Math.cos(robotAngle) - rightX);
-
     }
 
     public void absMove(double angle, double power, double gyro){
@@ -31,6 +30,13 @@ public class MecanumDrive {
         rl.setPower(power * Math.cos(a));
         fr.setPower(power * Math.cos(a));
         rr.setPower(power * Math.sin(a));
+    }
+    public void absMoveTurn(double angle, double power, double gyro, double turn){
+        double a = Math.toRadians(angle) - (3*Math.PI)/4 + Math.toRadians(gyro);
+        fl.setPower(power * Math.sin(a) - turn);
+        rl.setPower(power * Math.cos(a) - turn );
+        fr.setPower(power * Math.cos(a) + turn);
+        rr.setPower(power * Math.sin(a) + turn);
     }
 
     public void move(double angle, double power, double turn){

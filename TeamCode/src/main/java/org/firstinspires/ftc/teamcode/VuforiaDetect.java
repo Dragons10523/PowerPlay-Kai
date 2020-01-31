@@ -13,6 +13,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @TeleOp(name = "Vuforia Detect")
 
 
@@ -31,26 +34,20 @@ public class VuforiaDetect extends LinearOpMode {
 
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
-
         VuforiaTrackables trackables = this.vuforia.loadTrackablesFromAsset("Skystone");
 
         VuforiaTrackable stoneTarget = trackables.get(0);
         stoneTarget.setName("Stoner");
 
+
         trackables.activate();
 
-
-
-
-
         while(opModeIsActive()){
-            RelicRecoveryVuMark target = RelicRecoveryVuMark.from(stoneTarget);
-
-            if(target == RelicRecoveryVuMark.from(stoneTarget)){
-                telemetry.addData("Visible", "true");
+            if(((VuforiaTrackableDefaultListener)stoneTarget.getListener()).isVisible()){
+                telemetry.addData("Visible Target", "true");
             }
             else{
-                telemetry.addData("Visible", "false");
+                telemetry.addData("Visible Target", "false");
             }
             telemetry.update();
         }

@@ -20,6 +20,7 @@ public class HardwareConfig {
     public CRServo intake1, intake2;
     public DigitalChannel limitLeft;
     public BNO055IMU imu;
+    public DistanceSensor cameraDis;
 
     HardwareMap HWMAP;
 
@@ -64,6 +65,9 @@ public class HardwareConfig {
         distanceSensors[2] =    HWMAP.get(DistanceSensor.class, "rearLazer");
         distanceSensors[3] =    HWMAP.get(DistanceSensor.class, "frontLazer");
     }
+    public void initializeCameraDistance(){
+        cameraDis = HWMAP.get(DistanceSensor.class, "cameraDis");
+    }
 
     public void initializeLimitSwitches(){
         limitLeft =     HWMAP.get(DigitalChannel.class, "limitLeft");
@@ -73,6 +77,7 @@ public class HardwareConfig {
     public void initializeTools(){
         lift =      HWMAP.get(DcMotorEx.class, "lift");
         lift.setDirection(DcMotorSimple.Direction.REVERSE);
+        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         blockIntake =   HWMAP.get(Servo.class, "blockIntake");

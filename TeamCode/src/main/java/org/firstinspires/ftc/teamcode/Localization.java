@@ -48,13 +48,15 @@ public class Localization extends LinearOpMode {
 
     public static final double COUNTS_ROTATION = 560;
     public static final double WHEEL_DIAMETER = 3.0;
+    VuforiaTrackables targetsSkyStone;
     public Side side;
-
+    HardwareConfig robot;
     DistanceSensor[] sensors;
+    DistanceSensor cameraDis;
     Servo rightClaw, leftClaw;
 
     double X = 0, Y = 0;
-    VuforiaTrackable stoneTarget;
+    public VuforiaTrackable stoneTarget;
     boolean Xknown = true, Yknown = true;
     BNO055IMU imu;
     double angleError;
@@ -89,23 +91,26 @@ public class Localization extends LinearOpMode {
         trackables.activate();
     }
     public void initVuforiaWebcam(){
-        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraName = webcamName;
-        final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
-        final boolean PHONE_IS_PORTRAIT = false ;
-        float phoneXRotate    = 0;
-        float phoneYRotate    = 0;
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
-        VuforiaTrackables targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
+        robot.initializeCameraDistance();
+        cameraDis = robot.cameraDis;
 
-        VuforiaTrackable stoneTarget = targetsSkyStone.get(0);
+        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
+
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+
+        parameters.cameraName = webcamName;
+
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
+
+        stoneTarget = targetsSkyStone.get(0);
         stoneTarget.setName("Stone Target");
 
-        List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
-        allTrackables.addAll(targetsSkyStone);
         targetsSkyStone.activate();
     }
     @Override
@@ -219,7 +224,7 @@ public class Localization extends LinearOpMode {
     }
 
     void init(HardwareMap hwmap, boolean limitS, Side s){
-        HardwareConfig robot = new HardwareConfig(hwmap);
+        robot = new HardwareConfig(hwmap);
         robot.initializeDriveTrain();
         robot.initializeDistanceSensors();
         robot.initializeIMU();
@@ -298,7 +303,7 @@ public class Localization extends LinearOpMode {
         }
         mecanums.stopNow();
     }
-
+    //void rotateAndPos(double angle, double direction){}
     void moveWithEncoder(double Xdest, double Ydest, boolean YthenX){
         double Xdiff = Math.abs(Math.abs(Xdest + 72) - Math.abs(X + 72));
         double Ydiff = Math.abs(Ydest - Y);
@@ -307,7 +312,7 @@ public class Localization extends LinearOpMode {
 
 
         encoders.resetEncoders();
-        double speed = 0.75;
+        double speed = 0.65;
 
         double ticks = encoders.getTicks();
         double Xdir = 0;
@@ -351,7 +356,68 @@ public class Localization extends LinearOpMode {
         }
         mecanums.stopNow();
     }
+    void moveWithEncoderTurn(double Xdest, double Ydest, boolean YthenX, double angle){
+        double Xdiff = Math.abs(Math.abs(Xdest + 72) - Math.abs(X + 72));
+        double Ydiff = Math.abs(Ydest - Y);
+        double XTicks = (Xdiff * COUNTS_ROTATION)/(Math.PI*WHEEL_DIAMETER);
+        double YTicks = (Ydiff * COUNTS_ROTATION)/(Math.PI*WHEEL_DIAMETER);
 
+
+        encoders.resetEncoders();
+        double speed = 0.65;
+
+        double ticks = encoders.getTicks();
+        double Xdir = 0;
+        double Ydir = 90;
+        double thresh = 1.5;
+        boolean turnLeft = false;
+        if(Xdest > X){
+            Xdir = 180;
+        }
+        if(Ydest < Y){
+            Ydir = 270;
+        }
+        if(side == Side.RED){
+            Xdir = Math.abs(Xdir - 180);
+        }
+        if(getAngle() < angle){
+            while(getAngle() < angle + thresh || getAngle() < angle - thresh){
+
+            }
+        }
+        else{
+            turnLeft = false;
+        }
+
+
+        if(YthenX) {
+            ticks = encoders.getTicks();
+            while (opModeIsActive() && ticks < YTicks) {
+                ticks = encoders.getTicks();
+                mecanums.absMove(Ydir, speed, getAngle());
+            }
+            encoders.resetEncoders();
+            ticks = encoders.getTicks();
+            while (opModeIsActive() && ticks < XTicks) {
+                ticks = encoders.getTicks();
+                mecanums.absMove(Xdir, speed, getAngle());
+            }
+        }
+        else{
+            while (opModeIsActive() && ticks < XTicks) {
+                ticks = encoders.getTicks();
+                mecanums.absMove(Xdir, speed, getAngle());
+            }
+            encoders.resetEncoders();
+
+            ticks = encoders.getInches();
+            while (opModeIsActive() && ticks < YTicks) {
+                ticks = encoders.getTicks();
+                mecanums.absMove(Ydir, speed, getAngle());
+            }
+        }
+        mecanums.stopNow();
+    }
     double getAvgDis(int index){
         double iterations = 3;
         double mean = 0;
