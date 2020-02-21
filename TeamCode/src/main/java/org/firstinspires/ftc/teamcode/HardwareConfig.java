@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -12,11 +13,14 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
 public class HardwareConfig {
     //All Hardware Devices
     public DcMotorEx frontRight, frontLeft, rearRight, rearLeft, ramp1, ramp2, lift, horizontal;
     public DistanceSensor[] distanceSensors;
-    public Servo leftClaw, rightClaw, blockIntake;
+    public Servo leftClaw, rightClaw, blockIntake, leftHook, rightHook;
     public CRServo intake1, intake2;
     public DigitalChannel limitLeft;
     public BNO055IMU imu;
@@ -95,6 +99,8 @@ public class HardwareConfig {
         leftClaw =      HWMAP.get(Servo.class, "leftClaw");
         leftClaw.setDirection(Servo.Direction.REVERSE);
         rightClaw =     HWMAP.get(Servo.class, "rightClaw");
+        leftHook = HWMAP.get(Servo.class, "leftHook");
+        rightHook = HWMAP.get(Servo.class, "rightHook");
     }
 
     public void initializeIMU(){
@@ -103,12 +109,16 @@ public class HardwareConfig {
         parameters.calibrationDataFile = "BNO055IMUCalibration.json";
         parameters.loggingEnabled      = true;
         parameters.loggingTag          = "IMU";
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
         imu = HWMAP.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
         byte AXIS_MAP_CONFIG_BYTE = 0x6; //This is what to write to the AXIS_MAP_CONFIG register to swap x and z axes
         byte AXIS_MAP_SIGN_BYTE = 0x1; //This is what to write to the AXIS_MAP_SIGN register to negate the z axis
 
         imu.write8(BNO055IMU.Register.OPR_MODE,BNO055IMU.SensorMode.CONFIG.bVal & 0x0F);
+        imu.startAccelerationIntegration(new Position(), new Velocity(), 750);
 
         ElapsedTime time = new ElapsedTime();
         while(time.milliseconds()<100){}

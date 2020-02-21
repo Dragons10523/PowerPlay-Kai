@@ -15,6 +15,7 @@ public class MecanumDrive {
     }
 
 
+    //relative to robot TeleOP
     public void joystickMove(double leftY, double leftX, double rightX){
         double power = Math.hypot(leftX, leftY);
         double robotAngle = Math.atan2(leftY, leftX) - Math.PI / 4;
@@ -24,21 +25,26 @@ public class MecanumDrive {
         rl.setPower(power * Math.cos(robotAngle) - rightX);
     }
 
+    //relative to field Autonomous
     public void absMove(double angle, double power, double gyro){
-        double a = Math.toRadians(angle) - (3*Math.PI)/4 + Math.toRadians(gyro);
+        double a = (Math.toRadians(angle) - Math.PI/4 + Math.toRadians(gyro) - Math.PI/2);
         fl.setPower(power * Math.sin(a));
         rl.setPower(power * Math.cos(a));
         fr.setPower(power * Math.cos(a));
         rr.setPower(power * Math.sin(a));
     }
+
     public void absMoveTurn(double angle, double power, double gyro, double turn){
-        double a = Math.toRadians(angle) - (3*Math.PI)/4 + Math.toRadians(gyro);
+        double a = Math.toRadians(angle) - Math.PI/4 + Math.toRadians(gyro);
+        //turn is in power.
         fl.setPower(power * Math.sin(a) - turn);
-        rl.setPower(power * Math.cos(a) - turn );
-        fr.setPower(power * Math.cos(a) + turn);
+        rl.setPower(power * -Math.cos(a) - turn );
+        fr.setPower(power * -Math.cos(a) + turn);
         rr.setPower(power * Math.sin(a) + turn);
     }
 
+
+    //relative to robot Autonomous
     public void move(double angle, double power, double turn){
         double a = Math.toRadians(angle) - Math.PI/4;
         fl.setPower(power * Math.sin(a) - turn);
@@ -47,6 +53,7 @@ public class MecanumDrive {
         rr.setPower(power * Math.sin(a) + turn);
     }
 
+    //relative to field Autonomous
     public void absoluteMove(double leftY, double leftX, double angle, double rightX){
         double power  = Math.hypot(leftX, leftY);
         double robotAngle = Math.atan2(leftY, leftX) -(Math.PI/4) +angle;

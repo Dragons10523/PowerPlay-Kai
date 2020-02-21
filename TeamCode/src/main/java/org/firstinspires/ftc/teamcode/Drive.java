@@ -26,7 +26,7 @@ public class Drive extends OpMode {
     private Gamepad gp2;
     private AsyncTask lol;
     private double angleError;
-    private Servo blockintake, leftClaw, rightClaw;
+    private Servo blockintake, leftClaw, rightClaw, leftHook, rightHook;
 
     @Override
     public void init() {
@@ -40,6 +40,8 @@ public class Drive extends OpMode {
         blockintake = robot.blockIntake;
         leftClaw = robot.leftClaw;
         rightClaw = robot.rightClaw;
+        leftHook = robot.leftHook;
+        rightHook = robot.rightHook;
 
         robot.initializeIMU();
         imu = robot.imu;
@@ -68,6 +70,7 @@ public class Drive extends OpMode {
         robot.lift.setPower(gamepad2.left_stick_y);
         robot.horizontal.setPower(gamepad2.right_stick_y);
 
+        telemetry.addData("Acceleration", imu.getAcceleration().xAccel + "    " + imu.getAcceleration().yAccel);
         telemetry.addData("ServoLeft", robot.leftClaw.getPosition());
         telemetry.addData("ServoRight", robot.rightClaw.getPosition());
         telemetry.addData("Speed", (speed * 100) + "%");
@@ -89,6 +92,8 @@ public class Drive extends OpMode {
             boolean lastA = false;
             boolean lastLeftBump = false;
             boolean lastRightBump = false;
+            boolean lastHookLeft = false;
+            boolean lastHookRight = false;
             Gamepad gamepad1 = gp1;
             Gamepad gamepad2 = gp2;
             while(!this.isCancelled()){
@@ -125,15 +130,42 @@ public class Drive extends OpMode {
                 if(!gamepad2.a && lastA){
                     lastA = false;
                     if(!(blockintake.getPosition() > 0.2)) {
-                        blockintake.setPosition(0.55);
+                        blockintake.setPosition(0);
                     }
                     else{
-                        blockintake.setPosition(0);
+                        blockintake.setPosition(0.55);
                     }
                 }
                 else if(gamepad2.a){
                     lastA = true;
                 }
+
+                if (!gamepad2.y && lastHookLeft) {
+                    lastHookLeft = false;
+                    if (leftHook.getPosition() > 0.2){
+                        leftHook.setPosition(0);
+                    }
+                    else{
+                        leftHook.setPosition(0.75);
+                    }
+                }
+                else if(gamepad2.y){
+                    lastHookLeft = true;
+                }
+
+                if (!gamepad2.y && lastHookRight) {
+                    lastHookRight = false;
+                    if (rightHook.getPosition() < 0.65){
+                        rightHook.setPosition(0.75);
+                    }
+                    else{
+                        rightHook.setPosition(0);
+                    }
+                }
+                else if(gamepad2.y){
+                    lastHookRight = true;
+                }
+
                 if (!gamepad1.left_bumper && lastLeftBump) {
                     lastLeftBump = false;
                     if (leftClaw.getPosition() < 0.75){
