@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode;
+package SensorTests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.vuforia.TrackableResult;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @TeleOp(name = "Vuforia Detect")
-
+@Disabled
 
 public class VuforiaDetect extends LinearOpMode {
 

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -10,7 +12,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 
 import java.util.Vector;
 
-@TeleOp(name = "Vuforia_SkyStone")
+@Autonomous(name = "BlueSkystone")
+@Disabled
 public class SkystoneBlue extends Localization {
 
     double xDis;

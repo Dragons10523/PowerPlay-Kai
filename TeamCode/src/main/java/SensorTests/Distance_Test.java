@@ -1,12 +1,13 @@
-package org.firstinspires.ftc.teamcode;
+package SensorTests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.Localization;
 
-@TeleOp(name = "RAW distance output")
-public class Distance_Test extends Localization{
+/*@TeleOp(name = "RAW distance output")
+public class Distance_Test extends Localization {
 
     @Override
     public void runOpMode() {
@@ -23,3 +24,4 @@ public class Distance_Test extends Localization{
         }
     }
 }
+*/

@@ -26,7 +26,7 @@ public class Drive extends OpMode {
     private Gamepad gp2;
     private AsyncTask lol;
     private double angleError;
-    private Servo blockintake, leftClaw, rightClaw, leftHook, rightHook;
+    private Servo blockintake, leftClaw, rightClaw, leftHook, rightHook, capStone;
 
     @Override
     public void init() {
@@ -42,6 +42,7 @@ public class Drive extends OpMode {
         rightClaw = robot.rightClaw;
         leftHook = robot.leftHook;
         rightHook = robot.rightHook;
+        capStone = robot.capStone;
 
         robot.initializeIMU();
         imu = robot.imu;
@@ -70,7 +71,6 @@ public class Drive extends OpMode {
         robot.lift.setPower(gamepad2.left_stick_y);
         robot.horizontal.setPower(gamepad2.right_stick_y);
 
-        telemetry.addData("Acceleration", imu.getAcceleration().xAccel + "    " + imu.getAcceleration().yAccel);
         telemetry.addData("ServoLeft", robot.leftClaw.getPosition());
         telemetry.addData("ServoRight", robot.rightClaw.getPosition());
         telemetry.addData("Speed", (speed * 100) + "%");
@@ -90,6 +90,7 @@ public class Drive extends OpMode {
             boolean lastY = false;
             boolean lastLeftStick = false;
             boolean lastA = false;
+            boolean last2X = false;
             boolean lastLeftBump = false;
             boolean lastRightBump = false;
             boolean lastHookLeft = false;
@@ -129,8 +130,8 @@ public class Drive extends OpMode {
                 }
                 if(!gamepad2.a && lastA){
                     lastA = false;
-                    if(!(blockintake.getPosition() > 0.2)) {
-                        blockintake.setPosition(0);
+                    if(blockintake.getPosition() < 0.6) {
+                        blockintake.setPosition(1);
                     }
                     else{
                         blockintake.setPosition(0.55);
@@ -144,32 +145,21 @@ public class Drive extends OpMode {
                     lastHookLeft = false;
                     if (leftHook.getPosition() > 0.2){
                         leftHook.setPosition(0);
+                        rightHook.setPosition(0);
                     }
                     else{
                         leftHook.setPosition(0.75);
+                        rightHook.setPosition(0.75);
                     }
                 }
                 else if(gamepad2.y){
                     lastHookLeft = true;
                 }
 
-                if (!gamepad2.y && lastHookRight) {
-                    lastHookRight = false;
-                    if (rightHook.getPosition() < 0.65){
-                        rightHook.setPosition(0.75);
-                    }
-                    else{
-                        rightHook.setPosition(0);
-                    }
-                }
-                else if(gamepad2.y){
-                    lastHookRight = true;
-                }
-
                 if (!gamepad1.left_bumper && lastLeftBump) {
                     lastLeftBump = false;
                     if (leftClaw.getPosition() < 0.75){
-                        leftClaw.setPosition(0.75);
+                        leftClaw.setPosition(0.8);
                     }
                     else{
                         leftClaw.setPosition(0);
@@ -185,11 +175,24 @@ public class Drive extends OpMode {
                         rightClaw.setPosition(0);
                     }
                     else{
-                        rightClaw.setPosition(0.85);
+                        rightClaw.setPosition(0.9);
                     }
                 }
                 else if(gamepad1.right_bumper){
                     lastRightBump = true;
+                }
+
+                if(!gamepad2.x && last2X){
+                    last2X = false;
+                    if(capStone.getPosition() > 0.2){
+                        capStone.setPosition(0);
+                    }
+                    else{
+                        capStone.setPosition(1);
+                    }
+                }
+                else if(gamepad2.x){
+                    last2X = true;
                 }
             }
         return null;

@@ -23,8 +23,8 @@ public class RedFoundBridge extends Localization {
         leftClaw.setPosition(0.75);
 
         sleep(1500);
-
         updatePosition();
+
         moveWithEncoder(X, 40, false);
         sleep(250);
         turnToAngle(0, 0.4);

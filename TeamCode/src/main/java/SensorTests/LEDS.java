@@ -1,12 +1,14 @@
-package org.firstinspires.ftc.teamcode;
+package SensorTests;
 
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import java.util.regex.Pattern;
 
 @TeleOp(name = "LEDS")
+@Disabled
 public class LEDS extends OpMode {
 
     RevBlinkinLedDriver blinkin;

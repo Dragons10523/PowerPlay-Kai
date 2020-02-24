@@ -20,7 +20,7 @@ public class HardwareConfig {
     //All Hardware Devices
     public DcMotorEx frontRight, frontLeft, rearRight, rearLeft, ramp1, ramp2, lift, horizontal;
     public DistanceSensor[] distanceSensors;
-    public Servo leftClaw, rightClaw, blockIntake, leftHook, rightHook;
+    public Servo leftClaw, rightClaw, blockIntake, leftHook, rightHook, capStone;
     public CRServo intake1, intake2;
     public DigitalChannel limitLeft;
     public BNO055IMU imu;
@@ -93,6 +93,8 @@ public class HardwareConfig {
 
         ramp1 =         HWMAP.get(DcMotorEx.class, "ramp1");
         ramp2 =         HWMAP.get(DcMotorEx.class, "ramp2");
+
+        capStone = HWMAP.get(Servo.class, "capstone");
     }
 
     public void initializeServos(){
@@ -109,8 +111,6 @@ public class HardwareConfig {
         parameters.calibrationDataFile = "BNO055IMUCalibration.json";
         parameters.loggingEnabled      = true;
         parameters.loggingTag          = "IMU";
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         imu = HWMAP.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
@@ -118,7 +118,6 @@ public class HardwareConfig {
         byte AXIS_MAP_SIGN_BYTE = 0x1; //This is what to write to the AXIS_MAP_SIGN register to negate the z axis
 
         imu.write8(BNO055IMU.Register.OPR_MODE,BNO055IMU.SensorMode.CONFIG.bVal & 0x0F);
-        imu.startAccelerationIntegration(new Position(), new Velocity(), 750);
 
         ElapsedTime time = new ElapsedTime();
         while(time.milliseconds()<100){}
