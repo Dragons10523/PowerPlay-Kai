@@ -127,6 +127,90 @@ public class Localization extends LinearOpMode {
         }
     }
 
+    void updatePosition(double Xpre, double Ypre){
+        sleep(250);
+        angleQuad aQuad;
+        double angle = getAngle();
+        double angleDif;
+        if (angle >= 45 && angle < 135) {
+            angleDif = Math.abs(angle - 90);
+            aQuad = angleQuad.II;
+        } else if (angle >= 135 && angle < 225) {
+            angleDif = Math.abs(angle - 180);
+            aQuad = angleQuad.III;
+        } else if (angle >= 225 && angle < 315) {
+            angleDif = Math.abs(angle - 270);
+            aQuad = angleQuad.IV;
+        } else {
+            aQuad = angleQuad.I;
+            if (angle >= 315) {
+                angleDif = 360 - angle;
+            } else {
+                angleDif = Math.abs(angle);
+            }
+        }
+        double[] distance = new double[4];
+        for (int i = 0; i < sensors.length; i++) {
+            distance[i] = getAvgDis(i);
+            if (distance[i] >= 80) {
+                distance[i] = 0;
+            }
+        }
+
+        double[] formattedDis = new double[4];
+
+        for (int i = 0; i < distance.length; i++) {
+            if(i != 2 && distance[i] != 0) {
+                formattedDis[i] = (distance[i] + distanceThresh[i]) * Math.cos(Math.toRadians(angleDif));
+            }
+            else if(distance[i] != 0){
+                double diagDis = 10.35;
+                formattedDis[i] = diagDis*Math.cos(Math.toRadians(angleDif)) + distance[i]*Math.cos(Math.toRadians(angleDif));;
+            }
+            else{
+                formattedDis[i] = 0;
+            }
+        }
+        double dis = 0;
+        switch (aQuad) {
+            case III:
+            case I:
+                dis = Math.max(Math.abs(72-formattedDis[1] - Ypre), Math.abs(72 - formattedDis[0] - Ypre));
+                Y = 72 - dis;
+                break;
+            case II:
+            case IV:
+                dis = Math.max(Math.abs(72-formattedDis[2] - Ypre), Math.abs(72 - formattedDis[3] - Ypre));
+                Y = 72 - formattedDis[2] - formattedDis[3];
+                break;
+        }
+
+        switch (aQuad) {
+            case I:
+                X = isEnabled(formattedDis[2]) * (72 - formattedDis[2]) + isEnabled(formattedDis[3]) * (-72 + formattedDis[3]);
+                break;
+            case III:
+                X = isEnabled(formattedDis[2]) * (-72 + formattedDis[2]) + isEnabled(formattedDis[3]) * (72 - formattedDis[3]);
+                break;
+            case II:
+                X = isEnabled(formattedDis[1]) * (-72 + formattedDis[1]) + isEnabled(formattedDis[0]) * (72 - formattedDis[0]);
+                break;
+            case IV:
+                X = isEnabled(formattedDis[1]) * (72 - formattedDis[1]) + isEnabled(formattedDis[0]) * (-72 + formattedDis[0]);
+                break;
+        }
+        if(side ==  Side.RED){
+            X = -X;
+        }
+        if (Math.abs(X) == 72) {
+            Xknown = false;
+        }
+        if (Math.abs(Y) == 72) {
+            Yknown = false;
+        }
+
+    }
+
     void updatePosition() {
         sleep(250);
         angleQuad aQuad;
