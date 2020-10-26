@@ -21,7 +21,7 @@ public abstract class Localization extends Control {
     public Vector2D<Double> getPosition() {
         double x = intD.x;
         double y = intD.y;
-        // TODO Distance Sensor Shit
+        // TODO Distance Sensor Sh!t
         position.x = x;
         position.y = y;
         return position;
