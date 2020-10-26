@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public abstract class Control extends LinearOpMode{
     Thalatte thalatte;
@@ -14,6 +15,8 @@ public abstract class Control extends LinearOpMode{
     public GamepadPrev prev1;
 
     public GamepadPrev prev2;
+
+    public ElapsedTime time;
 
     public void drive(double l, double r) {
         thalatte.backRight.setPower(r);
@@ -56,6 +59,7 @@ public abstract class Control extends LinearOpMode{
         thalatte = new Thalatte(hardwareMap);
         prev1 = new GamepadPrev(gamepad1);
         prev2 = new GamepadPrev(gamepad2);
+        time = new ElapsedTime();
     }
 
     public double clamp(double num, double min, double max) {

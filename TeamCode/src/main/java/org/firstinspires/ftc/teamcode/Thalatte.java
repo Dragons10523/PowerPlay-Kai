@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -8,6 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Thalatte {
     public DcMotor frontLeft, frontRight, backLeft, backRight, shooterBack, shooterFront, intake, vwomp;
     public Servo localizationFrontLeft, localizationFrontRight, localizationBackLeft, localizationBackRight, vwompClampLeft, vwompClampRight;
+    public BNO055IMU imu;
 
     public HardwareMap hwmap;
 
@@ -42,5 +45,16 @@ public class Thalatte {
 //
 //        vwompClampLeft = hwmap.get(Servo.class, "vwompClampLeft");
 //        vwompClampRight = hwmap.get(Servo.class, "vwompClampRight");
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.RADIANS;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        imu = hwmap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
     }
 }
