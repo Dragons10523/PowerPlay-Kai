@@ -1,14 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.exception.RobotCoreException;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public abstract class Control extends LinearOpMode{
     Thalatte thalatte;
 
-    // CONSTANTS
     final double INTAKE = 1.0;
     final double CLAMP = 1.0;
 
@@ -66,4 +63,11 @@ public abstract class Control extends LinearOpMode{
         return Math.max(Math.min(num, max), min);
     }
 
+    public void setTarAng() {
+        // TODO
+    }
+
+    public void turnTo() {
+        // TODO
+    }
 }

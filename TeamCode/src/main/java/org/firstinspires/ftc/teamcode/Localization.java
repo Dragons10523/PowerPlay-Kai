@@ -10,11 +10,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 public abstract class Localization extends Control {
-    Vector2D<Double> position = new Vector2D<Double>(0.0,0.0);
+    Vector2D<Double> position = new Vector2D<>(0.0,0.0);
     IntegrationData intD;
     public void startLocalization() {
+        thalatte.imu.startAccelerationIntegration(new Position(), new Velocity(), 500);
         intD = new IntegrationData(thalatte.imu, time);
         time.startTime();
     }
@@ -26,13 +29,20 @@ public abstract class Localization extends Control {
         position.y = y;
         return position;
     }
+    public Vector2D<Double> updatePosition() {
+        sleep(500);
+
+        intD.integrate();
+
+        return getPosition();
+    }
 
 }
 
 class IntegrationData {
-    double deltaT = 10.5;
+    double deltaT = 0.5;
 
-    double[] pastDT = {10.5,10.5,10.5,10.5,10.5};
+    double[] pastDT = {0.5,0.5,0.5,0.5,0.5};
     int index = 0;
     int counter = 0;
 
@@ -57,12 +67,13 @@ class IntegrationData {
         time.reset();
     }
 
+
     void integrate(){
         updateTime();
         Acceleration acc = imu.getAcceleration().toUnit(DistanceUnit.INCH);
         Orientation or = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
 
-        double theta = or.firstAngle;
+        double theta = -or.firstAngle;
         double axl = acc.xAccel;
         double ayl = acc.yAccel;
 

@@ -10,4 +10,8 @@ public class Vector2D<D extends Number> {
         this.y = y;
     }
 
+    @Override
+    public String toString() {
+        return "(" + x.toString() + ", " + y.toString() + ")";
+    }
 }
