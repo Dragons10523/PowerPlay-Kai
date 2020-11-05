@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 public class Vector2D<D extends Number> {
-
     D x;
     D y;
 

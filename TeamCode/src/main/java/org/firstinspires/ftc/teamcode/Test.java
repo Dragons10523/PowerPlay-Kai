@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name = "Test")
 public class Test extends Localization {
-
     @Override
     public void runOpMode() throws InterruptedException {
         alize();
