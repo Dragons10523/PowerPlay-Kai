@@ -117,7 +117,7 @@ public abstract class Control extends LinearOpMode{
         prev1    = new GamepadPrev(gamepad1);
         prev2    = new GamepadPrev(gamepad2);
         time     = new ElapsedTime();
-        driveLoop();
+//        driveLoop();
         speed = Speed.NORMAL;
     }
 

@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.app.Activity;
+import android.view.View;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -14,28 +17,29 @@ public class Thalatte {
     public BNO055IMU imu;
 
     public HardwareMap hwmap;
+    public MouseTrap mouse;
 
-    public Thalatte(HardwareMap hwmap){
+    public Thalatte(HardwareMap hwmap) {
         this.hwmap = hwmap;
 
-        frontLeft  = hwmap.get(DcMotor.class,"frontLeft");
-        frontRight = hwmap.get(DcMotor.class,"frontRight");
-        backLeft   = hwmap.get(DcMotor.class,"backLeft");
-        backRight  = hwmap.get(DcMotor.class,"backRight");
-
-        frontRight.setDirection(DcMotor.Direction.REVERSE);
-        backRight.setDirection(DcMotor.Direction.REVERSE);
-        frontLeft.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.FORWARD);
-
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        shooterBack  = hwmap.get(DcMotor.class, "shooterBack");
-        shooterFront = hwmap.get(DcMotor.class, "shooterFront");
-
+//        frontLeft  = hwmap.get(DcMotor.class,"frontLeft");
+//        frontRight = hwmap.get(DcMotor.class,"frontRight");
+//        backLeft   = hwmap.get(DcMotor.class,"backLeft");
+//        backRight  = hwmap.get(DcMotor.class,"backRight");
+//
+//        frontRight.setDirection(DcMotor.Direction.REVERSE);
+//        backRight.setDirection(DcMotor.Direction.FORWARD);
+//        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+//        backLeft.setDirection(DcMotor.Direction.FORWARD);
+//
+//        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//
+//        shooterBack  = hwmap.get(DcMotor.class, "shooterBack");
+//        shooterFront = hwmap.get(DcMotor.class, "shooterFront");
+//
 //        intake = hwmap.get(DcMotor.class, "intake");
 //        vwomp  = hwmap.get(DcMotor.class, "vwomp");
 //
@@ -46,7 +50,7 @@ public class Thalatte {
 //
 //        vwompClampLeft  = hwmap.get(Servo.class, "vwompClampLeft");
 //        vwompClampRight = hwmap.get(Servo.class, "vwompClampRight");
-//
+
 //        intake1 = hwmap.get(CRServo.class, "intake1");
 //        intake2 = hwmap.get(CRServo.class, "intake2");
 
@@ -60,5 +64,10 @@ public class Thalatte {
 
         imu = hwmap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+
+        View v = ((Activity)hwmap.appContext).getWindow().getDecorView().findViewById(R.id.entire_screen);
+        v.requestPointerCapture();
+        v.setOnCapturedPointerListener(mouse);
+
     }
 }

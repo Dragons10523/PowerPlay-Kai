@@ -83,8 +83,8 @@ public class GamepadPrev {
         else if(slave.right_bumper       && !rb)    ret = ButtonEvent.RB;
         else if(slave.left_stick_button  && !lsb)   ret = ButtonEvent.LSB;
         else if(slave.right_stick_button && !rsb)   ret = ButtonEvent.RSB;
-        else if (slave.left_trigger  > 0 && !lt)    ret = ButtonEvent.LT;
-        else if (slave.right_trigger > 0 && !rt)    ret = ButtonEvent.RT;
+        else if(slave.left_trigger   > 0 && !lt)    ret = ButtonEvent.LT;
+        else if(slave.right_trigger  > 0 && !rt)    ret = ButtonEvent.RT;
         else                                        ret = ButtonEvent.NONE;
 
         update();

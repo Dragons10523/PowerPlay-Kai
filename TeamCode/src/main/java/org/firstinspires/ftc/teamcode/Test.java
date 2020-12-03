@@ -3,14 +3,14 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name = "Test")
-public class Test extends Localization {
+public class Test extends Control {
     @Override
     public void runOpMode() throws InterruptedException {
         alize();
         waitForStart();
-        startLocalization();
-        while (opModeIsActive()) {
-            telemetry.addData("Position", updatePosition());
+        while(opModeIsActive()) {
+            telemetry.addData("X",thalatte.mouse.x);
+            telemetry.addData("Y",thalatte.mouse.y);
             telemetry.update();
         }
     }
