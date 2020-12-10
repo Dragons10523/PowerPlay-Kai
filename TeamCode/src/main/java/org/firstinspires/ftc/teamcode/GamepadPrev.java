@@ -69,22 +69,22 @@ public class GamepadPrev {
     public ButtonEvent getEvent(){
         ButtonEvent ret;
 
-             if(slave.dpad_up            && !up)    ret = ButtonEvent.UP;
-        else if(slave.dpad_down          && !down)  ret = ButtonEvent.DOWN;
-        else if(slave.dpad_left          && !left)  ret = ButtonEvent.LEFT;
+             if(slave.dpad_up            && !up   ) ret = ButtonEvent.UP;
+        else if(slave.dpad_down          && !down ) ret = ButtonEvent.DOWN;
+        else if(slave.dpad_left          && !left ) ret = ButtonEvent.LEFT;
         else if(slave.dpad_right         && !right) ret = ButtonEvent.RIGHT;
-        else if(slave.a                  && !a)     ret = ButtonEvent.A;
-        else if(slave.b                  && !b)     ret = ButtonEvent.B;
-        else if(slave.x                  && !x)     ret = ButtonEvent.X;
-        else if(slave.y                  && !y)     ret = ButtonEvent.Y;
+        else if(slave.a                  && !a    ) ret = ButtonEvent.A;
+        else if(slave.b                  && !b    ) ret = ButtonEvent.B;
+        else if(slave.x                  && !x    ) ret = ButtonEvent.X;
+        else if(slave.y                  && !y    ) ret = ButtonEvent.Y;
         else if(slave.start              && !start) ret = ButtonEvent.START;
-        else if(slave.back               && !back)  ret = ButtonEvent.BACK;
-        else if(slave.left_bumper        && !lb)    ret = ButtonEvent.LB;
-        else if(slave.right_bumper       && !rb)    ret = ButtonEvent.RB;
-        else if(slave.left_stick_button  && !lsb)   ret = ButtonEvent.LSB;
-        else if(slave.right_stick_button && !rsb)   ret = ButtonEvent.RSB;
-        else if(slave.left_trigger   > 0 && !lt)    ret = ButtonEvent.LT;
-        else if(slave.right_trigger  > 0 && !rt)    ret = ButtonEvent.RT;
+        else if(slave.back               && !back ) ret = ButtonEvent.BACK;
+        else if(slave.left_bumper        && !lb   ) ret = ButtonEvent.LB;
+        else if(slave.right_bumper       && !rb   ) ret = ButtonEvent.RB;
+        else if(slave.left_stick_button  && !lsb  ) ret = ButtonEvent.LSB;
+        else if(slave.right_stick_button && !rsb  ) ret = ButtonEvent.RSB;
+        else if(slave.left_trigger   > 0 && !lt   ) ret = ButtonEvent.LT;
+        else if(slave.right_trigger  > 0 && !rt   ) ret = ButtonEvent.RT;
         else                                        ret = ButtonEvent.NONE;
 
         update();

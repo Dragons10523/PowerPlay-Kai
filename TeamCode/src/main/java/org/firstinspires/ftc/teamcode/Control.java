@@ -74,19 +74,19 @@ public abstract class Control extends LinearOpMode{
     public ElapsedTime time;
 
     public void drive(double l, double r) {
-        thalatte.backRight.setPower(r);
+        thalatte.backRight. setPower(r);
         thalatte.frontRight.setPower(r);
-        thalatte.backLeft.setPower(l);
-        thalatte.frontLeft.setPower(l);
+        thalatte.backLeft.  setPower(l);
+        thalatte.frontLeft. setPower(l);
     }
 
     public void shoot(double p) {
         thalatte.shooterFront.setPower(p);
-        thalatte.shooterBack.setPower(p);
+        thalatte.shooterBack. setPower(p);
     }
 
     public void intake(boolean on) {
-        thalatte.intake.setPower(on ? INTAKE : 0);
+        thalatte.intake. setPower(on ? INTAKE : 0);
         thalatte.intake1.setPower(on ? INTAKE : 0);
         thalatte.intake2.setPower(on ? INTAKE : 0);
     }
@@ -102,7 +102,7 @@ public abstract class Control extends LinearOpMode{
     }
 
     public void vwompClamp(boolean c) {
-        thalatte.vwompClampLeft.setPosition(c ? CLAMP : 0);
+        thalatte.vwompClampLeft. setPosition(c ? CLAMP : 0);
         thalatte.vwompClampRight.setPosition(c ? CLAMP : 0);
     }
 
@@ -119,6 +119,7 @@ public abstract class Control extends LinearOpMode{
         time     = new ElapsedTime();
 //        driveLoop();
         speed = Speed.NORMAL;
+
     }
 
     public double clamp(double num, double min, double max) {

@@ -65,9 +65,6 @@ public class Thalatte {
         imu = hwmap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-        View v = ((Activity)hwmap.appContext).getWindow().getDecorView().findViewById(R.id.entire_screen);
-        v.requestPointerCapture();
-        v.setOnCapturedPointerListener(mouse);
-
+        mouse = new MouseTrap(hwmap.appContext);
     }
 }

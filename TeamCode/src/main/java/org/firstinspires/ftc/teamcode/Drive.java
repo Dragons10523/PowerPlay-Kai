@@ -12,6 +12,7 @@ public class Drive extends Localization {
         while(opModeIsActive()) {
             GamepadPrev.ButtonEvent ev1 = GamepadPrev.ButtonEvent.NONE;
             GamepadPrev.ButtonEvent ev2 = GamepadPrev.ButtonEvent.NONE;
+
             while((ev1 = prev1.getEvent()) != GamepadPrev.ButtonEvent.NONE || (ev2 = prev2.getEvent()) != GamepadPrev.ButtonEvent.NONE){
 //                switch(ev1){
 //
@@ -25,11 +26,12 @@ public class Drive extends Localization {
                         break;
                 }
             }
-                 if(gamepad1.left_trigger > 0)  setSpeed(Speed.FASTER);
-            else if(gamepad1.left_bumper)       setSpeed(Speed.FAST);
-            else if(gamepad1.right_bumper)      setSpeed(Speed.SLOW);
+                 if(gamepad1.left_trigger > 0 ) setSpeed(Speed.FASTER);
+            else if(gamepad1.left_bumper      ) setSpeed(Speed.FAST  );
+            else if(gamepad1.right_bumper     ) setSpeed(Speed.SLOW  );
             else if(gamepad1.right_trigger > 0) setSpeed(Speed.SLOWER);
-            else setSpeed(Speed.NORMAL);
+            else                                setSpeed(Speed.NORMAL);
+
             driveLoop();
         }
         zero();
