@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp(name = "Drive")
-public class Drive extends Localization {
+public class Drive extends Control {
     @Override
     public void runOpMode() throws InterruptedException {
         alize();
@@ -24,6 +24,8 @@ public class Drive extends Localization {
                     case RB:
                         powerShotCycle(1);
                         break;
+                    case X:
+                        toggleIntake();
                 }
             }
                  if(gamepad1.left_trigger > 0 ) setSpeed(Speed.FASTER);

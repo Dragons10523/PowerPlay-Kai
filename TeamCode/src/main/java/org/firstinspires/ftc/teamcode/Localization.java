@@ -13,79 +13,56 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 public abstract class Localization extends Control {
-//    Vector2D<Double> position = new Vector2D<>(0.0,0.0);
-//    IntegrationData intD;
 
-    public void startLocalization(){
-//        thalatte.imu.startAccelerationIntegration(new Position(), new Velocity(), 500);
-//        intD = new IntegrationData(thalatte.imu, time);
-//        time.startTime();
+    public ElapsedTime time;
+    protected double theta;
+    private boolean turningFlag = false;
+    private double targetAngle;
+    private int turnDirection;
+
+    public void startLocalization() {
         Thread mouse = new Thread(thalatte.mouse,"mouseTrap");
         mouse.start();
+        time = new ElapsedTime();
     }
 
-//    public Vector2D<Double> getPosition(){
-//        double x = intD.x;
-//        double y = intD.y;
-//        // TODO Distance Sensor Sh!t
-//        position.x = x;
-//        position.y = y;
-//        return position;
-//    }
+    public void updateLocalization() {
+        theta = thalatte.imu.getAngularOrientation().toAngleUnit(AngleUnit.RADIANS).firstAngle;
+        theta %= Math.PI * 2;
+        thalatte.lightsaber.setTheta(theta);
+        if(turningFlag) updateTurnTo();
+    }
 
-//    public Vector2D<Double> updatePosition(){
-//        sleep(500);
-//
-//        intD.integrate();
-//
-//        return getPosition();
-//    }
+    public void startTurnTo(double theta){
+        turnDirection = 1;
+        theta %= Math.PI * 2;
+
+        if(theta - this.theta > 0) turnDirection =  1;
+        if(theta - this.theta < 0) turnDirection = -1;
+        if(Math.abs(theta - this.theta) > Math.PI) turnDirection = -turnDirection;
+
+        targetAngle = theta;
+        turningFlag = true;
+    }
+
+    public void updateTurnTo(){
+        if((targetAngle >= theta - 0.07)&&(targetAngle <= theta + 0.07)) stopTurnTo();
+
+        double power = 1 * turnDirection;
+
+        if(Math.abs(targetAngle - theta) > Math.PI / 8) power =   1;
+        else                                            power = 0.1;
+
+        drive(-power,power);
+    }
+
+    public void stopTurnTo(){
+        turningFlag = false;
+        drive(0,0);
+    }
+
+    public void moveTo(double x, double y){
+        //TODO: implement moveTo (requires localization)
+    }
+
 }
-
-//class IntegrationData {
-//    double deltaT = 0.5;
-//
-//    double[] pastDT = {0.5,0.5,0.5,0.5,0.5};
-//    int index       = 0;
-//    int counter     = 0;
-//
-//    double x = 0, y = 0, vx = 0, vy = 0;
-//
-//    BNO055IMU imu;
-//    ElapsedTime time;
-//
-//    IntegrationData(BNO055IMU imu, ElapsedTime time){
-//        this.imu  = imu;
-//        this.time = time;
-//    }
-//
-//    void updateTime(){
-//        if(++counter==10){
-//            counter %= 10;
-//            pastDT[index++] = time.seconds();
-//            index %= 5;
-//
-//            deltaT = (pastDT[0] + pastDT[1] + pastDT[2] + pastDT[3] + pastDT[4]) / 5.0;
-//        }
-//        time.reset();
-//    }
-//
-//    void integrate(){
-//        updateTime();
-//        Acceleration acc = imu.getAcceleration().toUnit(DistanceUnit.INCH);
-//        Orientation or   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
-//
-//        double theta = -or.firstAngle;
-//        double axl   = acc.xAccel;
-//        double ayl   = acc.yAccel;
-//
-//        double ax = Math.sin(theta)*axl + Math.cos(theta)*ayl;
-//        double ay = -Math.cos(theta)*axl + Math.sin(theta)*ayl;
-//
-//        vx += ax*deltaT;
-//        vy += ay*deltaT;
-//
-//        x += vx*deltaT;
-//        y += vy*deltaT;
-//    }
-//}

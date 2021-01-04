@@ -86,13 +86,13 @@ public abstract class Control extends LinearOpMode{
     }
 
     public void intake(boolean on) {
-        thalatte.intake. setPower(on ? INTAKE : 0);
+        //thalatte.intake. setPower(on ? INTAKE : 0);
         thalatte.intake1.setPower(on ? INTAKE : 0);
         thalatte.intake2.setPower(on ? INTAKE : 0);
     }
 
     public boolean toggleIntake() {
-        boolean set = thalatte.intake.getPower() == 0;
+        boolean set = thalatte.intake1.getPower() == 0;
         intake(set);
         return set;
     }
