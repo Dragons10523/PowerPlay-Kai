@@ -2,12 +2,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Vector;
 
 public class Lightsaber {
 
@@ -50,6 +49,7 @@ public class Lightsaber {
     }
 
     Geometry.Line lineate(LightsaberUnit unit){
+        if(unit.sensor.getDistance(DistanceUnit.INCH) == DistanceUnit.infinity) return null;
         Geometry.Wall wall = geometry.intersects(unit,position,theta);
         Geometry.Line line = geometry.line(wall);
 
@@ -61,7 +61,40 @@ public class Lightsaber {
         return line;
     }
 
-    final double range = 2.0;
+    public void estimate(){
+        Collection<LightsaberUnit> units = this.units.values();
+        Vector<Geometry.Line>      lines = new Vector<>();
+        Vector<Geometry.Point>    points = new Vector<>();
+        for(LightsaberUnit u : units){
+            Geometry.Line line;
+            if((line = lineate(u)) != null) lines.add(line);
+        }
+        for(int i = 0; i < lines.size(); i++){
+            for(int j = lines.size() - 1; j >= 0; j--){
+                Geometry.Point point;
+                Geometry.Line  line;
+                if(i == j)
+                    break;
+                if((point = geometry.intersection(lines.get(i), lines.get(j))) == null)
+                    continue;
+                if((line = geometry.line(point, position)).getDistance() > 2.0)
+                    continue;
+                points.add(point);
+            }
+        }
+        Vector<Double> xs = new Vector<>();
+        Vector<Double> ys = new Vector<>();
+        for(Geometry.Point p : points){
+            xs.add(p.x);
+            ys.add(p.y);
+        }
+        double xavg = 0, yavg = 0;
+        for(double x : xs) xavg += x;
+        for(double y : ys) yavg += y;
+        xavg /= xs.size();
+        yavg /= ys.size();
+        position = geometry.point(xavg, yavg);
+    }
 
     HashMap<String,LightsaberUnit> units;
 

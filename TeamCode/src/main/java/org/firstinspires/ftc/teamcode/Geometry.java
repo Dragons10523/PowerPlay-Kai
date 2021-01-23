@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import java.lang.reflect.Array;
-import java.util.Collection;
-
 public class Geometry {
 
     public class Point {
@@ -10,6 +7,9 @@ public class Geometry {
         Point(double x, double y){
             this.x = x;
             this.y = y;
+        }
+        double distance(){
+            return Math.sqrt(x*x + y*y);
         }
     }
 
@@ -70,8 +70,10 @@ public class Geometry {
         double y3 = l2.p1.y;
         double x4 = l2.p2.x;
         double y4 = l2.p2.y;
-        return new Point(((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / ((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)),
-                ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / ((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)));
+        double denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        if(denominator == 0) return null;
+        return new Point((((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / denominator),
+                          ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / denominator);
     }
 
     public Point point(double x, double y){
@@ -86,6 +88,7 @@ public class Geometry {
     public Line line(Wall wall){
         return new Line(wall);
     }
+
     Wall[] walls;
 
     Wall intersects(Lightsaber.LightsaberUnit unit, Point estimate, double theta){

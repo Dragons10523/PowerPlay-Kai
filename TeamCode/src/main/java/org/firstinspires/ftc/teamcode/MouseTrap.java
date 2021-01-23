@@ -16,8 +16,8 @@ public class MouseTrap implements Runnable {
     private final double theta_constant    = 2 * Math.PI / 2000.0;
     private final double distance_constant = 1.0 / 400.0;
 
-    private int mouse_x   = 0;
-    private int mouse_y   = 0;
+    protected int mouse_x   = 0;
+    protected int mouse_y   = 0;
 
     protected double theta = Math.PI / 2;
     protected double x     = 0;
@@ -72,13 +72,5 @@ public class MouseTrap implements Runnable {
         theta   += theta_constant    * deltaX;
         x       += distance_constant * deltaY * Math.cos(theta);
         y       += distance_constant * deltaY * Math.sin(theta);
-    }
-
-    public int getMouseX(){
-        return mouse_x;
-    }
-
-    public int getMouseY(){
-        return mouse_y;
     }
 }

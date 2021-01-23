@@ -3,10 +3,11 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public abstract class Control extends LinearOpMode{
+public abstract class Control extends LinearOpMode {
     Thalatte thalatte;
 
     final double INTAKE = 1.0;
+          double FLUP   = 1.0;
     final double CLAMP  = 1.0;
 
     enum Speed {
@@ -73,6 +74,8 @@ public abstract class Control extends LinearOpMode{
 
     public ElapsedTime time;
 
+
+
     public void drive(double l, double r) {
         thalatte.backRight. setPower(r);
         thalatte.frontRight.setPower(r);
@@ -85,14 +88,34 @@ public abstract class Control extends LinearOpMode{
         thalatte.shooterBack. setPower(p);
     }
 
+    public void shootDistance(double distance) throws InterruptedException{
+        double power = distance / 15.0;
+        shoot(power);
+        Thread.sleep(333);
+        shoot(0);
+    }
+
+    public boolean toggleShoot(double power){
+        boolean set = thalatte.shooterFront.getPower() == 0;
+        shoot(set ? power : 0);
+        return set;
+    }
+
     public void intake(boolean on) {
-        //thalatte.intake. setPower(on ? INTAKE : 0);
-        thalatte.intake1.setPower(on ? INTAKE : 0);
-        thalatte.intake2.setPower(on ? INTAKE : 0);
+        thalatte.intake.setPower(on ? INTAKE : 0);
+    }
+
+    public void flup(boolean on) {
+        thalatte.flup1.setPower(  on ? FLUP : 0);
+        thalatte.flup2.setPower(-(on ? FLUP : 0));
+    }
+
+    public void setFlupDirection(int direction){
+        FLUP = Math.signum(direction);
     }
 
     public boolean toggleIntake() {
-        boolean set = thalatte.intake1.getPower() == 0;
+        boolean set = thalatte.intake.getPower() == 0;
         intake(set);
         return set;
     }
@@ -117,7 +140,7 @@ public abstract class Control extends LinearOpMode{
         prev1    = new GamepadPrev(gamepad1);
         prev2    = new GamepadPrev(gamepad2);
         time     = new ElapsedTime();
-//        driveLoop();
+        zero();
         speed = Speed.NORMAL;
 
     }
@@ -125,10 +148,6 @@ public abstract class Control extends LinearOpMode{
     public double clamp(double num, double min, double max) {
         return Math.max(Math.min(num, max), min);
     }
-
-//    public void setTarAng() {
-//        // TODO
-//    }
 
     public void powerShotCycle(int i){
         ps = intToPs((i + psToInt(ps))%3);
@@ -163,6 +182,7 @@ public abstract class Control extends LinearOpMode{
         drive(0,0);
         vwompArm(0);
         intake(false);
+        flup(false);
         shoot(0);
     }
 }

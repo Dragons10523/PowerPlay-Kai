@@ -47,7 +47,7 @@ public class GamepadPrev {
         this.slave = slave;
     }
 
-    public void update(){
+    public void update() {
         up    = slave.dpad_up;
         down  = slave.dpad_down;
         left  = slave.dpad_left;
@@ -66,7 +66,7 @@ public class GamepadPrev {
         rt    = slave.right_trigger > 0;
     }
 
-    public ButtonEvent getEvent(){
+    public ButtonEvent getEvent() {
         ButtonEvent ret;
 
              if(slave.dpad_up            && !up   ) ret = ButtonEvent.UP;

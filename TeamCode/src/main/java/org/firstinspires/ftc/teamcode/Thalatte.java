@@ -7,20 +7,23 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class Thalatte {
-    public DcMotor frontLeft, frontRight, backLeft, backRight, shooterBack, shooterFront, intake1, intake2, vwomp;
+    public DcMotor frontLeft, frontRight, backLeft, backRight, shooterBack, shooterFront, intake, vwomp;
     public Servo vwompClampLeft, vwompClampRight;
-    //public CRServo intake1, intake2;
+    public CRServo flup1, flup2;
     public BNO055IMU imu;
 
     public HardwareMap hwmap;
-    public MouseTrap mouse;
+    //public MouseTrap mouse;
 
     public Geometry geometry;
     public Lightsaber lightsaber;
+
+    public VoltageSensor vs;
 
     public Thalatte(HardwareMap hwmap) {
         this.hwmap = hwmap;
@@ -40,21 +43,20 @@ public class Thalatte {
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        shooterBack  = hwmap.get(DcMotor.class, "shooterBack");
-//        shooterFront = hwmap.get(DcMotor.class, "shooterFront");
+        shooterBack  = hwmap.get(DcMotor.class, "shooterBack");
+        shooterFront = hwmap.get(DcMotor.class, "shooterFront");
 
-        intake1 = hwmap.get(DcMotor.class, "intake1");
-        intake2 = hwmap.get(DcMotor.class, "intake2");
+        intake = hwmap.get(DcMotor.class, "intake1");
 
-        intake2.setDirection(DcMotorSimple.Direction.REVERSE);
-//
-//        vwomp  = hwmap.get(DcMotor.class, "vwomp");
-//
-//        vwompClampLeft  = hwmap.get(Servo.class, "vwompClampLeft");
-//        vwompClampRight = hwmap.get(Servo.class, "vwompClampRight");
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        //intake1 = hwmap.get(CRServo.class, "intake1");
-        //intake2 = hwmap.get(CRServo.class, "intake2");
+        vwomp  = hwmap.get(DcMotor.class, "vwomp");
+
+        vwompClampLeft  = hwmap.get(Servo.class, "vwompClampLeft");
+        vwompClampRight = hwmap.get(Servo.class, "vwompClampRight");
+
+        flup1 = hwmap.get(CRServo.class, "flup1");
+        flup2 = hwmap.get(CRServo.class, "flup2");
 
         BNO055IMU.Parameters parameters             = new BNO055IMU.Parameters();
         parameters.angleUnit                        = BNO055IMU.AngleUnit.RADIANS;
@@ -77,6 +79,8 @@ public class Thalatte {
         lightsaberMap.put("frontSaber", new Lightsaber.LightsaberUnit(0,0,Math.PI/2)    );
         lightsaberMap.put("backSaber" , new Lightsaber.LightsaberUnit(0,0,Math.PI * 1.5));
 
-        //lightsaber = new Lightsaber(lightsaberMap,hwmap,geometry);
+        for(Iterator i  = hwmap.voltageSensor.iterator(); i.hasNext();) vs = (VoltageSensor) i.next();
+
+        lightsaber = new Lightsaber(lightsaberMap,hwmap,geometry);
     }
 }
