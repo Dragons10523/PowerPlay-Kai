@@ -14,3 +14,5 @@ public abstract class AutoAim extends Localization {
 //        return new Vector2D<>((double)-thalatte.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle + relAng,((1/20)*((Math.sqrt(((pos2.y - pos1.y)*(pos2.y - pos1.y) + (pos2.x - pos1.x)*(pos2.x - pos1.x)) + (height)*(height)) - 20)) + 1)*powerAdj);
 //    }
 }
+
+// ☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭

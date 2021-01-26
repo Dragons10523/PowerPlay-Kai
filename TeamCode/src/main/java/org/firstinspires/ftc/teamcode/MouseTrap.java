@@ -74,3 +74,5 @@ public class MouseTrap implements Runnable {
         y       += distance_constant * deltaY * Math.sin(theta);
     }
 }
+
+// ☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭

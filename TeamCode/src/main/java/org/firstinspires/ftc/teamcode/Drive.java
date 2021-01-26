@@ -38,6 +38,8 @@ public class Drive extends Control {
                     case DOWN:
                         sPower = Math.max(sPower - 0.1, 0);
                         break;
+                    case LT:
+                        setFlupDirection(FLUP > 0 ? -1 : 1);
                 }
             }
                  if(gamepad1.left_trigger > 0 ) setSpeed(Speed.FASTER);
@@ -51,3 +53,5 @@ public class Drive extends Control {
         zero();
     }
 }
+
+// ☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭

@@ -43,8 +43,14 @@ public abstract class Localization extends Control {
     private TFObjectDetector tfod;
 
     public void startLocalization() {
-        initVuforia();
-        initTfod();
+        startLocalization(true);
+    }
+
+    public void startLocalization(boolean vuFlag) {
+        if(vuFlag) {
+            initVuforia();
+            initTfod();
+        }
         lightsaber = thalatte.lightsaber;
         geometry = thalatte.geometry;
         time = new ElapsedTime();
@@ -220,3 +226,5 @@ public abstract class Localization extends Control {
         vuforia = null;
     }
 }
+
+// ☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭

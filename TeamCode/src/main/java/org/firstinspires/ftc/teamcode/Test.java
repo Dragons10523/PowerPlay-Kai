@@ -10,7 +10,7 @@ public class Test extends Localization {
         waitForStart();
         startLocalization();
         Double startTime = null;
-        Geometry.Point points[] = new Geometry.Point[4];
+        Geometry.Point[] points = new Geometry.Point[4];
         points[0] = geometry.point(10,10); // 10, 10
         points[1] = geometry.point(60,10);
         points[2] = geometry.point(60,60);
@@ -26,3 +26,5 @@ public class Test extends Localization {
         stop();
     }
 }
+
+// ☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭

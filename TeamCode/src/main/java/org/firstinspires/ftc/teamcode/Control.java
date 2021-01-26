@@ -117,6 +117,7 @@ public abstract class Control extends LinearOpMode {
     public boolean toggleIntake() {
         boolean set = thalatte.intake.getPower() == 0;
         intake(set);
+        flup(set);
         return set;
     }
 
@@ -186,3 +187,5 @@ public abstract class Control extends LinearOpMode {
         shoot(0);
     }
 }
+
+// ☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭
