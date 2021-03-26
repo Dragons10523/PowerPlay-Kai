@@ -1,13 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 public abstract class Control extends LinearOpMode {
     Thalatte thalatte;
+    double sPower = 1;
 
-    final double INTAKE = 1.0;
-          double FLUP   = 1.0;
+          double INTAKE = -1.0;
+          double FEEDER   = 1.0;
     final double CLAMP  = 1.0;
 
     enum Speed {
@@ -24,19 +27,6 @@ public abstract class Control extends LinearOpMode {
         CENTER,
         RIGHT
     }
-
-    enum Vwomp {
-        DOWN,
-        UP
-    }
-
-    enum Clamp {
-        OPENED,
-        CLOSED
-    }
-
-    Vwomp vwomp = Vwomp.UP;
-    Clamp clamp = Clamp.CLOSED;
 
     private int psToInt(PowerShot ps){
         switch (ps){
@@ -74,13 +64,18 @@ public abstract class Control extends LinearOpMode {
 
     public ElapsedTime time;
 
-
-
     public void drive(double l, double r) {
         thalatte.backRight. setPower(r);
         thalatte.frontRight.setPower(r);
         thalatte.backLeft.  setPower(l);
         thalatte.frontLeft. setPower(l);
+    }
+
+    public void driveVel(double l, double r) {
+        ((DcMotorEx)thalatte.backRight ).setVelocity(r);
+        ((DcMotorEx)thalatte.frontRight).setVelocity(r);
+        ((DcMotorEx)thalatte.backLeft  ).setVelocity(l);
+        ((DcMotorEx)thalatte.frontLeft ).setVelocity(l);
     }
 
     public void shoot(double p) {
@@ -105,19 +100,37 @@ public abstract class Control extends LinearOpMode {
         thalatte.intake.setPower(on ? INTAKE : 0);
     }
 
-    public void flup(boolean on) {
-        thalatte.flup1.setPower(  on ? FLUP : 0);
-        thalatte.flup2.setPower(-(on ? FLUP : 0));
+    public void feeder(boolean on) {
+        thalatte.feeder.setPower(on ? FEEDER : 0);
     }
 
-    public void setFlupDirection(int direction){
-        FLUP = Math.signum(direction);
+    public void setFeederDirection(double direction){
+        FEEDER = Math.signum(direction);
+        feeder(thalatte.feeder.getPower() != 0);
+    }
+
+    public void setIntakeDirection(double direction){
+        INTAKE = Math.signum(direction);
+        intake(thalatte.intake.getPower() != 0);
+    }
+
+    public void toggleFeederDirection(){
+        setFeederDirection(-Math.signum(FEEDER));
     }
 
     public boolean toggleIntake() {
         boolean set = thalatte.intake.getPower() == 0;
         intake(set);
-        flup(set);
+        return set;
+    }
+
+    public void toggleIntakeDirection(){
+        setIntakeDirection(-Math.signum(INTAKE));
+    }
+
+    public boolean toggleFeeder() {
+        boolean set = thalatte.feeder.getPower() == 0;
+        feeder(set);
         return set;
     }
 
@@ -126,12 +139,11 @@ public abstract class Control extends LinearOpMode {
     }
 
     public void vwompClamp(boolean c) {
-        thalatte.vwompClampLeft. setPosition(c ? CLAMP : 0);
-        thalatte.vwompClampRight.setPosition(c ? CLAMP : 0);
+        thalatte.vwompClamp.setPosition(c ? CLAMP : 0);
     }
 
     public boolean toggleVwompClamp() {
-        boolean set = thalatte.vwompClampLeft.getPosition() == 0;
+        boolean set = thalatte.vwompClamp.getPosition() == 0;
         vwompClamp(set);
         return set;
     }
@@ -142,11 +154,11 @@ public abstract class Control extends LinearOpMode {
         prev2    = new GamepadPrev(gamepad2);
         time     = new ElapsedTime();
         zero();
-        speed = Speed.NORMAL;
-
+        speed = Speed.FASTER;
+//        thalatte.lights.setConstant(80);
     }
 
-    public double clamp(double num, double min, double max) {
+    public static double clamp(double num, double min, double max) {
         return Math.max(Math.min(num, max), min);
     }
 
@@ -179,12 +191,93 @@ public abstract class Control extends LinearOpMode {
                 break;
         }
     }
+
     public void zero(){
         drive(0,0);
         vwompArm(0);
         intake(false);
-        flup(false);
+        feeder(false);
         shoot(0);
+    }
+
+    public void disableMotor(DcMotor motor){
+        if(((DcMotorEx)motor).isMotorEnabled()){
+            ((DcMotorEx)motor).setMotorDisable();
+        }
+    }
+
+    public void enableMotor(DcMotor motor){
+        if(!((DcMotorEx)motor).isMotorEnabled()){
+            ((DcMotorEx)motor).setMotorEnable();
+        }
+    }
+
+    public void disableIntake(){
+        disableMotor(thalatte.intake);
+    }
+
+    public void disableShooter(){
+        disableMotor(thalatte.shooterBack);
+        disableMotor(thalatte.shooterFront);
+    }
+
+    public void disableDrive(){
+        disableMotor(thalatte.frontLeft);
+        disableMotor(thalatte.frontRight);
+        disableMotor(thalatte.backLeft);
+        disableMotor(thalatte.backRight);
+    }
+
+    public void disableVwomp(){
+        disableMotor(thalatte.vwomp);
+    }
+
+    public void disableAll(){
+        disableDrive();
+        disableIntake();
+        disableShooter();
+        disableVwomp();
+    }
+
+    public void enableIntake(){
+        enableMotor(thalatte.intake);
+    }
+
+    public void enableShooter(){
+        enableMotor(thalatte.shooterBack);
+        enableMotor(thalatte.shooterFront);
+    }
+
+    public void enableDrive(){
+        enableMotor(thalatte.frontLeft);
+        enableMotor(thalatte.frontRight);
+        enableMotor(thalatte.backLeft);
+        enableMotor(thalatte.backRight);
+    }
+
+    public void enableVwomp(){
+        enableMotor(thalatte.vwomp);
+    }
+
+    public void enableAll(){
+        enableDrive();
+        enableIntake();
+        enableShooter();
+        enableVwomp();
+    }
+
+    @Deprecated
+    public void disableForever(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    disableAll();
+                    disableForever();
+                    sleep(10);
+                }
+            }
+        });
     }
 }
 

@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 public class Geometry {
 
-    public class Point {
+    public static class Point {
         double x, y;
         Point(double x, double y){
             this.x = x;
@@ -13,7 +13,7 @@ public class Geometry {
         }
     }
 
-    public class Wall {
+    public static class Wall {
         Point p1, p2;
 
         Wall(Point p1, Point p2) {
@@ -22,19 +22,24 @@ public class Geometry {
         }
 
         Point midpoint(){
-            return new Point((p1.x + p2.x)/2,(p1.y+p2.y)/2);
+            return new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
         }
 
         boolean inRange(Line l){
             Line l1      = new Line(l.p1,this.p1   );
             Line l2      = new Line(l.p1,this.p2   );
             Line midline = new Line(l.p1,midpoint());
-            return (midline.theta <= l1.theta && midline.theta >= l2.theta) == (l.theta <= l1.theta && l.theta >= l2.theta);
+            double p1mid = l1.theta - midline.theta;
+            double p2mid = midline.theta - l2.theta;
+            double p1l   = l1.theta - l.theta;
+            double p2l   = l.theta - l2.theta;
+            return ((p1mid == Control.clamp(p1mid,0,Math.PI) || p1mid == Control.clamp(p1mid,-2 * Math.PI, -Math.PI)) && (p2mid == Control.clamp(p2mid,0,Math.PI) || p2mid == Control.clamp(p2mid,-2 * Math.PI, -Math.PI)))
+                    == ((p1l == Control.clamp(p1l,0,Math.PI) || p1l == Control.clamp(p1l,-2 * Math.PI, -Math.PI)) && (p2l == Control.clamp(p2l,0,Math.PI) || p2l == Control.clamp(p2l,-2 * Math.PI, -Math.PI)));
         }
     }
 
 
-    public class Line {
+    public static class Line {
         Point p1;
         Point p2;
         double theta;
@@ -42,22 +47,21 @@ public class Geometry {
         Line(Point p1, Point p2) {
             this.p1 = p1;
             this.p2 = p2;
-            theta = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+            theta = Localization.collapseAngle(Math.atan2(p2.y - p1.y, p2.x - p1.x));
         }
 
         Line(Point p, double theta) {
             p1 = p;
             p2 = new Point(p.x + Math.cos(theta), p.y + Math.sin(theta));
-            this.theta = theta;
+            this.theta = Localization.collapseAngle(theta);
         }
 
         Line(Wall w){
-            p1 = w.p1;
-            p2 = w.p2;
+            this(w.p1,w.p2);
         }
 
         double getDistance() {
-            return Math.sqrt((p2.x-p1.x)*(p2.x-p1.x)+(p2.y-p1.y)*(p2.y-p1.y));
+            return Math.sqrt(((p2.x-p1.x)*(p2.x-p1.x))+((p2.y-p1.y)*(p2.y-p1.y)));
         }
     }
 
@@ -70,14 +74,14 @@ public class Geometry {
         double y3 = l2.p1.y;
         double x4 = l2.p2.x;
         double y4 = l2.p2.y;
-        double denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        double denominator = ((x1 - x2) * (y3 - y4)) - ((y1 - y2) * (x3 - x4));
         if(denominator == 0) return null;
-        return new Point((((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / denominator),
-                          ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / denominator);
+        return new Point((((((x1 * y2) - (y1 * x2)) * (x3 - x4)) - ((x1 - x2) * ((x3 * y4) - (y3 * x4)))) / denominator),
+                ((((x1 * y2) - (y1 * x2)) * (y3 - y4)) - ((y1 - y2) * ((x3 * y4) - (y3 * x4)))) / denominator);
     }
 
     public Point point(double x, double y){
-        return new Point(x,y);
+        return new Point(x, y);
     }
     public Line line(Point p1, Point p2) {
         return new Line(p1,p2);
@@ -91,32 +95,36 @@ public class Geometry {
 
     Wall[] walls;
 
-    Wall intersects(Lightsaber.LightsaberUnit unit, Point estimate, double theta){
-        double direction = Math.atan2(unit.getYDistance(theta),unit.getXDistance(theta));
-        Line aim = new Line(estimate,direction);
-        return intersects(aim);
-    }
-
-    Wall intersects(Line line){
-        double distance = Double.POSITIVE_INFINITY;
-        Wall   closest  = null;
-
-        for(Wall w : walls){
-            Point  estimate         = line.p1;
-            double theta            = line.theta;
-            Point  intersection     = intersection(line,new Line(w));
-            Line   path             = new Line(estimate,intersection);
-            double possibleDistance = path.getDistance();
-
-            if(Math.signum(path.theta) != Math.signum(theta)) continue;
-            if(!w.inRange(line)                             ) continue;
-            if(possibleDistance        >  distance          ) continue;
-
-            distance = possibleDistance;
-            closest  = w;
-        }
-        return closest;
-    }
+//    Wall intersects(Lightsaber.LightsaberUnit unit, Point estimate, double theta){
+//        double direction = Math.atan2(unit.getYDistance(theta),unit.getXDistance(theta));
+//        Line aim = new Line(estimate,direction);
+//        return intersects(aim);
+//    }
+//
+//    Wall intersects(Line line){
+//        double distance = Double.POSITIVE_INFINITY;
+//        Wall   closest  = null;
+//
+//        for(Wall w : walls){
+//            Point  estimate         = line.p1;
+//            double theta            = line.theta;
+//            Point  intersection     = intersection(line,new Line(w));
+//            Line   path             = new Line(estimate,intersection);
+//            double possibleDistance = path.getDistance();
+//
+////            System.out.println("|| 0");
+//            if((Math.abs(path.theta - line.theta) > Math.PI / 2) && (Math.abs(path.theta - line.theta) < Math.PI)) continue;
+////            System.out.println("|| 1");
+//            if(!w.inRange(line)                             ) continue;
+////            System.out.println("|| 2");
+//            if(possibleDistance        >= distance          ) continue;
+////            System.out.println("|| 3");
+//
+//            distance = possibleDistance;
+//            closest  = w;
+//        }
+//        return closest;
+//    }
 
     Geometry(Wall[] walls){
         this.walls = walls;
@@ -125,8 +133,8 @@ public class Geometry {
     Geometry(){
         Point lowerLeft  = new Point(0, 0);
         Point upperLeft  = new Point(0, 144);
-        Point lowerRight = new Point(144, 0);
-        Point upperRight = new Point(144, 144);
+        Point lowerRight = new Point(96, 0);
+        Point upperRight = new Point(96, 144);
 
         Wall left  = new Wall(lowerLeft,upperLeft);
         Wall right = new Wall(lowerRight,upperRight);

@@ -1,10 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.motors.GoBILDA5201Series;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -12,6 +15,7 @@ public class Lightsaber {
 
     Geometry geometry;
     Geometry.Point position;
+    final Geometry.Point MIDPOINT = new Geometry.Point(48,72);
     double theta;
 
     public static class LightsaberUnit {
@@ -22,6 +26,7 @@ public class Lightsaber {
             this.xOffset   = xOffset;
             this.yOffset   = yOffset;
             this.direction = direction;
+
         }
 
         double getXDistance(double theta){
@@ -30,7 +35,7 @@ public class Lightsaber {
             double yMagnitude = distance * Math.sin(direction);
             double x = xOffset + xMagnitude;
             double y = yOffset + yMagnitude;
-            return (Math.cos(theta)*x) + (Math.sin(theta)*y);
+            return (Math.cos(theta - (Math.PI / 2))*x) + (Math.sin(theta - (Math.PI / 2))*y);
         }
 
         double getYDistance(double theta){
@@ -39,7 +44,7 @@ public class Lightsaber {
             double yMagnitude = distance * Math.sin(direction);
             double x = xOffset + xMagnitude;
             double y = yOffset + yMagnitude;
-            return (-Math.sin(theta)*x) + (Math.cos(theta)*y);
+            return (-Math.sin(theta - (Math.PI / 2))*x) + (Math.cos(theta - (Math.PI / 2))*y);
         }
 
     }
@@ -48,52 +53,87 @@ public class Lightsaber {
         this.theta = theta;
     }
 
-    Geometry.Line lineate(LightsaberUnit unit){
-        if(unit.sensor.getDistance(DistanceUnit.INCH) == DistanceUnit.infinity) return null;
-        Geometry.Wall wall = geometry.intersects(unit,position,theta);
-        Geometry.Line line = geometry.line(wall);
+    Vector<Geometry.Line> lineate(LightsaberUnit unit){
+        Vector<Geometry.Line> ret = new Vector<>();
 
-        line.p1.x -= unit.getXDistance(theta);
-        line.p1.y -= unit.getYDistance(theta);
-        line.p2.x -= unit.getXDistance(theta);
-        line.p2.y -= unit.getYDistance(theta);
+        for(int i = 0; i < geometry.walls.length; i++) {
+            if(unit.sensor.getDistance(DistanceUnit.METER) >= 2.0)
+                break;
+            Geometry.Wall wall = geometry.walls[i];
+            Geometry.Line line = new Geometry.Line(wall);
+            double p1_1, p2_1, p1_2, p2_2;
+            line.p1.x -= unit.getXDistance(theta);
+            line.p1.y -= unit.getYDistance(theta);
+            line.p2.x -= unit.getXDistance(theta);
+            line.p2.y -= unit.getYDistance(theta);
 
-        return line;
+            p1_1 = new Geometry.Line(wall.p1,MIDPOINT).getDistance();
+            p2_1 = new Geometry.Line(wall.p2,MIDPOINT).getDistance();
+            p1_2 = new Geometry.Line(line.p1,MIDPOINT).getDistance();
+            p2_2 = new Geometry.Line(line.p2,MIDPOINT).getDistance();
+
+            if(p1_1 <= p1_2 && p2_1 <= p2_2)
+                continue;
+
+            ret.add(line);
+        }
+
+        return ret;
     }
 
-    public void estimate(){
+    public void estimate() {
+
         Collection<LightsaberUnit> units = this.units.values();
         Vector<Geometry.Line>      lines = new Vector<>();
         Vector<Geometry.Point>    points = new Vector<>();
-        for(LightsaberUnit u : units){
-            Geometry.Line line;
-            if((line = lineate(u)) != null) lines.add(line);
+
+        for(LightsaberUnit u : units) {
+            Vector<Geometry.Line> ls = lineate(u);
+            lines.addAll(ls);
         }
-        for(int i = 0; i < lines.size(); i++){
-            for(int j = lines.size() - 1; j >= 0; j--){
+
+        System.out.println("||| POINTS REPORT");
+
+        for(int i = 0; i < lines.size(); i++) {
+            for(int j = lines.size() - 1; j >= 0; j--) {
                 Geometry.Point point;
-                Geometry.Line  line;
                 if(i == j)
                     break;
                 if((point = geometry.intersection(lines.get(i), lines.get(j))) == null)
                     continue;
-                if((line = geometry.line(point, position)).getDistance() > 2.0)
-                    continue;
+                System.out.printf("X: %f, Y: %f\n", point.x, point.y);
                 points.add(point);
             }
         }
-        Vector<Double> xs = new Vector<>();
-        Vector<Double> ys = new Vector<>();
-        for(Geometry.Point p : points){
-            xs.add(p.x);
-            ys.add(p.y);
+
+        double xs = 0;
+        double ys = 0;
+
+        int removed = 0;
+
+        for(int i = 0; i < points.size(); i++) {
+
+            double x = points.get(i - removed).x;
+            double y = points.get(i - removed).y;
+
+            if(Control.clamp(x,0,96) != x || Control.clamp(y,0,144) != y) {
+                points.remove(i-(removed++));
+                continue;
+            }
+
+            xs += x;
+            ys += y;
+
         }
-        double xavg = 0, yavg = 0;
-        for(double x : xs) xavg += x;
-        for(double y : ys) yavg += y;
-        xavg /= xs.size();
-        yavg /= ys.size();
-        position = geometry.point(xavg, yavg);
+
+        if(points.size() == 0)
+            return;
+
+        xs /= (double)(points.size());
+        ys /= (double)(points.size());
+
+        position = new Geometry.Point(xs,ys);
+
     }
 
     HashMap<String,LightsaberUnit> units;
