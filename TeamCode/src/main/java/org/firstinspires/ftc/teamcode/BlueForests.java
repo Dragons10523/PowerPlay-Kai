@@ -11,7 +11,7 @@ public class BlueForests extends Localization{
     @Override
     public void runOpMode() throws InterruptedException {
         alize();
-        startLocalization(false);
+        startLocalization(vuFlag.OFF);
         vwompClamp(false);
         waitForStart();
 //        final int r = rings();

@@ -10,6 +10,9 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -21,13 +24,13 @@ public class Thalatte {
 
     public HardwareMap hwmap;
 
-//    public Geometry geometry;
-//    public Lightsaber lightsaber;
     public DistanceSensor front, right, left, back;
 
     public VoltageSensor vs = null;
 
 //    public Blinker lights;
+
+    public WebcamName webcam;
 
     public Thalatte(HardwareMap hwmap) {
         this.hwmap = hwmap;
@@ -85,14 +88,6 @@ public class Thalatte {
         imu = hwmap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-//        geometry = new Geometry();
-//
-//        HashMap<String, Lightsaber.LightsaberUnit> lightsaberMap = new HashMap<>();
-//        lightsaberMap.put("rightSaber", new Lightsaber.LightsaberUnit(6.25, 2.5,   0)              );
-//        lightsaberMap.put("leftSaber" , new Lightsaber.LightsaberUnit(-5.25, 2.25, Math.PI)        );
-//        lightsaberMap.put("frontSaber", new Lightsaber.LightsaberUnit(4.75, 4.5,   Math.PI / 2)    );
-//        lightsaberMap.put("backSaber" , new Lightsaber.LightsaberUnit(-4.75,-4.25, Math.PI * 3 / 2));
-
         front = hwmap.get(DistanceSensor.class, "frontSaber");
         right = hwmap.get(DistanceSensor.class, "rightSaber");
         left = hwmap.get(DistanceSensor.class, "leftSaber");
@@ -103,7 +98,7 @@ public class Thalatte {
             break;
         }
 
-//        lightsaber = new Lightsaber(lightsaberMap,hwmap,geometry);
+        webcam = hwmap.get(WebcamName.class, "Webcam 1");
     }
 }
 

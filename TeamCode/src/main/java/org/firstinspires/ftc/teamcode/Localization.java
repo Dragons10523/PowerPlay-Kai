@@ -20,6 +20,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.List;
 
@@ -27,20 +31,16 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGR
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 
-public abstract class Localization extends Control {
+public abstract class Localization extends VuforiaAbstract {
 
-//    public ElapsedTime time;
     protected double theta = Math.PI / 2;
-    public double theta_offset;
-//    protected double theta_prime;
+    public Double theta_offset = null;
     protected boolean turningFlag = false;
+    protected boolean aimingFlag = false;
     protected double targetAngle;
     private int turnDirection;
-//    protected Geometry.Point robotLocation;
-//    protected Geometry.Point velocity;
-//    public Geometry geometry;
-//    private Lightsaber lightsaber;
-//    private double prevTime = 0;
+    OpenCvCamera camera;
+    CVinator cv;
 
     final double DELTA_T = 0.01;
 
@@ -51,46 +51,40 @@ public abstract class Localization extends Control {
     public VuforiaLocalizer vuforia;
     public TFObjectDetector tfod;
 
+    enum vuFlag {
+        OFF,
+        AUTO,
+        AIM,
+        CV
+    }
+
     public static double collapseAngle(double theta){
         return (((theta % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI));
     }
 
     public void startLocalization() {
-        startLocalization(true);
+        startLocalization(vuFlag.OFF);
     }
 
-    public void startLocalization(boolean vuFlag) {
-        if(vuFlag) {
+    public void startLocalization(vuFlag vf) {
+        sleep(3000);
+        if(theta_offset == null) theta_offset = (Double)(double)thalatte.imu.getAngularOrientation().toAngleUnit(AngleUnit.RADIANS).firstAngle;
+        if (vf == vuFlag.AUTO) {
             initVuforia();
             initTfod();
+            sleep(3000);
+        }else if(vf == vuFlag.AIM){
+            initAVuforia();
+        }else if(vf == vuFlag.CV){
+            initCV();
         }
-//        lightsaber = thalatte.lightsaber;
-//        geometry = thalatte.geometry;
-//        time = new ElapsedTime();
-//        lightsaber.estimate();
-//        robotLocation = lightsaber.position;
-//        velocity = geometry.point(0, 0);
-//        theta_prime = 0;
-        sleep(3000);
-        theta_offset = thalatte.imu.getAngularOrientation().toAngleUnit(AngleUnit.RADIANS).firstAngle;
     }
 
     public void updateLocalization() {
-//        double delta_t, delta_x, delta_y, delta_theta;
-//        double theta_prev = theta;
         theta = collapseAngle(thalatte.imu.getAngularOrientation().toAngleUnit(AngleUnit.RADIANS).firstAngle + (Math.PI / 2) - theta_offset);
-//        delta_theta = theta - theta_prev;
-//        lightsaber.setTheta(theta);
         if(turningFlag) updateTurnTo();
-//        lightsaber.estimate();
-//        delta_t = time.seconds() - prevTime;
-//        delta_x = lightsaber.position.x - robotLocation.x;
-//        delta_y = lightsaber.position.y - robotLocation.y;
-//        velocity = geometry.point(delta_x / delta_t, delta_y / delta_t);
-//        if(Math.abs(delta_theta) > Math.PI) delta_theta = (2 * Math.PI) - delta_theta;
-//        theta_prime = delta_theta / delta_t;
-//        prevTime += delta_t;
-//        robotLocation = lightsaber.position;
+        else if(aimingFlag) autoAim();
+        if(isInited) updateAV();
     }
 
     public void startTurnTo(double theta){
@@ -115,12 +109,13 @@ public abstract class Localization extends Control {
         if(targetAngle - this.theta < 0) turnDirection =   -1;
         if(Math.abs(targetAngle - this.theta) > Math.PI) turnDirection = -turnDirection;
 
-        double power = 0.35 * turnDirection;
+        double power = Math.abs(targetAngle - this.theta);
+        if(power > Math.PI)
+            power = (2*Math.PI) - power;
+        power *= 0.75 / Math.PI;
+        power += 0.25;
 
-        if(Math.abs(targetAngle - theta) < Math.PI / 8 ||
-           Math.abs(targetAngle - theta) > Math.PI * 15 / 8) power *= 0.8;
-
-        drive(-power,power);
+        drive(-power*turnDirection,power*turnDirection);
     }
 
     public void stopTurnTo(){
@@ -130,104 +125,6 @@ public abstract class Localization extends Control {
         if(((theta >= targetAngle - 0.05)&&(theta <= targetAngle + 0.05))||((theta - (Math.PI * 2) >= targetAngle - 0.05)&&(theta - (Math.PI * 2) <= targetAngle + 0.05)))
             turningFlag = false;
     }
-
-//    private Geometry.Point linearCurve(double t, Geometry.Point p1, Geometry.Point p2){
-//        return new Geometry.Point(p1.x + t * (p2.x - p1.x), p1.y + t * (p2.y - p1.y));
-//    }
-//
-//    public Geometry.Line bezierLine(double t, Geometry.Point ... points){
-//        Geometry.Point[] list = new Geometry.Point[points.length - 1];
-//        for(int i = 0; i < points.length - 1; i++){
-//            list[i] = linearCurve(t, points[i], points[i + 1]);
-//        }
-//        if(list.length == 2) return new Geometry.Line(list[0], list[1]);
-//        return bezierLine(t, list);
-//    }
-//
-//    public double velocity(double time, double speed, Geometry.Point ... points){
-//        double t1 = clamp(speed * (time - (DELTA_T / 2)), 0, 1);
-//        double t2 = clamp(speed * (time + (DELTA_T / 2)), 0, 1);
-//
-//        Geometry.Line l     = bezierLine(speed * time, points);
-//        Geometry.Point p1   = linearCurve(t1, l.p1, l.p2     );
-//        Geometry.Point p2   = linearCurve(t2, l.p1, l.p2     );
-//        Geometry.Line delta = new Geometry.Line(p1, p2);
-//
-//        return delta.getDistance() / DELTA_T;
-//    }
-//
-//    public double rotVelocity(double time, double speed, Geometry.Point ... points){
-//        double t1 = clamp(speed * (time - (DELTA_T / 2)), 0, 1);
-//        double t2 = clamp(speed * (time + (DELTA_T / 2)), 0, 1);
-//
-//        Geometry.Line l1 = bezierLine(t1, points);
-//        Geometry.Line l2 = bezierLine(t2, points);
-//
-//        double delta_theta  = collapseAngle(l2.theta - l1.theta);
-//           if (delta_theta  >                           Math.PI)
-//               delta_theta -=                           Math.PI * 2;
-//
-//        return delta_theta / DELTA_T;
-//    }
-//
-//    public void driveWithTheta(double velocity, double rot_velocity){
-//        final double width = 8.25;
-//        double x, vel_r, vel_l, pow_r, pow_l;
-//        if(rot_velocity != 0) {
-//            double vel_act_l, vel_act_r, vel_diff_l, vel_diff_r, pow_adj_l, pow_adj_r;
-//            x     = velocity / (rot_velocity * Math.PI * 2);
-//            vel_r = (width + x) * rot_velocity;
-//            vel_l = (x - width) * rot_velocity;
-//            if(theta_prime != 0){
-//                double x_act = this.velocity.distance() / (theta_prime * Math.PI * 2);
-//                vel_act_r = (width + x_act) * theta_prime;
-//                vel_act_l = (x_act - width) * theta_prime;
-//            } else {
-//                vel_act_l = vel_act_r = velocity();
-//            }
-//            vel_diff_r = vel_r - vel_act_r;
-//            vel_diff_l = vel_l - vel_act_l;
-//            pow_adj_r  = power(vel_diff_r);
-//            pow_adj_l  = power(vel_diff_l);
-//
-//            pow_r = thalatte.frontRight.getPower() + pow_adj_r;
-//            pow_l = thalatte.frontLeft .getPower() + pow_adj_l;
-//        } else{
-//            double vel_act  = velocity();
-//            double vel_diff = velocity - vel_act;
-//            double pow_adj  = power(vel_diff);
-//
-//            pow_l = pow_r = thalatte.frontRight.getPower() + pow_adj;
-//        }
-//        drive(pow_l,pow_r);
-//    }
-//
-//    public double velocity(){
-//        double speed = velocity.distance();
-//        double angle = collapseAngle(Math.atan2(velocity.y,velocity.x));
-//        if(Math.abs(angle - theta) < Math.PI / 2 || Math.abs(angle - theta) > 1.5 * Math.PI)
-//            return speed;
-//        else
-//            return -speed;
-//    }
-//
-//    public double power(double velocity){
-//        final double const1 = 14.5; // Maximum Battery?
-//        final double const2 = 96;   // Maximum Velocity?
-//        return clamp((thalatte.vs.getVoltage() / const1) * (velocity / const2), -1, 1);
-//    }
-//
-//    public boolean bezierDrive(double time, double vel, Geometry.Point ... points) {
-//        double speed = Math.abs(vel);
-//        if(time * speed > 1.0){
-//            zero();
-//            return false;
-//        }
-//        double velocity = Math.signum(vel) * velocity(time,speed,points);
-//        double rotVelocity = rotVelocity(time,speed,points);
-//        driveWithTheta(velocity,rotVelocity);
-//        return true;
-//    }
 
     public void initVuforia() {
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
@@ -262,6 +159,34 @@ public abstract class Localization extends Control {
     public void stopTfodCrap(){
         tfod.shutdown();
         vuforia = null;
+    }
+
+    public void initCV(){
+        cv = new CVinator();
+        camera = OpenCvCameraFactory.getInstance().createWebcam(thalatte.webcam);
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                camera.startStreaming(320,240,OpenCvCameraRotation.UPRIGHT);
+                camera.setPipeline(cv);
+            }
+        });
+    }
+
+    public void autoAim(){
+        aimingFlag = true;
+        final double target = 0.50;
+        Double position = cv.averagePosition();
+        if(position == null) return;
+        double difference = position - target;
+        if(Math.abs(difference) <= 0.05) {
+            aimingFlag = false;
+            return;
+        }
+        double power = difference * 2; // difference / 0.5
+        power *= 0.75;
+        power += 0.25;
+        drive(-power,power);
     }
 }
 

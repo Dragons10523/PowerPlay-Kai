@@ -9,7 +9,7 @@ public class  Test extends Localization {
     @Override
     public void runOpMode() throws InterruptedException {
         alize();
-        startLocalization(false);
+        startLocalization(vuFlag.OFF);
         waitForStart();
         new Thread(new Runnable() {
             @Override
