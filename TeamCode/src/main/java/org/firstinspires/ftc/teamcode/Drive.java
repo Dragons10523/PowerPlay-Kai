@@ -10,7 +10,7 @@ public class Drive extends Localization {
     @Override
     public void runOpMode() throws InterruptedException {
         alize();
-        startLocalization(vuFlag.CV);
+        startLocalization(vuFlag.OFF);
         waitForStart();
 
         new Thread(new Runnable() {
@@ -25,6 +25,11 @@ public class Drive extends Localization {
                     telemetry.addData("Feeder Direction", Math     .signum(FEEDER)             == 1 ? "1"    : "-1"    );
                     telemetry.addData("Feeder"          , thalatte .feeder      .getPower()    != 0 ? "ON"   : "OFF"   );
                     telemetry.addData("Clamp"           , thalatte .vwompClamp  .getPosition() != 0 ? "OPEN" : "CLOSED");
+//                    telemetry.addData("Aiming"          , aimingFlag                                                   );
+//                    telemetry.addData("m10",cv.m10);
+//                    telemetry.addData("m00",cv.m00);
+//                    telemetry.addData("cols",cv.cols);
+//                    telemetry.addData("averagePosition", cv.averagePosition());
 //                    telemetry.addData("IsInited", isInited);
 //                    telemetry.addData("IsVisible", targetVisible);
 ////                    if(isInited) {
@@ -46,17 +51,16 @@ public class Drive extends Localization {
             GamepadPrev.ButtonEvent ev1 = GamepadPrev.ButtonEvent.NONE;
             GamepadPrev.ButtonEvent ev2 = GamepadPrev.ButtonEvent.NONE;
 
-            if(turningFlag) updateLocalization();
+            if(turningFlag /*|| aimingFlag*/) updateLocalization();
             while((ev1 = prev1.getEvent()) != GamepadPrev.ButtonEvent.NONE || (ev2 = prev2.getEvent()) != GamepadPrev.ButtonEvent.NONE){
                 switch(ev1){
-                    case A:
-                        autoAim();
-                        drive(0,0);
-                        break;
-                    case B:
-                        turningFlag = false;
-                        aimingFlag  = false;
-                        break;
+//                    case A:
+//                        autoAim();
+//                        break;
+//                    case B:
+//                        turningFlag = false;
+//                        aimingFlag  = false;
+//                        break;
                     case LEFT:
                         if(!turningFlag) startTurnTo(Math.PI / 2);
                         break;
@@ -105,7 +109,7 @@ public class Drive extends Localization {
 
             vwompArm(-gamepad2.left_stick_y);
 
-            if(!(turningFlag || aimingFlag)) driveLoop();
+            if(!(turningFlag /*|| aimingFlag*/)) driveLoop();
         }
         zero();
     }

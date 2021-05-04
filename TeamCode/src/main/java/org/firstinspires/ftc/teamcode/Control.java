@@ -7,10 +7,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public abstract class Control extends LinearOpMode {
     Thalatte thalatte;
-    double sPower = 1;
+    double sPower = 1.0;
 
-          double INTAKE = -1.0;
-          double FEEDER   = 1.0;
+          double INTAKE = 0.9;
+          double FEEDER = 1.0;
     final double CLAMP  = 1.0;
 
     enum Speed {
@@ -22,42 +22,11 @@ public abstract class Control extends LinearOpMode {
         STOP
     }
 
-    enum PowerShot {
-        LEFT,
-        CENTER,
-        RIGHT
-    }
-
-    private int psToInt(PowerShot ps){
-        switch (ps){
-            case LEFT:
-                return 0;
-            case CENTER:
-                return 1;
-            case RIGHT:
-                return 2;
-        }
-        return 0;
-    }
-
-    private PowerShot intToPs(int i){
-        switch (i){
-            case 0:
-                return PowerShot.LEFT;
-            case 1:
-                return PowerShot.CENTER;
-            case 2:
-                return PowerShot.RIGHT;
-        }
-        return PowerShot.LEFT;
-    }
-
     public void setSpeed(Speed speed){
         this.speed = speed;
     }
 
     Speed speed  = Speed.STOP;
-    PowerShot ps = PowerShot.LEFT;
 
     public GamepadPrev prev1;
     public GamepadPrev prev2;
@@ -162,10 +131,6 @@ public abstract class Control extends LinearOpMode {
         return Math.max(Math.min(num, max), min);
     }
 
-    public void powerShotCycle(int i){
-        ps = intToPs((i + psToInt(ps))%3);
-    }
-
     public void driveLoop() {
         double l = -gamepad1.left_stick_y;
         double r = -gamepad1.right_stick_y;
@@ -198,86 +163,6 @@ public abstract class Control extends LinearOpMode {
         intake(false);
         feeder(false);
         shoot(0);
-    }
-
-    public void disableMotor(DcMotor motor){
-        if(((DcMotorEx)motor).isMotorEnabled()){
-            ((DcMotorEx)motor).setMotorDisable();
-        }
-    }
-
-    public void enableMotor(DcMotor motor){
-        if(!((DcMotorEx)motor).isMotorEnabled()){
-            ((DcMotorEx)motor).setMotorEnable();
-        }
-    }
-
-    public void disableIntake(){
-        disableMotor(thalatte.intake);
-    }
-
-    public void disableShooter(){
-        disableMotor(thalatte.shooterBack);
-        disableMotor(thalatte.shooterFront);
-    }
-
-    public void disableDrive(){
-        disableMotor(thalatte.frontLeft);
-        disableMotor(thalatte.frontRight);
-        disableMotor(thalatte.backLeft);
-        disableMotor(thalatte.backRight);
-    }
-
-    public void disableVwomp(){
-        disableMotor(thalatte.vwomp);
-    }
-
-    public void disableAll(){
-        disableDrive();
-        disableIntake();
-        disableShooter();
-        disableVwomp();
-    }
-
-    public void enableIntake(){
-        enableMotor(thalatte.intake);
-    }
-
-    public void enableShooter(){
-        enableMotor(thalatte.shooterBack);
-        enableMotor(thalatte.shooterFront);
-    }
-
-    public void enableDrive(){
-        enableMotor(thalatte.frontLeft);
-        enableMotor(thalatte.frontRight);
-        enableMotor(thalatte.backLeft);
-        enableMotor(thalatte.backRight);
-    }
-
-    public void enableVwomp(){
-        enableMotor(thalatte.vwomp);
-    }
-
-    public void enableAll(){
-        enableDrive();
-        enableIntake();
-        enableShooter();
-        enableVwomp();
-    }
-
-    @Deprecated
-    public void disableForever(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    disableAll();
-                    disableForever();
-                    sleep(10);
-                }
-            }
-        });
     }
 }
 

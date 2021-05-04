@@ -11,13 +11,13 @@ public class BlueForests extends Localization{
     @Override
     public void runOpMode() throws InterruptedException {
         alize();
-        startLocalization(vuFlag.OFF);
+        startLocalization(vuFlag.AUTO);
         vwompClamp(false);
         waitForStart();
-//        final int r = rings();
-//        sleep(3000);
-//        stopTfodCrap();
-        final int r = 4;
+        final int r =  rings();
+        sleep(3000);
+        stopTfodCrap();
+//        final int r = 1;
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -42,14 +42,14 @@ public class BlueForests extends Localization{
         drive(0,0);
 //        startTurnTo((Math.PI/2) - 0.5);
 //        while(turningFlag) updateLocalization();
-//        shoot(1);
-//        sleep(500);
-//        intake(true);
-//        feeder(true);
-//        sleep(3000);
-//        intake(false);
-//        feeder(false);
-//        shoot(0);
+        shoot(1);
+        sleep(500);
+        intake(true);
+        feeder(true);
+        sleep(3000);
+        intake(false);
+        feeder(false);
+        shoot(0);
 //        startTurnTo(Math.PI/2);
 //        while(turningFlag) updateLocalization();
         switch(r){
@@ -59,6 +59,9 @@ public class BlueForests extends Localization{
                 drive(0,0);
                 startTurnTo(0);
                 while(turningFlag) updateLocalization();
+                drive(-0.7,-0.7);
+                sleep(300);
+                drive(0,0);
                 vwompArm(1);
                 sleep(1300);
                 vwompArm(0);
@@ -79,6 +82,9 @@ public class BlueForests extends Localization{
                 drive(0,0);
                 startTurnTo(Math.PI);
                 while(turningFlag) updateLocalization();
+                drive(0.7,0.7);
+                sleep(400);
+                drive(0,0);
                 vwompArm(1);
                 sleep(1300);
                 vwompArm(0);
@@ -101,6 +107,9 @@ public class BlueForests extends Localization{
                 drive(0,0);
                 startTurnTo(0);
                 while(turningFlag) updateLocalization();
+                drive(-0.7,-0.7);
+                sleep(300);
+                drive(0,0);
                 vwompArm(1);
                 sleep(1300);
                 vwompArm(0);

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.provider.MediaStore;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -20,27 +22,32 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.opencv.videoio.VideoCapture;
+import org.opencv.videoio.Videoio;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+import java.io.File;
 import java.util.List;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.XYZ;
 import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.EXTRINSIC;
 
-public abstract class Localization extends VuforiaAbstract {
+public abstract class Localization extends Control {
 
     protected double theta = Math.PI / 2;
     public Double theta_offset = null;
     protected boolean turningFlag = false;
-    protected boolean aimingFlag = false;
+//    protected boolean aimingFlag = false;
     protected double targetAngle;
     private int turnDirection;
-    OpenCvCamera camera;
-    CVinator cv;
+//    OpenCvCamera camera;
+//    CVinator cv;
+//    VideoCapture vc;
+//    File theta_file = new File("/storage/emulated/0/FIRST/theta");
 
     final double DELTA_T = 0.01;
 
@@ -54,8 +61,8 @@ public abstract class Localization extends VuforiaAbstract {
     enum vuFlag {
         OFF,
         AUTO,
-        AIM,
-        CV
+        AIM  //,
+//        CV
     }
 
     public static double collapseAngle(double theta){
@@ -68,23 +75,25 @@ public abstract class Localization extends VuforiaAbstract {
 
     public void startLocalization(vuFlag vf) {
         sleep(3000);
+//        if(theta_file.exists())
         if(theta_offset == null) theta_offset = (Double)(double)thalatte.imu.getAngularOrientation().toAngleUnit(AngleUnit.RADIANS).firstAngle;
         if (vf == vuFlag.AUTO) {
             initVuforia();
             initTfod();
             sleep(3000);
-        }else if(vf == vuFlag.AIM){
-            initAVuforia();
-        }else if(vf == vuFlag.CV){
-            initCV();
         }
+//        }else if(vf == vuFlag.AIM){
+//            initAVuforia();
+////        }//else if(vf == vuFlag.CV){
+////            initCV();
+//        }
     }
 
     public void updateLocalization() {
         theta = collapseAngle(thalatte.imu.getAngularOrientation().toAngleUnit(AngleUnit.RADIANS).firstAngle + (Math.PI / 2) - theta_offset);
         if(turningFlag) updateTurnTo();
-        else if(aimingFlag) autoAim();
-        if(isInited) updateAV();
+//        else if(aimingFlag) autoAim();
+//        if(isInited) updateAV();
     }
 
     public void startTurnTo(double theta){
@@ -161,33 +170,39 @@ public abstract class Localization extends VuforiaAbstract {
         vuforia = null;
     }
 
-    public void initCV(){
-        cv = new CVinator();
-        camera = OpenCvCameraFactory.getInstance().createWebcam(thalatte.webcam);
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                camera.startStreaming(320,240,OpenCvCameraRotation.UPRIGHT);
-                camera.setPipeline(cv);
-            }
-        });
-    }
+//    public void initCV(){
+//        cv = new CVinator();
+//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+//        camera = OpenCvCameraFactory.getInstance().createWebcam(thalatte.webcam, cameraMonitorViewId);
+//        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+//            @Override
+//            public void onOpened() {
+//                camera.startStreaming(640,480,OpenCvCameraRotation.UPRIGHT);
+////                vc = new VideoCapture(camera.);
+////                vc.set(Videoio.CAP_PROP_CONVERT_RGB, 1);
+//                camera.setPipeline(cv);
+//            }
+//        });
+//    }
+//
+//    public void autoAim(){
+//        aimingFlag = true;
+//        final double target = 0.50;
+//        Double position = cv.averagePosition();
+//        if(position == null) return;
+//        double difference = position - target;
+//        if(Math.abs(difference) <= 0.05) {
+//            aimingFlag = false;
+//            return;
+//        }
+//        double power = difference * 2; // difference / 0.5
+//        power *= 0.05;
+//        power += 0.25;
+//        drive(-power,power);
+//    }
 
-    public void autoAim(){
-        aimingFlag = true;
-        final double target = 0.50;
-        Double position = cv.averagePosition();
-        if(position == null) return;
-        double difference = position - target;
-        if(Math.abs(difference) <= 0.05) {
-            aimingFlag = false;
-            return;
-        }
-        double power = difference * 2; // difference / 0.5
-        power *= 0.75;
-        power += 0.25;
-        drive(-power,power);
-    }
+
+
 }
 
 // ☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭☭
