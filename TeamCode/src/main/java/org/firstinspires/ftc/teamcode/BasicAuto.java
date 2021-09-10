@@ -14,10 +14,13 @@ public class BasicAuto extends Localization{
         startLocalization(vuFlag.AUTO);
         vwompClamp(false);
         waitForStart();
+
         stopTfodCrap();
-        drive(0.6, 0.6);
+
+        driveDist(48.0, 0.5);
+        /*drive(0.6, 0.6);
         ElapsedTime e = new ElapsedTime();
         while(thalatte.back.getDistance(DistanceUnit.INCH) < 67 && e.seconds() < 1.3);
-        sleep(200);
+        sleep(200);*/
     }
 }

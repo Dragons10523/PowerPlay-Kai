@@ -24,10 +24,11 @@ public class RedForests extends Localization{
                 while(opModeIsActive()){
                     telemetry.addData("Rings", r);
                     telemetry.addData("theta", theta * 180 / Math.PI);
-                    telemetry.addData("F", thalatte.front.getDistance(DistanceUnit.INCH));
-                    telemetry.addData("B", thalatte.back.getDistance(DistanceUnit.INCH));
-                    telemetry.addData("R", thalatte.right.getDistance(DistanceUnit.INCH));
-                    telemetry.addData("L", thalatte.left.getDistance(DistanceUnit.INCH));
+//                    telemetry.addData("F", thalatte.front.getDistance(DistanceUnit.INCH));
+//                    telemetry.addData("B", thalatte.back.getDistance(DistanceUnit.INCH));
+//                    telemetry.addData("R", thalatte.right.getDistance(DistanceUnit.INCH));
+//                    telemetry.addData("L", thalatte.left.getDistance(DistanceUnit.INCH));
+                    telemetry.addData("ticks", thalatte.backLeft.getCurrentPosition());
                     telemetry.update();
                     sleep(30);
                 }
@@ -36,32 +37,38 @@ public class RedForests extends Localization{
         drive(0.7,0.7);
         sleep(500);
         drive(-1,-1);
-        sleep(200);
-        drive(0.7,0.7);
-        while(thalatte.back.getDistance(DistanceUnit.INCH) < 5);
-        drive(0,0);
-//        startTurnTo((Math.PI/2) - 0.5);
-//        while(turningFlag) updateLocalization();
-        shoot(1);
         sleep(500);
+
+        driveDist(12.0, 0.3);
+        sleep(1000);
+        /*drive(0.7,0.7);
+        while(thalatte.back.getDistance(DistanceUnit.INCH) < 5);
+        drive(0,0);*/
+
+        startTurnTo((Math.PI/2) + 0.15);
+        while(turningFlag) updateLocalization();
+        shoot(.92);
+        sleep(2500);
         intake(true);
         feeder(true);
         sleep(3000);
         intake(false);
         feeder(false);
         shoot(0);
-//        startTurnTo(Math.PI/2);
-//        while(turningFlag) updateLocalization();
+        startTurnTo(Math.PI/2);
+        while(turningFlag) updateLocalization();
         switch(r){
             case 4:
-                drive(0.7,0.7);
+                driveDist(88.0, 0.7);
+                /*drive(0.7,0.7);
                 while(thalatte.front.getDistance(DistanceUnit.INCH) > 30);
-                drive(0,0);
+                drive(0,0);*/
+
                 startTurnTo(Math.PI);
                 while(turningFlag) updateLocalization();
-                drive(-0.7,-0.7);
-                sleep(600);
-                drive(0,0);
+
+                driveDist(14.0, 0.3);
+
                 vwompArm(1);
                 sleep(1300);
                 vwompArm(0);
@@ -70,21 +77,26 @@ public class RedForests extends Localization{
                 vwompArm(-1);
                 sleep(1300);
                 vwompArm(0);
+
                 startTurnTo(Math.PI / 2);
                 while(turningFlag) updateLocalization();
-                drive(-0.7,-0.7);
+
+                driveDist(-44.0, 0.3);
+                /*drive(-0.7,-0.7);
                 while(thalatte.front.getDistance(DistanceUnit.INCH) < 28);
-                drive(0,0);
+                drive(0,0);*/
                 break;
             case 1:
-                drive(0.7,0.7);
+                driveDist(72.0, 0.6);
+                /*drive(0.7,0.7);
                 while(thalatte.front.getDistance(DistanceUnit.INCH) > 56 );
-                drive(0,0);
+                drive(0,0);*/
+
                 startTurnTo(0);
                 while(turningFlag) updateLocalization();
-                drive(0.7,0.7);
-                sleep(400);
-                drive(0,0);
+
+                driveDist(6, 0.3);
+
                 vwompArm(1);
                 sleep(1300);
                 vwompArm(0);
@@ -93,23 +105,28 @@ public class RedForests extends Localization{
                 vwompArm(-1);
                 sleep(1300);
                 vwompArm(0);
+
                 startTurnTo(Math.PI / 2);
                 while(turningFlag) updateLocalization();
-                drive(-0.5,-0.5);
+
+                driveDist(-20.0, 0.3);
+                /*drive(-0.5,-0.5);
                 while(thalatte.front.getDistance(DistanceUnit.INCH) < 42);
-                drive(0,0);
+                drive(0,0);*/
                 break;
             case 0:
-                drive(0.6,0.6);
+                driveDist(48.0, 0.5);
+                /*drive(0.6,0.6);
                 ElapsedTime e = new ElapsedTime();
                 while(thalatte.back.getDistance(DistanceUnit.INCH) < 67 && e.seconds() < 1.3);
                 sleep(200);
-                drive(0,0);
+                drive(0,0);*/
+
                 startTurnTo(Math.PI);
                 while(turningFlag) updateLocalization();
-                drive(-0.7,-0.7);
-                sleep(600);
-                drive(0,0);
+
+                driveDist(12.0, 0.3);
+
                 vwompArm(1);
                 sleep(1300);
                 vwompArm(0);

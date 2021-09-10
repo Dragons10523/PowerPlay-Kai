@@ -47,9 +47,43 @@ public abstract class Control extends LinearOpMode {
         ((DcMotorEx)thalatte.frontLeft ).setVelocity(l);
     }
 
+    public void driveDist(double dist, double power) {
+        int ticks = (int)Math.round(dist*560/(4*Math.PI*1.5));
+
+        thalatte.frontRight.setTargetPosition(ticks+thalatte.frontRight.getCurrentPosition());
+        thalatte.frontLeft .setTargetPosition(ticks+thalatte.frontLeft .getCurrentPosition());
+        thalatte.backRight .setTargetPosition(ticks+thalatte.backRight .getCurrentPosition());
+        thalatte.backLeft  .setTargetPosition(ticks+thalatte.backLeft  .getCurrentPosition());
+
+        thalatte.frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        thalatte.frontLeft .setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        thalatte.backRight .setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        thalatte.backLeft  .setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        thalatte.frontRight.setPower(power);
+        thalatte.frontLeft .setPower(power);
+        thalatte.backRight .setPower(power);
+        thalatte.backLeft  .setPower(power);
+
+        while(thalatte.frontRight.isBusy() || thalatte.frontLeft.isBusy() || thalatte.backRight.isBusy() || thalatte.backLeft.isBusy()){
+            sleep(10);
+        }
+        sleep(500);
+
+        thalatte.frontRight.setPower(0);
+        thalatte.frontLeft .setPower(0);
+        thalatte.backRight .setPower(0);
+        thalatte.backLeft  .setPower(0);
+
+        thalatte.frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        thalatte.frontLeft .setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        thalatte.backRight .setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        thalatte.backLeft  .setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
     public void shoot(double p) {
-        thalatte.shooterFront.setPower(p);
-        thalatte.shooterBack. setPower(p);
+        thalatte.shooterFront.setPower( p);
+        thalatte.shooterBack. setPower(-p );
     }
 
     public void shootDistance(double distance) throws InterruptedException{

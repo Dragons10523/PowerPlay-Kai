@@ -22,8 +22,11 @@ public class  Test extends Localization {
             }
         }).start();
         sleep(500);
-        startTurnTo(Math.PI);
-        while(turningFlag) updateLocalization();
+
+        //driveDist(24.0);
+
+        //startTurnTo(Math.PI);
+        //while(turningFlag) updateLocalization();
     }
 }
 
