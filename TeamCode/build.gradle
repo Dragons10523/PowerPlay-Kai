@@ -11,16 +11,21 @@
 
 // Custom definitions may go here
 
+plugins {
+    id "org.gretty" version "3.0.5"
+}
+
+gretty {
+    servletContainer = 'tomcat9'
+    contextPath = '/'
+}
+
 // Include common definitions from above.
 apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
 
 dependencies {
     implementation project(':FtcRobotController')
+    implementation 'javax.websocket:javax.websocket-api:1.1'
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
-
-    compile ('io.socket:socket.io-client:2.0.1') {
-        // excluding org.json which is provided by Android
-        exclude group: 'org.json', module: 'json'
-    }
 }
