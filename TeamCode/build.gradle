@@ -28,4 +28,5 @@ dependencies {
     implementation project(':FtcRobotController')
     implementation 'javax.websocket:javax.websocket-api:1.1'
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
+    implementation "com.corundumstudio.socketio:netty-socketio:1.7.19"
 }
