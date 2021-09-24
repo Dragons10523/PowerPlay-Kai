@@ -3,24 +3,25 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import com.corundumstudio.socketio.AckRequest;
-import com.corundumstudio.socketio.Configuration;
-import com.corundumstudio.socketio.SocketIOClient;
-import com.corundumstudio.socketio.SocketIOServer;
-import com.corundumstudio.socketio.Transport;
-import com.corundumstudio.socketio.listener.DataListener;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-@TeleOp(name = "SocketRemote", group = "Sensor")
+@TeleOp(name = "ReDUX_Server", group = "Sensor")
 public class SocketRemote extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
 
+
+        telemetry.addData(">", " READY FOR START");
+        telemetry.update();
         waitForStart();
+
+        telemetry.addData(">", " ACTIVE");
+        telemetry.update();
 
         // SERVER CODE
 
@@ -31,12 +32,12 @@ public class SocketRemote extends LinearOpMode {
     }
 
 
-    public static final int port = 12345;
+    public static final int port = 4444;
     private ServerSocket server;
 
     public void listen() {
         try {
-            server = new ServerSocket(4444);
+            server = new ServerSocket(port);
         } catch (IOException e) {
             System.out.println("Could not listen on port 4444");
             System.exit(-1);
@@ -44,7 +45,7 @@ public class SocketRemote extends LinearOpMode {
         while(true){
 
             try {
-                System.out.println("Waiting for connection");
+                System.out.println( "Waiting for connection");
                 final Socket socket = server.accept();
 
                 final InputStream inputStream = socket.getInputStream();
@@ -54,7 +55,10 @@ public class SocketRemote extends LinearOpMode {
                 // readLine blocks until line arrives or socket closes, upon which it returns null
                 String line = null;
                 while ((line = br.readLine()) != null) {
-                    System.out.println(line);
+                    if(line.startsWith("DD")) {
+                        String driveData = line.split("DD")[1];
+                        System.out.println("Recieved Drive Data: " + driveData);
+                    }
                 }
 
             } catch (IOException e) {
