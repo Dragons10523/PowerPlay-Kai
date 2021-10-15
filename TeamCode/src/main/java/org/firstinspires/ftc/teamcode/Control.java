@@ -6,6 +6,7 @@ public abstract class Control extends LinearOpMode {
     Ahi ahi;
 
     final int armOffset = 0;
+    final double CONVERSION_FACTOR = 8192*(4.0+(2.0/7.0)*Math.PI);
 
     enum ArmPosition {
         START,
@@ -34,8 +35,8 @@ public abstract class Control extends LinearOpMode {
         drive(left, right);
     }
 
-    public void driveDist() {
-
+    public void driveDist(double dist) {
+        int ticks = (int)(dist*CONVERSION_FACTOR);
     }
 
     public void armControl(ArmPosition armPosition) {
