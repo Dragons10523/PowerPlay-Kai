@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public abstract class Control extends LinearOpMode {
     Ahi ahi;
@@ -37,6 +38,66 @@ public abstract class Control extends LinearOpMode {
 
     public void driveDist(double dist) {
         int ticks = (int)(dist*CONVERSION_FACTOR);
+
+        int leftTarget = ticks+ahi.leftA.getCurrentPosition();
+        int rightTarget = ticks+ahi.rightA.getCurrentPosition();
+
+        // Defining PID variables
+        double kP = 1;
+        double kI = 1;
+        double kD = 1;
+
+        double PLeft = leftTarget-ahi.leftA.getCurrentPosition();
+        double PLeftPrev = PLeft;
+        double ILeft = 0;
+        double DLeft = 0;
+
+        double PRight = rightTarget-ahi.rightA.getCurrentPosition();
+        double PRightPrev = PRight;
+        double IRight = 0;
+        double DRight = 0;
+
+        // Setting up timer for deltaTime
+        ElapsedTime time = new ElapsedTime(); // Potentially change to a global timer
+
+        double lastTime = time.milliseconds();
+        double deltaTime = 0;
+
+        double timeInBounds = 0;
+
+        while(opModeIsActive()) {
+            deltaTime = time.milliseconds()-lastTime;
+
+            PLeft = leftTarget-ahi.leftA.getCurrentPosition();
+            PRight = rightTarget-ahi.rightA.getCurrentPosition();
+
+            ILeft += PLeft*deltaTime;
+            IRight += PRight*deltaTime;
+
+            try { // In case of divide by zero error
+                DLeft = (PLeft - PLeftPrev) / deltaTime;
+                DRight = (PRight - PRightPrev) / deltaTime;
+            } catch (ArithmeticException e) {
+                DLeft = 0;
+                DRight = 0;
+            }
+
+            drive(kP*PLeft + kI*ILeft + kD*DLeft, kP*PRight + kI*IRight + kD*DRight);
+
+            PRightPrev = PRight;
+            PLeftPrev = PLeft;
+            lastTime = time.milliseconds();
+
+            if(Math.abs(PLeft) < 350 && Math.abs(PRight) < 350) {
+                timeInBounds += deltaTime;
+            } else {
+                timeInBounds = 0;
+            }
+
+            if(timeInBounds > 300) {
+                break;
+            }
+        }
     }
 
     public void armControl(ArmPosition armPosition) {
@@ -60,8 +121,8 @@ public abstract class Control extends LinearOpMode {
         ahi.arm.setPower(1.0);
     }
 
-    public void runIntake(double power) {
-        ahi.succc.setPower(power);
+    public void runIntake(boolean on) {
+        ahi.succc.setPower(on ? 1.0 : 0.0);
     }
 
     public void playDDR(double power) {
@@ -72,7 +133,7 @@ public abstract class Control extends LinearOpMode {
         ahi.flup.setPosition(open ? 1.0 : 0.0);
     }
 
-    public void setLiftHeight(double power) {
+    public void setLiftPower(double power) {
         ahi.capLift.setPower(power);
     }
 }

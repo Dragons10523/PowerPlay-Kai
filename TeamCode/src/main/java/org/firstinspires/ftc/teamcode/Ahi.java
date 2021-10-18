@@ -17,9 +17,9 @@ public class Ahi{
     public Servo flup;
     public BNO055IMU imu;
 
-    public HardwareMap hwmap;
-
     public WebcamName webcam;
+
+    public HardwareMap hwmap;
 
     final boolean drivetrainReverse = false;
 
