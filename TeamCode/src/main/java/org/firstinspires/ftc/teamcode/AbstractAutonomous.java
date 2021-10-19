@@ -112,7 +112,7 @@ public abstract class AbstractAutonomous extends Control {
     public void updateTurnTo() {
         theta = collapseAngle(ahi.imu.getAngularOrientation().toAngleUnit(AngleUnit.RADIANS).firstAngle + (Math.PI / 2) - theta_offset);
 
-        if(((theta >= targetAngle - 0.05)&&(theta <= targetAngle + 0.05))||((theta - (Math.PI * 2) >= targetAngle - 0.05)&&(theta - (Math.PI * 2) <= targetAngle + 0.05))) {
+        if(((theta >= targetAngle - 0.05)&&(theta <= targetAngle + 0.05)) || ((theta - (Math.PI * 2) >= targetAngle - 0.05)&&(theta - (Math.PI * 2) <= targetAngle + 0.05)) || isStopRequested()) {
             stopTurnTo();
             return;
         }
