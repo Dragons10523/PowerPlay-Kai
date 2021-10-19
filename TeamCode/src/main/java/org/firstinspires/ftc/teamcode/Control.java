@@ -10,12 +10,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public abstract class Control extends LinearOpMode {
     Ahi ahi;
 
-    enum FieldSide {
+    public enum FieldSide {
         RED,
         BLUE
     }
 
-    enum ArmPosition {
+    public enum ArmPosition {
         START,
         LOW,
         MED,
@@ -68,5 +68,24 @@ public abstract class Control extends LinearOpMode {
 
     public void setLiftPower(double power) {
         ahi.capLift.setPower(power);
+    }
+
+    public void zero() {
+        drive(0, 0);
+        runIntake(false);
+        playDDR(0);
+        setLiftPower(0);
+        ahi.arm.setPower(0);
+    }
+
+    public boolean protectedSleep(long milliseconds) {
+        for(long i = 0; i < milliseconds/10; i++) {
+            sleep(10);
+            if(isStopRequested()) {
+                zero();
+                return true;
+            }
+        }
+        return false;
     }
 }
