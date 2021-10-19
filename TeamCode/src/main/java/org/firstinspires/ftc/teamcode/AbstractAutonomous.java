@@ -10,12 +10,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
  * */
 
 public abstract class AbstractAutonomous extends Control {
-    enum FieldOrientation {
-        LOW,
-        MED,
-        HIGH
-    }
-
     protected double theta = Math.PI / 2;
     private int turnDirection;
     protected double targetAngle;
@@ -86,9 +80,9 @@ public abstract class AbstractAutonomous extends Control {
         }
     }
 
-    public FieldOrientation getFieldOrientation() {
+    public ArmPosition getFieldOrientation() {
         // TODO: AprilTag fiducial tracker
-        return FieldOrientation.HIGH;
+        return ArmPosition.HIGH;
     }
 
     // Everything from this point on is copy pasted code from last year

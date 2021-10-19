@@ -15,9 +15,6 @@ public abstract class Control extends LinearOpMode {
         BLUE
     }
 
-    final int armOffset = 0;
-    final double CONVERSION_FACTOR = 8192*(4.0+(2.0/7.0)*Math.PI);
-
     enum ArmPosition {
         START,
         LOW,
@@ -25,6 +22,9 @@ public abstract class Control extends LinearOpMode {
         HIGH,
         PICKUP
     }
+
+    final int armOffset = 0;
+    final double CONVERSION_FACTOR = 8192*(4.0+(2.0/7.0)*Math.PI);
 
     public void drive(double left, double right) {
         ahi.leftA.setPower(left);
