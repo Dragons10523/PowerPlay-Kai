@@ -11,6 +11,7 @@ public abstract class AbstractDuck extends AbstractAutonomous {
 
     public void run(FieldSide fieldSide) {
         // TODO: Use fieldSide
+        // TODO: Change to protected sleep, check for isStopRequested in turnTo
         boolean onRed = fieldSide == FieldSide.RED;
 
         initializeValues();

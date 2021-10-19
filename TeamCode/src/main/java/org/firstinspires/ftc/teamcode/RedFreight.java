@@ -7,5 +7,6 @@ public class RedFreight extends AbstractFreight {
     @Override
     public void runOpMode() throws InterruptedException {
         run(FieldSide.RED);
+        zero();
     }
 }

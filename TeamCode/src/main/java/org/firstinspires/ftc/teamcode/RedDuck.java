@@ -7,5 +7,6 @@ public class RedDuck extends AbstractDuck {
     @Override
     public void runOpMode() throws InterruptedException {
         run(FieldSide.RED);
+        zero();
     }
 }

@@ -7,5 +7,6 @@ public class BlueFreight extends AbstractFreight {
     @Override
     public void runOpMode() throws InterruptedException {
         run(FieldSide.BLUE);
+        zero();
     }
 }

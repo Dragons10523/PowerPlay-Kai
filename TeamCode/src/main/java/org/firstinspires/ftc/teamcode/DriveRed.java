@@ -13,5 +13,6 @@ public class DriveRed extends AbstractDrive {
     @Override
     public void runOpMode() throws InterruptedException {
         run(FieldSide.RED);
+        zero();
     }
 }

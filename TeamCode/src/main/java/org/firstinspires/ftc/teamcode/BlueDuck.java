@@ -7,5 +7,6 @@ public class BlueDuck extends AbstractDuck {
     @Override
     public void runOpMode() throws InterruptedException {
         run(FieldSide.BLUE);
+        zero();
     }
 }
