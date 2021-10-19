@@ -10,15 +10,23 @@ public class ArmControlTest extends Control {
     public void runOpMode() throws InterruptedException {
         waitForStart();
 
+        telemetry.addLine("Moving arm to PICKUP");
+        telemetry.update();
         armControl(ArmPosition.PICKUP);
         if(protectedSleep(1000)) return;
 
+        telemetry.addLine("Moving arm to HIGH");
+        telemetry.update();
         armControl(ArmPosition.HIGH);
         if(protectedSleep(1000)) return;
 
+        telemetry.addLine("Moving arm to MED");
+        telemetry.update();
         armControl(ArmPosition.MED);
         if(protectedSleep(1000)) return;
 
+        telemetry.addLine("Moving arm to LOW");
+        telemetry.update();
         armControl(ArmPosition.LOW);
         if(protectedSleep(1000)) return;
 
