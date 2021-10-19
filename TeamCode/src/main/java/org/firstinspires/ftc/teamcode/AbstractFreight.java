@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+/* CLASS SUMMARY:
+ * Drives the autonomous path used for the freight side, toggle to change between red and blue
+ *  */
+
+// ORDER OF OPERATIONS: Preload -> Cycle -> Park
+
 public abstract class AbstractFreight extends AbstractAutonomous {
     protected ArmPosition fieldOrientation;
 
