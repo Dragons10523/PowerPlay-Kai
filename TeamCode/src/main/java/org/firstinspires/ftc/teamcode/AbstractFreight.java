@@ -10,7 +10,6 @@ public abstract class AbstractFreight extends AbstractAutonomous {
     protected ArmPosition fieldOrientation;
 
     public void run(FieldSide fieldSide) {
-        // TODO: Use fieldSide
         boolean onRed = fieldSide == FieldSide.RED;
 
         initializeValues();
