@@ -9,7 +9,12 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
-public class Ahi{
+/* CLASS SUMMARY:
+* Initializes all hardware and maps it from the hardware map to class variables
+* Sets default values and modes where applicable
+* */
+
+public class Ahi {
     // Encoder goes in the motor port, A motors for drivetrain and arm motor for manipulation
     public DcMotor rightA, rightB, leftA, leftB; // Drivetrain
     public DcMotor arm, succc, capLift; // Manipulation Motors
