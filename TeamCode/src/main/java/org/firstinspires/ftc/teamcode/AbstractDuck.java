@@ -11,7 +11,6 @@ public abstract class AbstractDuck extends AbstractAutonomous {
 
     public void run(FieldSide fieldSide) {
         // TODO: Use fieldSide
-        // TODO: Change to protected sleep, check for isStopRequested in turnTo
         boolean onRed = fieldSide == FieldSide.RED;
 
         initializeValues();
@@ -20,34 +19,34 @@ public abstract class AbstractDuck extends AbstractAutonomous {
 
         fieldOrientation = getFieldOrientation();
 
-        driveDist(6); // Get away from the wall
+        if(driveDist(6)) return; // Get away from the wall
 
         startTurnTo(onRed ? 0 : Math.PI);
         while(turningFlag) updateTurnTo(); // Turn to face the carousel
 
-        driveDist(-18); // Drive up to carousel
+        if(driveDist(-18)) return; // Drive up to carousel
 
         startTurnTo(onRed ? Math.PI/2 : Math.PI);
         while(turningFlag) updateTurnTo(); // Put the spinner on the carousel
 
         playDDR(1); // Spin the carousel
-        sleep(1500);
+        if(protectedSleep(1500)) return;
         playDDR(0);
 
         startTurnTo(onRed ? 7*Math.PI/6 : -Math.PI/6);
         while(turningFlag) updateTurnTo(); // Turn to face away from the goal
 
-        driveDist(-28); // Reverse to the goal
+        if(driveDist(-28)) return; // Reverse to the goal
 
         startTurnTo(onRed ? 5*Math.PI/4 : -Math.PI/4);
         while(turningFlag) updateTurnTo(); // Turn to face away from the goal
 
         armControl(fieldOrientation); // Position arm
-        sleep(700);
+        if(protectedSleep(700)) return;
 
         setFlup(true); // Dump duck
         runIntake(true);
-        sleep(200);
+        if(protectedSleep(200)) return;
 
         setFlup(false); // Close and stop intake
         runIntake(false);
@@ -56,45 +55,45 @@ public abstract class AbstractDuck extends AbstractAutonomous {
         startTurnTo(3*Math.PI/2);
         while(turningFlag) updateTurnTo(); // Face the wall
 
-        driveDist(16); // Drive to the wall
+        if(driveDist(16)) return; // Drive to the wall
 
         startTurnTo(onRed ? Math.PI : 0);
         while(turningFlag) updateTurnTo(); // Face the freight
 
-        driveDist(28); // Drive to the barrier
+        if(driveDist(28)) return; // Drive to the barrier
 
         drive(.7, .7); // Drive over the barrier
-        sleep(500);
+        if(protectedSleep(500)) return;
         drive(0, 0);
-        sleep(200);
+        if(protectedSleep(200)) return;
 
         startTurnTo(onRed ? Math.PI : 0);
         while(turningFlag) updateTurnTo(); // Realign after crossing the barrier
 
         runIntake(true); // Attempt to grab freight
         drive(0.4, 0.4);
-        sleep(700);
+        if(protectedSleep(700)) return;
         // TODO: Branching program to detect failure
         drive(0, 0); // Stop attempting to grab freight
         runIntake(false);
-        sleep(200);
+        if(protectedSleep(200)) return;
 
         startTurnTo(onRed ? 7*Math.PI/6 : -Math.PI/6);
         while(turningFlag) updateTurnTo(); // Face back towards goal
 
-        driveDist(-24); // Drive to goal
+        if(driveDist(-24)) return; // Drive to goal
 
         armControl(ArmPosition.HIGH); // Position arm to high goal
-        sleep(650);
+        if(protectedSleep(650)) return;
 
         setFlup(true); // Dump freight
         runIntake(true);
-        sleep(200);
+        if(protectedSleep(200)) return;
 
         setFlup(false); // Stop intake
         runIntake(false);
         armControl(ArmPosition.START);
 
-        driveDist(24); // Park
+        if(driveDist(24)) return; // Park
     }
 }

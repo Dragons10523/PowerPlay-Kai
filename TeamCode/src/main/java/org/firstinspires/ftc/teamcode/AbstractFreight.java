@@ -11,7 +11,6 @@ public abstract class AbstractFreight extends AbstractAutonomous {
 
     public void run(FieldSide fieldSide) {
         // TODO: Use fieldSide
-        // TODO: Change to protected sleep, check for isStopRequested in turnTo
         boolean onRed = fieldSide == FieldSide.RED;
 
         initializeValues();
@@ -20,12 +19,12 @@ public abstract class AbstractFreight extends AbstractAutonomous {
 
         fieldOrientation = getFieldOrientation();
 
-        driveDist(6); // Get away from the wall
+        if(driveDist(6)) return; // Get away from the wall
 
         startTurnTo(onRed ? 3*Math.PI/4 : Math.PI/4);
         while(turningFlag) updateTurnTo(); // Face the goal
 
-        driveDist(16); // Drive to the goal
+        if(driveDist(16)) return; // Drive to the goal
 
         armControl(fieldOrientation); // Position the arm
 
@@ -34,7 +33,7 @@ public abstract class AbstractFreight extends AbstractAutonomous {
 
         setFlup(true); // Dump preload
         runIntake(true);
-        sleep(200);
+        if(protectedSleep(200)) return;
 
         setFlup(false); // Stop intake
         runIntake(false);
@@ -43,28 +42,28 @@ public abstract class AbstractFreight extends AbstractAutonomous {
         startTurnTo(onRed ? Math.PI : 0); // Face the freight
         while(turningFlag) updateTurnTo();
 
-        driveDist(20); // Drive to the barrier
+        if(driveDist(20)) return; // Drive to the barrier
 
         drive(0.7, 0.7); // Drive over the barrier
-        sleep(500);
+        if(protectedSleep(500)) return;
         drive(0, 0);
-        sleep(200);
+        if(protectedSleep(200)) return;
 
         startTurnTo(onRed ? Math.PI : 0);
         while(turningFlag) updateTurnTo(); // Realign after crossing the barrier
 
         runIntake(true); // Attempt to grab freight
         drive(0.4, 0.4);
-        sleep(700);
+        if(protectedSleep(700)) return;
         // TODO: Branching program to detect failure
         drive(0, 0); // Stop attempting to grab freight
         runIntake(false);
-        sleep(200);
+        if(protectedSleep(200)) return;
 
         startTurnTo(onRed ? 7*Math.PI/6 : -Math.PI/6);
         while(turningFlag) updateTurnTo(); // Face back towards goal
 
-        driveDist(-24); // Drive to goal
+        if(driveDist(-24)) return; // Drive to goal
 
         armControl(ArmPosition.HIGH); // Position arm to high goal
 
@@ -73,7 +72,7 @@ public abstract class AbstractFreight extends AbstractAutonomous {
 
         setFlup(true); // Dump freight
         runIntake(true);
-        sleep(200);
+        if(protectedSleep(200)) return;
 
         setFlup(false); // Stop intake
         runIntake(false);
@@ -82,6 +81,6 @@ public abstract class AbstractFreight extends AbstractAutonomous {
         startTurnTo(onRed ? 7*Math.PI/6 : -Math.PI/6); // Face the barrier
         while(turningFlag) updateTurnTo();
 
-        driveDist(24); // Park
+        if(driveDist(24)) return; // Park
     }
 }
