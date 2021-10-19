@@ -20,7 +20,7 @@ public abstract class AbstractAutonomous extends Control {
         if(theta_offset == null) theta_offset = (Double)(double)ahi.imu.getAngularOrientation().toAngleUnit(AngleUnit.RADIANS).firstAngle; // Bit of a mess to convert float -> double -> Double
     }
 
-    public void driveDist(double dist) {
+    public boolean driveDist(double dist) {
         int ticks = (int)(dist*CONVERSION_FACTOR);
 
         int leftTarget = ticks+ahi.leftA.getCurrentPosition();
@@ -77,7 +77,14 @@ public abstract class AbstractAutonomous extends Control {
             } else {
                 timeInBounds = 0;
             }
+
+            if(isStopRequested()) {
+                zero();
+                return true;
+            }
         }
+
+        return false;
     }
 
     public ArmPosition getFieldOrientation() {
