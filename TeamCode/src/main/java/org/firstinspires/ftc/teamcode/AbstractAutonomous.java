@@ -77,11 +77,6 @@ public abstract class AbstractAutonomous extends Control {
             } else {
                 timeInBounds = 0;
             }
-
-            if(isStopRequested()) {
-                zero();
-                return true;
-            }
         }
 
         return false;
