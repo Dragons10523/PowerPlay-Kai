@@ -26,6 +26,10 @@ public abstract class Control extends LinearOpMode {
     final int armOffset = 0;
     final double CONVERSION_FACTOR = 8192*(4.0+(2.0/7.0)*Math.PI);
 
+    public void initialize() {
+        ahi = new Ahi(hardwareMap);
+    }
+
     public void drive(double left, double right) {
         ahi.leftA.setPower(left);
         ahi.leftB.setPower(left);

@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
 
 /* CLASS SUMMARY:
 * Initializes all hardware and maps it from the hardware map to class variables
@@ -22,7 +24,9 @@ public class Ahi {
     public Servo flup;
     public BNO055IMU imu;
 
-    public WebcamName webcam;
+    public OpenCvCamera camera;
+
+    int cameraMonitorViewId;
 
     public HardwareMap hwmap;
 
@@ -31,7 +35,7 @@ public class Ahi {
     public Ahi(HardwareMap hwmap) {
         this.hwmap = hwmap;
 
-        rightA = hwmap.get(DcMotor.class, "rightA");
+        /*rightA = hwmap.get(DcMotor.class, "rightA");
         rightB = hwmap.get(DcMotor.class, "rightB");
         leftA = hwmap.get(DcMotor.class, "leftA");
         leftB = hwmap.get(DcMotor.class, "leftB");
@@ -62,8 +66,10 @@ public class Ahi {
         parameters.loggingTag                       = "IMU";
 
         imu = hwmap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
+        imu.initialize(parameters);*/
 
-        webcam = hwmap.get(WebcamName.class, "Webcam 1");
+        WebcamName webcamName = hwmap.get(WebcamName.class, "Webcam 1");
+        cameraMonitorViewId = hwmap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwmap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
     }
 }
