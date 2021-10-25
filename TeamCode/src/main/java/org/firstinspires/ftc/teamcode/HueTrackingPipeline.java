@@ -13,13 +13,14 @@ import java.util.List;
 public class HueTrackingPipeline extends OpenCvPipeline {
 
     List<Mat> channels = new ArrayList<>();
-    Mat bit = new Mat();
-    Mat hsv = new Mat();
 
     double m10;
     double m00;
     double cols;
     boolean quality = false;
+
+    double minH = 30;
+    double maxH = 80;
 
     double averageXPosition;
     double averageXPixelPosition;
@@ -28,15 +29,35 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
-        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2YUV); // Light equalization
-        Core.split(input, channels);
-        Imgproc.equalizeHist(channels.get(0), channels.get(0));
-        Core.merge(channels, input);
-        Imgproc.cvtColor(input, input, Imgproc.COLOR_YUV2RGB);
+//        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2YUV); // Light equalization
+//        Core.split(input, channels);
+//        Imgproc.equalizeHist(channels.get(0), channels.get(0));
+//        Core.merge(channels, input);
+//        Imgproc.cvtColor(input, input, Imgproc.COLOR_YUV2RGB);
 
-        Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV); // Color Isolation
-        /*Core.inRange(input, new Scalar(44, 40, 60), new Scalar(80, 100, 100), bit);
-        Core.multiply(bit, new Scalar(255), input);
+        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV); // Color Isolation
+
+        //Core.inRange(input, new Scalar(minH, (minS/100)*255, (minV/100)*255), new Scalar(maxH, (maxS/100)*255, (maxV/100)*255), bit);
+
+
+
+        // Loop through pixels and evaluate saturation and value
+        for(int x = 0; x < input.cols(); x++) {
+            for(int y = 0; y < input.rows(); y++) {
+                if(evaluateSatVal(input.get(y, x))) {
+                    input.put(y, x, 255d,255d,255d);
+                } else {
+                    input.put(y, x, 0d,0d,0d);
+                }
+            }
+        }
+
+        Core.
+
+        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2GRAY);
+
+        centerColor = input.get((int)input.rows()/2, (int)input.cols()/2);
+        Core.multiply(input, new Scalar(255), input);
 
         Moments m = Imgproc.moments(input);
         m10 = m.m10;
@@ -51,9 +72,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         for(int y = 0; y < input.rows(); y++) {
             double[] color = {0, 255, 0};
             input.put(y, (int)averageXPixelPosition, color);
-        }*/
-
-        centerColor = hsv.get((int)hsv.cols()/2, (int)hsv.rows()/2);
+        }
 
         return input;
     }
@@ -64,5 +83,18 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
     public double[] getCenterColor() {
         return centerColor;
+    }
+
+    // Evaluate saturation and value to be over a certain slope
+    public boolean evaluateSatVal(double[] hsv) {
+        final double satValSlope = 30/65; // Slope
+        final double satPoint = 35;
+        final double valPoint = 100;
+        double lowestPossibleValue = (satValSlope * (hsv[1] - ((satPoint/100)*255))) + ((valPoint/100)*255); // Point slope form
+
+        if(lowestPossibleValue > hsv[2]) {
+            return false;
+        }
+        return true;
     }
 }

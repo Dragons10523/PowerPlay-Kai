@@ -19,7 +19,7 @@ public class OpenCVTesting extends LinearOpMode {
         ahi.camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                ahi.camera.startStreaming(640, 480);
+                ahi.camera.startStreaming(160, 120);
             }
 
             @Override
@@ -33,7 +33,8 @@ public class OpenCVTesting extends LinearOpMode {
         waitForStart();
 
         while(opModeIsActive()) {
-            telemetry.addData("Center HSV: ", hueTrackingPipeline.getCenterColor());
+            double[] centerHue = hueTrackingPipeline.getCenterColor();
+            telemetry.addData("Center HSV", centerHue[0] + " " + centerHue[1] + " " + centerHue[2]);
             telemetry.update();
             sleep(20);
         }
