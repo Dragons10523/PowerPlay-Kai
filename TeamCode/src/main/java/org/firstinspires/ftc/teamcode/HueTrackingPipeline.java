@@ -28,7 +28,8 @@ public class HueTrackingPipeline extends OpenCvPipeline {
     double cols;
     boolean quality = false;
 
-    double[] centerColor;
+    double[] centerColorLab;
+    double[] centerColorVanilla;
 
     /**
      * Lab values are
@@ -54,10 +55,17 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
+        // TODO: Someone on stackoverflow said that this ^ "Mat input" value is BGR not RGB so now im paranoid and I need to double check this before I do hundreds of hours of work just to find out that its BGR not RGB
 
-        // TODO: Verify that OpenCV L*A*B* values are clamped to the standard values and not expressed as percentages
+        centerColorVanilla = input.get((int)input.rows()/2, (int)input.cols()/2);
+
+        /**
+         *         WARNING: OpenCV is cancerous and converts 8-bit CIELAB values like this:
+         *         L <- L*255/100, a <- a + 128, b <- b + 128
+         *         This will make the OpenCV Limits of all 3 values 0 <-> 255
+         */
         Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2Lab); // Color Isolation
-        centerColor = input.get((int)input.rows()/2, (int)input.cols()/2);
+        centerColorLab = input.get((int)input.rows()/2, (int)input.cols()/2);
 
         // Loop through pixels and evaluate saturation and value
         for(int x = 0; x < input.cols(); x++) {
@@ -96,8 +104,12 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         return averageXPosition;
     }
 
-    public double[] getCenterColor() {
-        return centerColor;
+    public double[] getCenterColorLab() {
+        return centerColorLab;
+    }
+
+    public double[] getCenterColorVanilla() {
+        return centerColorVanilla;
     }
 
     // Evaluate saturation and value to be over a certain slope
@@ -115,6 +127,9 @@ public class HueTrackingPipeline extends OpenCvPipeline {
     }
 
     public double evaluateLabDistance(double[] lab) {
-        return Math.sqrt( Math.pow(lab[1] - setpointLab[1], 2) + Math.pow(lab[2] - setpointLab[2], 2) + Math.pow(lab[0] - setpointLab[0], 2));
+        // Convert dumbfuck values
+        double[] labButNotStupid = {lab[0]/255*100, lab[1] - 128, lab[2] - 128};
+
+        return Math.sqrt( Math.pow(labButNotStupid[1] - setpointLab[1], 2) + Math.pow(labButNotStupid[2] - setpointLab[2], 2) + Math.pow(labButNotStupid[0] - setpointLab[0], 2));
     }
 }
