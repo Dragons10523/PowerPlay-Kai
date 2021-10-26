@@ -37,7 +37,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
         Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV); // Color Isolation
 
-        //Core.inRange(input, new Scalar(minH, (minS/100)*255, (minV/100)*255), new Scalar(maxH, (maxS/100)*255, (maxV/100)*255), bit);
+        //Core.inRange(input, new Scalar(minH, (100/100)*255, (100/100)*255), new Scalar(maxH, (100/100)*255, (100/100)*255), new Scalar(50, 50, 50), input);
 
 
 
@@ -52,7 +52,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
             }
         }
 
-        Core.
+        //Core.
 
         Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2GRAY);
 
