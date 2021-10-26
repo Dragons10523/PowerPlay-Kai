@@ -10,6 +10,15 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The CIELAB (L*a*b*) colorspace is being used because
+ * the nonlinear relations for L*, a*, and b* are intended to mimic the nonlinear
+ * response of the eye. Furthermore, uniform changes of components in the L*a*b* color space
+ * aim to correspond to uniform changes in perceived color, so the relative perceptual differences
+ * between any two colors in L*a*b* can be approximated by treating each color as a point in a
+ * three-dimensional space (with three components: L*, a*, b*) and taking the Euclidean distance between them.
+ */
+
 public class HueTrackingPipeline extends OpenCvPipeline {
 
     List<Mat> channels = new ArrayList<>();
@@ -19,32 +28,41 @@ public class HueTrackingPipeline extends OpenCvPipeline {
     double cols;
     boolean quality = false;
 
-    double minH = 30;
-    double maxH = 80;
+    double[] centerColor;
+
+    /**
+     * Lab values are
+     * [L]ightness : range 0-100
+     * [A] (green <-> red): range usually clamped to +- 128
+     * [B] (blue <-> yellow): range usually clamped to +- 128
+     */
+    double[] setpointLab = {82, -21, 128};
+
+    /**
+     * Difference is expressed as distance within a 3D colorspace
+     * Horizontal axes: A/B
+     * Vertical axis: L
+     *
+     * The practical bounds of this threshold are 0 to 375
+     * 0 being royal blue and 375 being firetruck red, the two most opposite colors represented
+     * by this colorspace
+     */
+    float labDistanceThreshold = 50;
 
     double averageXPosition;
     double averageXPixelPosition;
 
-    double[] centerColor = {0, 0, 0};
-
     @Override
     public Mat processFrame(Mat input) {
-//        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2YUV); // Light equalization
-//        Core.split(input, channels);
-//        Imgproc.equalizeHist(channels.get(0), channels.get(0));
-//        Core.merge(channels, input);
-//        Imgproc.cvtColor(input, input, Imgproc.COLOR_YUV2RGB);
 
-        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV); // Color Isolation
-
-        //Core.inRange(input, new Scalar(minH, (100/100)*255, (100/100)*255), new Scalar(maxH, (100/100)*255, (100/100)*255), new Scalar(50, 50, 50), input);
-
-
+        // TODO: Verify that OpenCV L*A*B* values are clamped to the standard values and not expressed as percentages
+        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2Lab); // Color Isolation
+        centerColor = input.get((int)input.rows()/2, (int)input.cols()/2);
 
         // Loop through pixels and evaluate saturation and value
         for(int x = 0; x < input.cols(); x++) {
             for(int y = 0; y < input.rows(); y++) {
-                if(evaluateSatVal(input.get(y, x))) {
+                if(evaluateLabDistance(input.get(y, x)) < labDistanceThreshold) {
                     input.put(y, x, 255d,255d,255d);
                 } else {
                     input.put(y, x, 0d,0d,0d);
@@ -52,11 +70,8 @@ public class HueTrackingPipeline extends OpenCvPipeline {
             }
         }
 
-        //Core.
-
         Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2GRAY);
 
-        centerColor = input.get((int)input.rows()/2, (int)input.cols()/2);
         Core.multiply(input, new Scalar(255), input);
 
         Moments m = Imgproc.moments(input);
@@ -86,6 +101,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
     }
 
     // Evaluate saturation and value to be over a certain slope
+    @Deprecated
     public boolean evaluateSatVal(double[] hsv) {
         final double satValSlope = 30/65; // Slope
         final double satPoint = 35;
@@ -96,5 +112,9 @@ public class HueTrackingPipeline extends OpenCvPipeline {
             return false;
         }
         return true;
+    }
+
+    public double evaluateLabDistance(double[] lab) {
+        return Math.sqrt( Math.pow(lab[1] - setpointLab[1], 2) + Math.pow(lab[2] - setpointLab[2], 2) + Math.pow(lab[0] - setpointLab[0], 2));
     }
 }

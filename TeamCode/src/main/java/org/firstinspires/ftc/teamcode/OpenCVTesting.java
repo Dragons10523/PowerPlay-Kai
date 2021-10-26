@@ -33,8 +33,8 @@ public class OpenCVTesting extends LinearOpMode {
         waitForStart();
 
         while(opModeIsActive()) {
-            double[] centerHue = hueTrackingPipeline.getCenterColor();
-            telemetry.addData("Center HSV", centerHue[0] + " " + centerHue[1] + " " + centerHue[2]);
+            double[] centerColor = hueTrackingPipeline.getCenterColor();
+            telemetry.addData("Center L*A*B*", centerColor[0] + " " + centerColor[1] + " " + centerColor[2]);
             telemetry.update();
             sleep(20);
         }
