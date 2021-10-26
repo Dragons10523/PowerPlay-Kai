@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name = "Blue Freight", preselectTeleOp = "Drive Blue")
+@Autonomous(name = "Blue Freight", group = "Main", preselectTeleOp = "Drive Blue")
 public class BlueFreight extends AbstractFreight {
     @Override
     public void runOpMode() throws InterruptedException {

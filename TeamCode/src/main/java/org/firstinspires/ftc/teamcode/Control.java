@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * */
 
 public abstract class Control extends LinearOpMode {
-    Ahi ahi;
+    public Ahi ahi;
 
     public enum FieldSide {
         RED,

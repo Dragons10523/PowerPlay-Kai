@@ -70,6 +70,6 @@ public class Ahi {
 
         WebcamName webcamName = hwmap.get(WebcamName.class, "Webcam 1");
         cameraMonitorViewId = hwmap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwmap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+        camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
     }
 }

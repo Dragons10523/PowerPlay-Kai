@@ -6,10 +6,12 @@ package org.firstinspires.ftc.teamcode;
 
 // ORDER OF OPERATIONS: Ducks -> Preload -> Cycle -> Park
 
-public abstract class AbstractDuck extends AbstractAutonomous {
+public abstract class AbstractDuck extends AbstractBarcode {
     protected ArmPosition fieldOrientation;
 
     public void run(FieldSide fieldSide) {
+        startOpenCV();
+
         boolean onRed = fieldSide == FieldSide.RED;
 
         initializeValues();
@@ -17,6 +19,11 @@ public abstract class AbstractDuck extends AbstractAutonomous {
         waitForStart();
 
         fieldOrientation = getFieldOrientation();
+
+        stopOpenCV();
+
+        telemetry.addLine("Target arm pos: " + fieldOrientation.toString());
+        telemetry.update();
 
         if(driveDist(6)) return; // Get away from the wall
 

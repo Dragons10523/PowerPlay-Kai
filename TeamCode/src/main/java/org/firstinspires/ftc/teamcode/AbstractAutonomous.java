@@ -83,11 +83,6 @@ public abstract class AbstractAutonomous extends Control {
         return false;
     }
 
-    public ArmPosition getFieldOrientation() {
-        // TODO: AprilTag fiducial tracker
-        return ArmPosition.HIGH;
-    }
-
     // Everything from this point on is copy pasted code from last year
     public static double collapseAngle(double theta) {
         return (((theta % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI));
