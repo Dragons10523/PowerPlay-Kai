@@ -39,7 +39,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * [A] (green <-> red): range usually clamped to +- 128
      * [B] (blue <-> yellow): range usually clamped to +- 128
      */
-    double[] setpointLab = {80, -20, 50};
+    final double[] setpointLab = {80, -20, 50};
 
     /**
      * Difference is expressed as distance within a 3D colorspace
@@ -61,7 +61,6 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
-        // TODO: Someone on stackoverflow said that this ^ "Mat input" value is BGR not RGB so now im paranoid and I need to double check this before I do hundreds of hours of work just to find out that its BGR not RGB
         originalImage = input.clone();
 
         centerColorVanilla = input.get((int)input.rows()/2, (int)input.cols()/2);

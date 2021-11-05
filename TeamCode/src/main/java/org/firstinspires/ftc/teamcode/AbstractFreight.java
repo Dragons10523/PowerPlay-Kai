@@ -10,11 +10,10 @@ public abstract class AbstractFreight extends AbstractBarcode {
     protected ArmPosition fieldOrientation;
 
     public void run(FieldSide fieldSide) {
+        initializeValues();
         startOpenCV();
 
         boolean onRed = fieldSide == FieldSide.RED;
-
-        initializeValues();
 
         waitForStart();
 
@@ -24,6 +23,8 @@ public abstract class AbstractFreight extends AbstractBarcode {
 
         telemetry.addLine("Target arm pos: " + fieldOrientation.toString());
         telemetry.update();
+
+        sleep(2000); // for testing only
 
         if(driveDist(6)) return; // Get away from the wall
 

@@ -9,6 +9,7 @@ public class OpenCVColorCalibrate extends AbstractBarcode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+        initializeValues();
         startOpenCV();
 
         waitForStart();

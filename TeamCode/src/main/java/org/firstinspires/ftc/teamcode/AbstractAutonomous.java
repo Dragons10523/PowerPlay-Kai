@@ -17,8 +17,8 @@ public abstract class AbstractAutonomous extends Control {
     public Double theta_offset = null; // Leave this as null, it is initialized in initializeValues
 
     public void initializeValues() {
-        if(theta_offset == null) theta_offset = (Double)(double)ahi.imu.getAngularOrientation().toAngleUnit(AngleUnit.RADIANS).firstAngle; // Bit of a mess to convert float -> double -> Double
         initialize();
+        if(theta_offset == null) theta_offset = (Double)(double)ahi.imu.getAngularOrientation().toAngleUnit(AngleUnit.RADIANS).firstAngle; // Bit of a mess to convert float -> double -> Double
     }
 
     public boolean driveDist(double dist) {

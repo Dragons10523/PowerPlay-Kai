@@ -29,7 +29,9 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
             sleep(100);
         }
 
-        telemetry.clear();
+        telemetry.clearAll();
+        
+        telemetry.update();
     }
 
     public void stopOpenCV() {
@@ -39,14 +41,14 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
     public ArmPosition getFieldOrientation() {
         ArmPosition armPosition;
-        double averageX = hueTrackingPipeline.getAverageXPosition();
+        double averageY = hueTrackingPipeline.getAverageYPosition();
 
-        if(averageX < 0.333) {
-            armPosition = ArmPosition.LOW;
-        } else if(averageX < 0.667) {
+        if(averageY < 0.333) {
+            armPosition = ArmPosition.HIGH;
+        } else if(averageY < 0.667) {
             armPosition = ArmPosition.MED;
         } else {
-            armPosition = ArmPosition.HIGH;
+            armPosition = ArmPosition.LOW;
         }
 
         return armPosition;

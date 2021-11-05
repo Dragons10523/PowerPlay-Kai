@@ -57,19 +57,20 @@ public class Ahi {
         capLift = hwmap.get(DcMotor.class, "capLift");
 
         ddr = hwmap.get(CRServo.class, "ddr");
-
+*/
         BNO055IMU.Parameters parameters             = new BNO055IMU.Parameters();
         parameters.angleUnit                        = BNO055IMU.AngleUnit.RADIANS;
         parameters.accelUnit                        = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile              = "AdafruitIMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled                   = true;
+        parameters.loggingEnabled                   = false;
         parameters.loggingTag                       = "IMU";
 
         imu = hwmap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);*/
+        imu.initialize(parameters);
 
         WebcamName webcamName = hwmap.get(WebcamName.class, "Webcam 1");
         cameraMonitorViewId = hwmap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwmap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
+        camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+
     }
 }
