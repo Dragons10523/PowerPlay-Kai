@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.Control;
 public class ArmControlTest extends Control {
     @Override
     public void runOpMode() throws InterruptedException {
+        initialize();
         waitForStart();
 
         telemetry.addLine("Moving arm to PICKUP");

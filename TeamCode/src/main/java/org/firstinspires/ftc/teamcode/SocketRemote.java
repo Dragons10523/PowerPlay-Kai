@@ -9,7 +9,9 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-@TeleOp(name = "ReDUX_Server", group = "Sensor")
+// PROGRAM PURELY FOR TESTING AND DEBUGGING, DISABLE DURING COMPETITION
+
+@TeleOp(name = "ReDUX Server (DISABLE ME)", group = "Debug")
 public class SocketRemote extends LinearOpMode {
 
     @Override

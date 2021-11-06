@@ -55,9 +55,9 @@ public class Ahi {
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         capLift = hwmap.get(DcMotor.class, "capLift");
-
-        ddr = hwmap.get(CRServo.class, "ddr");
 */
+        ddr = hwmap.get(CRServo.class, "ddr");
+
         BNO055IMU.Parameters parameters             = new BNO055IMU.Parameters();
         parameters.angleUnit                        = BNO055IMU.AngleUnit.RADIANS;
         parameters.accelUnit                        = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;

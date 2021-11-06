@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.Control;
 public class ToolControlTest extends Control {
     @Override
     public void runOpMode() throws InterruptedException {
+        initialize();
         waitForStart();
 
         telemetry.addLine("Testing Intake");

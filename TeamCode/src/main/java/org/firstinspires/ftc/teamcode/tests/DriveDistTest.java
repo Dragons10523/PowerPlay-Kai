@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.AbstractAutonomous;
 public class DriveDistTest extends AbstractAutonomous {
     @Override
     public void runOpMode() throws InterruptedException {
+        initialize();
         waitForStart();
 
         telemetry.addLine("Driving forwards 6\"");

@@ -63,7 +63,7 @@ public abstract class Control extends LinearOpMode {
     }
 
     public void playDDR(double power) {
-        ahi.ddr.setPower(power);
+        ahi.ddr.setPower(power/2);
     }
 
     public void setFlup(boolean open) {
