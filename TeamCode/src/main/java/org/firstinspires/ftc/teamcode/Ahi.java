@@ -17,11 +17,11 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 * */
 
 public class Ahi {
-    // Encoder goes in the motor port, A motors for drivetrain and arm motor for manipulation
-    public DcMotor rightA, rightB, leftA, leftB; // Drivetrain
-    public DcMotor arm, succc, capLift; // Manipulation Motors
-    public CRServo ddr; // Manipulation Servos
-    public Servo flup;
+    // Encoder goes in the motor port, A motors for drivetrain and arm motor for manipulation (CH = Control Hub | DH = Driver Hub)
+    public DcMotor rightA, rightB, leftA, leftB; // Drivetrain (CH 0-3)
+    public DcMotor arm, succc, capLift; // Manipulation Motors (DH 0-2)
+    public CRServo ddr; // Manipulation Servos (CH 0)
+    public Servo flup; // (CH 1)
     public BNO055IMU imu;
 
     public OpenCvCamera camera;
@@ -35,7 +35,7 @@ public class Ahi {
     public Ahi(HardwareMap hwmap) {
         this.hwmap = hwmap;
 
-        /*rightA = hwmap.get(DcMotor.class, "rightA");
+        rightA = hwmap.get(DcMotor.class, "rightA");
         rightB = hwmap.get(DcMotor.class, "rightB");
         leftA = hwmap.get(DcMotor.class, "leftA");
         leftB = hwmap.get(DcMotor.class, "leftB");
@@ -55,7 +55,7 @@ public class Ahi {
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         capLift = hwmap.get(DcMotor.class, "capLift");
-*/
+
         ddr = hwmap.get(CRServo.class, "ddr");
 
         BNO055IMU.Parameters parameters             = new BNO055IMU.Parameters();
