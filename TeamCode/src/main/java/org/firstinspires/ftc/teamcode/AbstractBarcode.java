@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 public abstract class AbstractBarcode extends AbstractAutonomous {
     public HueTrackingPipeline hueTrackingPipeline;
@@ -14,7 +15,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         ahi.camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                ahi.camera.startStreaming(160, 120);
+                ahi.camera.startStreaming(160, 120, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
@@ -25,7 +26,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
         ahi.camera.setPipeline(hueTrackingPipeline);
 
-        while(!hueTrackingPipeline.isPipelineReady()) {
+        while(!hueTrackingPipeline.isPipelineReady() && opModeIsActive()) {
             sleep(100);
         }
 
@@ -41,11 +42,11 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
     public ArmPosition getFieldOrientation() {
         ArmPosition armPosition;
-        double averageY = hueTrackingPipeline.getAverageYPosition();
+        double averageX = hueTrackingPipeline.getAverageXPosition();
 
-        if(averageY < 0.333) {
+        if(averageX < 0.333) {
             armPosition = ArmPosition.HIGH;
-        } else if(averageY < 0.667) {
+        } else if(averageX < 0.667) {
             armPosition = ArmPosition.MED;
         } else {
             armPosition = ArmPosition.LOW;
