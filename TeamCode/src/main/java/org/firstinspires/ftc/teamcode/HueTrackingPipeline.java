@@ -20,7 +20,7 @@ import java.util.List;
  */
 
 public class HueTrackingPipeline extends OpenCvPipeline {
-    final boolean debugMode = false;
+    final boolean debugMode = true;
 
     List<Mat> channels = new ArrayList<>();
     Mat originalImage = new Mat();
@@ -50,7 +50,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * 0 being royal blue and 375 being firetruck red, the two most opposite colors represented
      * by this colorspace
      */
-    float labDistanceThreshold = 20;
+    float labDistanceThresholdSquared = 400;
 
     double averageXPosition;
     double averageXPixelPosition;
@@ -76,7 +76,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         // Loop through pixels and evaluate saturation and value
         for(int x = 0; x < input.cols(); x++) {
             for(int y = 0; y < input.rows(); y++) {
-                if(evaluateLabDistance(input.get(y, x)) < labDistanceThreshold) {
+                if(evaluateLabDistanceSquared(input.get(y, x)) < labDistanceThresholdSquared) {
                     input.put(y, x, 255d,255d,255d);
                 } else {
                     input.put(y, x, 0d,0d,0d);
@@ -113,7 +113,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
         isPipelineReady = true;
 
-        return input;
+        return originalImage;
     }
 
     public Double getAverageXPosition() {
@@ -150,11 +150,11 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         return true;
     }
 
-    public double evaluateLabDistance(double[] lab) {
+    public double evaluateLabDistanceSquared(double[] lab) {
         // Convert dumbfuck values
         double[] labButNotStupid = {100*lab[0]/255, lab[1] - 128, lab[2] - 128};
 
 
-        return Math.sqrt( Math.pow(labButNotStupid[1] - setpointLab[1], 2) + Math.pow(labButNotStupid[2] - setpointLab[2], 2) + Math.pow(labButNotStupid[0] - setpointLab[0], 2));
+        return Math.pow(labButNotStupid[1] - setpointLab[1], 2) + Math.pow(labButNotStupid[2] - setpointLab[2], 2) + Math.pow(labButNotStupid[0] - setpointLab[0], 2);
     }
 }
