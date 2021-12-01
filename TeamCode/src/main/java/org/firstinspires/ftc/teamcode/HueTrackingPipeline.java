@@ -22,16 +22,8 @@ import java.util.List;
 public class HueTrackingPipeline extends OpenCvPipeline {
     final boolean debugMode = true;
 
-    List<Mat> channels = new ArrayList<>();
-    Mat originalImage = new Mat();
-
-    double m10;
-    double m01;
-    double m00;
-    double cols;
-
-    double[] centerColorLab;
-    double[] centerColorVanilla;
+    private double[] centerColorLab;
+    private double[] centerColorVanilla;
 
     /**
      * Lab values are
@@ -39,7 +31,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * [A] (green <-> red): range usually clamped to +- 128
      * [B] (blue <-> yellow): range usually clamped to +- 128
      */
-    final double[] setpointLab = {80, -20, 50};
+    protected double[] setpointLab;
 
     /**
      * Difference is expressed as distance within a 3D colorspace
@@ -50,18 +42,24 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * 0 being royal blue and 375 being firetruck red, the two most opposite colors represented
      * by this colorspace
      */
-    float labDistanceThresholdSquared = 400;
+    protected final float labDistanceThresholdSquared = 400;
 
-    double averageXPosition;
-    double averageXPixelPosition;
-    double averageYPosition;
-    double averageYPixelPosition;
+    private double averageXPosition;
+    private double averageYPosition;
 
-    boolean isPipelineReady = false;
+    private boolean isPipelineReady = false;
+
+    public HueTrackingPipeline() {
+        this.setpointLab = new double[]{80, -20, 50};
+    }
+
+    public HueTrackingPipeline(double[] setpointLab) {
+        this.setpointLab = setpointLab;
+    }
 
     @Override
     public Mat processFrame(Mat input) {
-        originalImage = input.clone();
+        Mat originalImage = input.clone();
 
         centerColorVanilla = input.get((int)input.rows()/2, (int)input.cols()/2);
 
@@ -89,15 +87,15 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         Core.multiply(input, new Scalar(255), input);
 
         Moments m = Imgproc.moments(input);
-        m10 = m.m10;
-        m01 = m.m01;
-        m00 = m.m00;
-        cols = input.cols();
+        double m10 = m.m10;
+        double m01 = m.m01;
+        double m00 = m.m00;
+        int cols = input.cols();
 
-        averageXPixelPosition = (m10/m00);
-        averageYPixelPosition = (m01/m00);
-        averageXPosition = averageXPixelPosition/((double)(input.cols()));
-        averageYPosition = averageYPixelPosition/((double)(input.rows()));
+        double averageXPixelPosition = (m10 / m00);
+        double averageYPixelPosition = (m01 / m00);
+        averageXPosition = averageXPixelPosition /((double)(input.cols()));
+        averageYPosition = averageYPixelPosition /((double)(input.rows()));
 
         if(debugMode) {
             double[] color = {0, 255, 0, 0};
@@ -156,5 +154,9 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
 
         return Math.pow(labButNotStupid[1] - setpointLab[1], 2) + Math.pow(labButNotStupid[2] - setpointLab[2], 2) + Math.pow(labButNotStupid[0] - setpointLab[0], 2);
+    }
+
+    public void setSetpointLab(double[] setpointLab) {
+        this.setpointLab = setpointLab;
     }
 }
