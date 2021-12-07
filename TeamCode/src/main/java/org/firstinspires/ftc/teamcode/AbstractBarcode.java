@@ -10,36 +10,41 @@ import java.nio.ByteBuffer;
 public abstract class AbstractBarcode extends AbstractAutonomous {
     public HueTrackingPipeline hueTrackingPipeline;
 
-    public void startOpenCV() throws IOException {
+    public void startOpenCV() {
         telemetry.addLine("Starting OpenCV");
-        telemetry.update();
+        //telemetry.update();
 
         double[] calibrationColor = new double[3];
         calibrationColor[2] = -1000;
 
-        FileInputStream fis = new FileInputStream("/storage/emulated/0/FIRST/color.dat"); // Get the color calibration
-        for(int i = 0; i < 3; i++) {
-            int Byte = fis.read();
-            byte[] byteArray = new byte[8];
-            for(int j = 0; j < 8; j++) {
-                if(Byte == -1) break;
-                byteArray[j] = (byte)Byte;
-                Byte = fis.read();
-            }
-            if(Byte == -1) break;
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream("/storage/emulated/0/FIRST/color.dat"); // Get the color calibration
+            for (int i = 0; i < 3; i++) {
+                byte[] byteArray = new byte[8];
+                int bytesRead = fis.read(byteArray, 0, 8);
 
-            ByteBuffer byteBuffer = ByteBuffer.wrap(byteArray);
-            calibrationColor[i] = byteBuffer.getDouble();
+                if(bytesRead == -1) {
+                    break;
+                }
+
+                ByteBuffer byteBuffer = ByteBuffer.wrap(byteArray);
+                calibrationColor[i] = byteBuffer.getDouble();
+            }
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         if(calibrationColor[2] == -1000) { // Default to standard value if calibration failed
             hueTrackingPipeline = new HueTrackingPipeline();
             telemetry.addLine("Failed to retrieve calibration data from file");
-            telemetry.update();
-            sleep(5000);
         } else {
             hueTrackingPipeline = new HueTrackingPipeline(calibrationColor);
         }
+
+        telemetry.addData("Calibration Color", "[" + calibrationColor[0] + ", " + calibrationColor[1] + ", " + calibrationColor[2] + "]");
+        telemetry.update();
 
         ahi.camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override

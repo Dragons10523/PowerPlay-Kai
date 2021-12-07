@@ -25,7 +25,16 @@ public class CalibrationPipeline extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
         Imgproc.cvtColor(input, lab, Imgproc.COLOR_RGB2Lab);
 
+        Imgproc.GaussianBlur(lab, lab, new Size(7, 7), 0.00);
         centerColor = lab.get((int)lab.rows()/2, (int)lab.cols()/2);
+
+        int halfX = lab.cols()/2;
+        int halfY = lab.rows()/2;
+        Scalar color = new Scalar(255, 255, 255);
+        Imgproc.line(lab, new Point(0, halfY), new Point(halfX*2, halfY), color);
+        Imgproc.line(lab, new Point(halfX, 0), new Point(halfX, halfY*2), color);
+
+        ready = true;
 
         return lab;
     }

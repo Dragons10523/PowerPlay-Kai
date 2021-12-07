@@ -14,6 +14,8 @@ public class OpenCVColorCalibrate extends AbstractBarcode {
 
         waitForStart();
 
+        while(!hueTrackingPipeline.isPipelineReady() && opModeIsActive()) sleep(50);
+
         while(opModeIsActive()) {
             double[] centerColor = hueTrackingPipeline.getCenterColorLab();
             double[] centerColorVanilla = hueTrackingPipeline.getCenterColorVanilla();

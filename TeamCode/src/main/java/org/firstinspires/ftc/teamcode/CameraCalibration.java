@@ -3,11 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -44,18 +42,41 @@ public class CameraCalibration extends LinearOpMode {
         }
 
         double[] centerColor = calibrationPipeline.getColor();
+        int frame = 0;
+        while(opModeIsActive()) {
+            double[] color = calibrationPipeline.getColor();
+            centerColor[0] += color[0];
+            centerColor[1] += color[1];
+            centerColor[2] += color[2];
+
+            centerColor[0] /= 2;
+            centerColor[1] /= 2;
+            centerColor[2] /= 2;
+
+            telemetry.addData("Real L*A*B*", (100*centerColor[0]/255) + " " + (centerColor[1]-128) + " " + (centerColor[2]-128));
+            telemetry.addData("OpenCV L*A*B*", (centerColor[0]) + " " + (centerColor[1]) + " " + (centerColor[2]));
+            telemetry.update();
+
+            while(ahi.camera.getFrameCount() <= frame) {
+                frame = ahi.camera.getFrameCount();
+                sleep(1);
+            }
+        }
+
+        centerColor[0] = 100*centerColor[0]/255;
+        centerColor[1] = centerColor[1]-128;
+        centerColor[2] = centerColor[2]-128;
 
         try {
             FileOutputStream fos = new FileOutputStream("/storage/emulated/0/FIRST/color.dat");
 
-            byte[] data = ByteBuffer.allocate(8 * 3).putDouble(centerColor[0]).putDouble(centerColor[1]).putDouble(centerColor[2]).array();
-            fos.write(data);
+            ByteBuffer data = (ByteBuffer) ByteBuffer.allocate(8 * 3).putDouble(centerColor[0]).putDouble(centerColor[1]).putDouble(centerColor[2]).rewind();
+            byte[] dataArray = new byte[8*3];
+            data.get(dataArray, 0, dataArray.length);
+            fos.write(dataArray);
+            fos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        telemetry.addData("Real L*A*B*", (100*centerColor[0]/255) + " " + (centerColor[1]-128) + " " + (centerColor[2]-128));
-        telemetry.addData("OpenCV L*A*B*", (centerColor[0]) + " " + (centerColor[1]) + " " + (centerColor[2]));
-        telemetry.update();
     }
 }
