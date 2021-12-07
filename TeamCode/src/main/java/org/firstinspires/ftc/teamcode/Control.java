@@ -11,6 +11,7 @@ public abstract class Control extends LinearOpMode {
 
           double INTAKE = 0.9;
           double FEEDER = 1.0;
+          double SHOOTER = 1.0;
     final double CLAMP  = 1.0;
 
     enum Speed {
@@ -26,7 +27,7 @@ public abstract class Control extends LinearOpMode {
         this.speed = speed;
     }
 
-    Speed speed  = Speed.STOP;
+    Speed speed = Speed.STOP;
 
     public GamepadPrev prev1;
     public GamepadPrev prev2;
@@ -82,8 +83,11 @@ public abstract class Control extends LinearOpMode {
     }
 
     public void shoot(double p) {
-        thalatte.shooterFront.setPower( p);
-        thalatte.shooterBack. setPower(-p );
+        if(p < 0) {
+            p *= 0.5;
+        }
+        thalatte.shooterFront.setPower( p * SHOOTER);
+        thalatte.shooterBack. setPower(-p * SHOOTER);
     }
 
     public void shootDistance(double distance) throws InterruptedException{
@@ -108,17 +112,27 @@ public abstract class Control extends LinearOpMode {
     }
 
     public void setFeederDirection(double direction){
-        FEEDER = Math.signum(direction);
+        FEEDER = direction;
         feeder(thalatte.feeder.getPower() != 0);
     }
 
     public void setIntakeDirection(double direction){
-        INTAKE = Math.signum(direction);
+        INTAKE = direction;
         intake(thalatte.intake.getPower() != 0);
     }
 
+    public void setShooterDirection(double direction){
+        SHOOTER = direction;
+        if(thalatte.shooterBack.getPower() > 0) {
+            shoot(thalatte.shooterBack.getPower());
+        } else {
+            shoot(thalatte.shooterBack.getPower() * 2);
+        }
+    }
+
+    @Deprecated
     public void toggleFeederDirection(){
-        setFeederDirection(-Math.signum(FEEDER));
+        setFeederDirection(-FEEDER);
     }
 
     public boolean toggleIntake() {
@@ -127,14 +141,21 @@ public abstract class Control extends LinearOpMode {
         return set;
     }
 
+    @Deprecated
     public void toggleIntakeDirection(){
-        setIntakeDirection(-Math.signum(INTAKE));
+        setIntakeDirection(-INTAKE);
     }
 
     public boolean toggleFeeder() {
         boolean set = thalatte.feeder.getPower() == 0;
         feeder(set);
         return set;
+    }
+
+    public void toggleDirection(){
+        setIntakeDirection (-INTAKE );
+        setFeederDirection (-FEEDER );
+        setShooterDirection(-SHOOTER);
     }
 
     public void vwompArm(double p) {

@@ -21,8 +21,7 @@ public class Drive extends Localization {
                     telemetry.addData("Shooter"         , thalatte .shooterFront.getPower()    != 0 ? "ON"   : "OFF"   );
                     telemetry.addData("Shooter Power"   , sPower                                                       );
                     telemetry.addData("Intake"          , thalatte .intake      .getPower()    != 0 ? "ON"   : "OFF"   );
-                    telemetry.addData("Intake Direction", Math     .signum(INTAKE)             == 1 ? "1"    : "-1"    );
-                    telemetry.addData("Feeder Direction", Math     .signum(FEEDER)             == 1 ? "1"    : "-1"    );
+                    telemetry.addData("Reversed",       Math       .signum(FEEDER)             >  0 ? "Yes"  : "No"    );
                     telemetry.addData("Feeder"          , thalatte .feeder      .getPower()    != 0 ? "ON"   : "OFF"   );
                     telemetry.addData("Clamp"           , thalatte .vwompClamp  .getPosition() != 0 ? "OPEN" : "CLOSED");
 //                    telemetry.addData("Aiming"          , aimingFlag                                                   );
@@ -88,10 +87,8 @@ public class Drive extends Localization {
                         toggleShoot(sPower);
                         break;
                     case LEFT:
-                        toggleFeederDirection();
-                        break;
                     case RIGHT:
-                        toggleIntakeDirection();
+                        toggleDirection();
                         break;
                     case UP:
                         sPower = Math.min(sPower + 0.1, 1);
