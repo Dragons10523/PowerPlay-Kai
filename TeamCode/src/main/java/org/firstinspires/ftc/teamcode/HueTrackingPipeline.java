@@ -31,7 +31,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * [A] (green <-> red): range usually clamped to +- 128
      * [B] (blue <-> yellow): range usually clamped to +- 128
      */
-    protected double[] setpointLab;
+    private double[] setpointLab = {80, -20, 50};
 
     /**
      * Difference is expressed as distance within a 3D colorspace
@@ -42,7 +42,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * 0 being royal blue and 375 being firetruck red, the two most opposite colors represented
      * by this colorspace
      */
-    protected final float labDistanceThresholdSquared = 400;
+    protected final float labDistanceThresholdSquared = 250;
 
     private double averageXPosition;
     private double averageYPosition;
@@ -71,16 +71,23 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2Lab); // Color Isolation
         centerColorLab = input.get((int)input.rows()/2, (int)input.cols()/2);
 
+        Mat gray = input.clone();
+
         // Loop through pixels and evaluate saturation and value
-        for(int x = 0; x < input.cols(); x++) {
+        /*for(int x = 0; x < input.cols(); x++) {
             for(int y = 0; y < input.rows(); y++) {
-                if(evaluateLabDistanceSquared(input.get(y, x)) < labDistanceThresholdSquared) {
+                double dist =  evaluateLabDistanceSquared(input.get(y, x));
+                gray.put(y, x, dist, dist, dist);
+                if(dist < labDistanceThresholdSquared) {
                     input.put(y, x, 255d,255d,255d);
                 } else {
                     input.put(y, x, 0d,0d,0d);
                 }
             }
-        }
+        }*/
+
+        input.mul(input);
+        Core.transform(input, input, new Mat(1, 3, 1));
 
         Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2GRAY);
 
@@ -152,11 +159,14 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         // Convert dumbfuck values
         double[] labButNotStupid = {100*lab[0]/255, lab[1] - 128, lab[2] - 128};
 
-
         return Math.pow(labButNotStupid[1] - setpointLab[1], 2) + Math.pow(labButNotStupid[2] - setpointLab[2], 2) + Math.pow(labButNotStupid[0] - setpointLab[0], 2);
     }
 
     public void setSetpointLab(double[] setpointLab) {
         this.setpointLab = setpointLab;
+    }
+
+    public double[] getSetpointLab() {
+        return this.setpointLab;
     }
 }
