@@ -40,6 +40,10 @@ public abstract class AbstractDrive extends Control {
             } else if (gamepad2.y) {
                 armControl(ArmPosition.HIGH);
             }
+
+            telemetry.addData("Arm Target", ahi.arm.getTargetPosition());
+            telemetry.addData("Arm Current", ahi.arm.getCurrentPosition());
+            telemetry.update();
         }
     }
 }
