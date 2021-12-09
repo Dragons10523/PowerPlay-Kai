@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.renderscript.Matrix3f;
+
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
@@ -20,10 +24,10 @@ import java.util.List;
  */
 
 public class HueTrackingPipeline extends OpenCvPipeline {
-    final boolean debugMode = true;
+    final boolean debugMode = false;
 
     private double[] centerColorLab;
-    private double[] centerColorVanilla;
+    //private double[] centerColorVanilla;
 
     /**
      * Lab values are
@@ -31,7 +35,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * [A] (green <-> red): range usually clamped to +- 128
      * [B] (blue <-> yellow): range usually clamped to +- 128
      */
-    private double[] setpointLab = {80, -20, 50};
+    private double[] setpointLab = {204, 108, 178};
 
     /**
      * Difference is expressed as distance within a 3D colorspace
@@ -50,7 +54,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
     private boolean isPipelineReady = false;
 
     public HueTrackingPipeline() {
-        this.setpointLab = new double[]{80, -20, 50};
+        this.setpointLab = new double[]{204, 108, 178};
     }
 
     public HueTrackingPipeline(double[] setpointLab) {
@@ -60,8 +64,8 @@ public class HueTrackingPipeline extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
         Mat originalImage = input.clone();
-
-        centerColorVanilla = input.get((int)input.rows()/2, (int)input.cols()/2);
+        int rows = input.rows();
+        int cols = input.cols();
 
         /**
          *         WARNING: OpenCV is cancerous and converts 8-bit CIELAB values like this:
@@ -69,55 +73,40 @@ public class HueTrackingPipeline extends OpenCvPipeline {
          *         This will make the OpenCV Limits of all 3 values 0 <-> 255
          */
         Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2Lab); // Color Isolation
-        centerColorLab = input.get((int)input.rows()/2, (int)input.cols()/2);
+        centerColorLab = input.get((int)rows/2, (int)cols/2);
+        
+        input.convertTo(input, CvType.CV_32F);
+        Core.subtract(input, new Scalar(setpointLab), input); // input - setpointLab
 
-        Mat gray = input.clone();
+        Core.multiply(input, input, input); // input^2
 
-        // Loop through pixels and evaluate saturation and value
-        /*for(int x = 0; x < input.cols(); x++) {
-            for(int y = 0; y < input.rows(); y++) {
-                double dist =  evaluateLabDistanceSquared(input.get(y, x));
-                gray.put(y, x, dist, dist, dist);
-                if(dist < labDistanceThresholdSquared) {
-                    input.put(y, x, 255d,255d,255d);
-                } else {
-                    input.put(y, x, 0d,0d,0d);
-                }
-            }
-        }*/
+        // Add all channels
+        Core.reduce(input.reshape(1, cols * rows), input, 1, Core.REDUCE_SUM);
+        input = input.reshape(1, rows);
 
-        input.mul(input);
-        Core.transform(input, input, new Mat(1, 3, 1));
+        Core.inRange(input, new Scalar(0), new Scalar(labDistanceThresholdSquared), input);
 
-        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2GRAY);
-
-        Core.multiply(input, new Scalar(255), input);
-
+        input.convertTo(input, CvType.CV_8U);
         Moments m = Imgproc.moments(input);
         double m10 = m.m10;
         double m01 = m.m01;
         double m00 = m.m00;
-        int cols = input.cols();
 
         double averageXPixelPosition = (m10 / m00);
         double averageYPixelPosition = (m01 / m00);
-        averageXPosition = averageXPixelPosition /((double)(input.cols()));
-        averageYPosition = averageYPixelPosition /((double)(input.rows()));
+        averageXPosition = averageXPixelPosition /((double)(cols));
+        averageYPosition = averageYPixelPosition /((double)(rows));
 
         if(debugMode) {
-            double[] color = {0, 255, 0, 0};
-            //double color = 255;
-            for (int y = 0; y < input.rows(); y++) {
-                originalImage.put(y, (int) averageXPixelPosition, color);
-            }
-
-            for (int x = 0; x < input.cols(); x++) {
-                originalImage.put((int) averageYPixelPosition, x, color);
-            }
+            Scalar color = new Scalar(127, 255, 127);
+            Imgproc.line(originalImage, new Point(0, averageYPixelPosition), new Point(cols, averageYPixelPosition), color);
+            Imgproc.line(originalImage, new Point(averageXPixelPosition, 0), new Point(averageXPixelPosition, rows), color);
         }
 
         isPipelineReady = true;
 
+        input.release();
+        //.convertTo(input, CvType.CV_8U);
         return originalImage;
     }
 
@@ -131,10 +120,6 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
     public double[] getCenterColorLab() {
         return centerColorLab;
-    }
-
-    public double[] getCenterColorVanilla() {
-        return centerColorVanilla;
     }
 
     public boolean isPipelineReady() {

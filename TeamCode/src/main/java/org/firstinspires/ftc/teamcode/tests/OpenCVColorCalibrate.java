@@ -18,11 +18,10 @@ public class OpenCVColorCalibrate extends AbstractBarcode {
 
         while(opModeIsActive()) {
             double[] centerColor = hueTrackingPipeline.getCenterColorLab();
-            double[] centerColorVanilla = hueTrackingPipeline.getCenterColorVanilla();
-            telemetry.addData("Center Vanilla", centerColorVanilla[0] + " " + centerColorVanilla[1] + " " + centerColorVanilla[2]);
             telemetry.addData("Center L*A*B*", (100*centerColor[0]/255) + " " + (centerColor[1]-128) + " " + (centerColor[2]-128));
-            telemetry.addData("Tracking Pipeline Overhead", ahi.camera.getTotalFrameTimeMs());
+            telemetry.addData("Pipeline Time", ahi.camera.getPipelineTimeMs());
             telemetry.update();
+
             sleep(20);
         }
 

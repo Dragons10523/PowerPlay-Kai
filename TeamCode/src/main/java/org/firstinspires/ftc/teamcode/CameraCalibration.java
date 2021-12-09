@@ -63,10 +63,6 @@ public class CameraCalibration extends LinearOpMode {
             }
         }
 
-        centerColor[0] = 100*centerColor[0]/255;
-        centerColor[1] = centerColor[1]-128;
-        centerColor[2] = centerColor[2]-128;
-
         try {
             FileOutputStream fos = new FileOutputStream("/storage/emulated/0/FIRST/color.dat");
 

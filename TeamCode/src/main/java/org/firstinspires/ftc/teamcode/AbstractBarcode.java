@@ -12,7 +12,6 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
     public void startOpenCV() {
         telemetry.addLine("Starting OpenCV");
-        //telemetry.update();
 
         double[] calibrationColor = new double[3];
         calibrationColor[2] = -1000;
