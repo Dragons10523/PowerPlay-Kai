@@ -16,9 +16,8 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         double[] calibrationColor = new double[3];
         calibrationColor[2] = -1000;
 
-        FileInputStream fis = null;
         try {
-            fis = new FileInputStream("/storage/emulated/0/FIRST/color.dat"); // Get the color calibration
+            FileInputStream fis = new FileInputStream("/storage/emulated/0/FIRST/color.dat"); // Get the color calibration
             for (int i = 0; i < 3; i++) {
                 byte[] byteArray = new byte[8];
                 int bytesRead = fis.read(byteArray, 0, 8);
@@ -88,38 +87,20 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         return armPosition;
     }
 
-    /*@Override
-    public void runOpMode() throws InterruptedException {
-        ahi = new Ahi(hardwareMap);
-        hueTrackingPipeline = new HueTrackingPipeline();
-
-        ahi.camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-            @Override
-            public void onOpened() {
-                ahi.camera.startStreaming(160, 120);
-            }
-
-            @Override
-            public void onError(int errorCode) {
-
-            }
-        });
-
-        ahi.camera.setPipeline(hueTrackingPipeline);
-
-        waitForStart();
+    public void driveToFreight() {
+        double[] originalSetPoint = hueTrackingPipeline.getSetpointLab();
+        hueTrackingPipeline.setSetpointLab(new double[]{194, 128, 198});
 
         while(opModeIsActive()) {
-            double[] centerColor = hueTrackingPipeline.getCenterColorLab();
-            double[] centerColorVanilla = hueTrackingPipeline.getCenterColorVanilla();
-            telemetry.addData("Center Vanilla", centerColorVanilla[0] + " " + centerColorVanilla[1] + " " + centerColorVanilla[2]);
-            telemetry.addData("Center L*A*B*", (100*centerColor[0]/255) + " " + (centerColor[1]-128) + " " + (centerColor[2]-128));
-            telemetry.addData("Tracking Pipeline Overhead", ahi.camera.getTotalFrameTimeMs());
-            telemetry.update();
-            sleep(20);
+            double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
+
+            drive(0.7+drift, 0.7-drift);
+
+            if(hueTrackingPipeline.getAverageYPosition() > 0.6) {
+                break;
+            }
         }
 
-        ahi.camera.stopStreaming();
-        ahi.camera.closeCameraDevice();
-    }*/
+        hueTrackingPipeline.setSetpointLab(originalSetPoint);
+    }
 }

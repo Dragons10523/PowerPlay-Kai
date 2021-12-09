@@ -87,7 +87,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         Core.inRange(input, new Scalar(0), new Scalar(labDistanceThresholdSquared), input);
 
         input.convertTo(input, CvType.CV_8U);
-        Moments m = Imgproc.moments(input);
+        Moments m = Imgproc.moments(input, true);
         double m10 = m.m10;
         double m01 = m.m01;
         double m00 = m.m00;
