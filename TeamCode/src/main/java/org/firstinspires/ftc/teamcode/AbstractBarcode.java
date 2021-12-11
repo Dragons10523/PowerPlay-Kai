@@ -47,7 +47,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         ahi.camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                ahi.camera.startStreaming(160, 120, OpenCvCameraRotation.UPRIGHT);
+                ahi.camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
@@ -68,6 +68,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
     }
 
     public void stopOpenCV() {
+        hueTrackingPipeline.stopVideo();
         ahi.camera.stopStreaming();
         ahi.camera.closeCameraDevice();
     }

@@ -1,16 +1,24 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.app.Application;
+import android.content.Context;
+import android.os.Environment;
 import android.renderscript.Matrix3f;
+
+import androidx.core.app.ActivityCompat;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
+import org.opencv.videoio.VideoWriter;
 import org.openftc.easyopencv.OpenCvPipeline;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +32,7 @@ import java.util.List;
  */
 
 public class HueTrackingPipeline extends OpenCvPipeline {
-    final boolean debugMode = false;
+    final boolean debugMode = true;
 
     private double[] centerColorLab;
     //private double[] centerColorVanilla;
@@ -36,6 +44,9 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * [B] (blue <-> yellow): range usually clamped to +- 128
      */
     private double[] setpointLab = {204, 108, 178};
+    private Scalar setpointLabScalar = new Scalar(setpointLab);
+
+    private final Scalar lineColor = new Scalar(127, 255, 127);
 
     /**
      * Difference is expressed as distance within a 3D colorspace
@@ -53,19 +64,26 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
     private boolean isPipelineReady = false;
 
+    private VideoWriter video = new VideoWriter();
+    Mat originalImage = new Mat();
+
     public HueTrackingPipeline() {
         this.setpointLab = new double[]{204, 108, 178};
+        setpointLabScalar = new Scalar(this.setpointLab);
     }
 
     public HueTrackingPipeline(double[] setpointLab) {
         this.setpointLab = setpointLab;
+        setpointLabScalar = new Scalar(this.setpointLab);
     }
 
     @Override
     public Mat processFrame(Mat input) {
-        Mat originalImage = input.clone();
+        originalImage.release();
+        originalImage = input.clone();
+
         int rows = input.rows();
-        int cols = input.cols();
+        int cols = input.cols(); // Cache variables
 
         /**
          *         WARNING: OpenCV is cancerous and converts 8-bit CIELAB values like this:
@@ -76,17 +94,17 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         centerColorLab = input.get((int)rows/2, (int)cols/2);
         
         input.convertTo(input, CvType.CV_32F);
-        Core.subtract(input, new Scalar(setpointLab), input); // input - setpointLab
+        Core.subtract(input, setpointLabScalar, input); // input - setpointLab
 
         Core.multiply(input, input, input); // input^2
 
         // Add all channels
         Core.reduce(input.reshape(1, cols * rows), input, 1, Core.REDUCE_SUM);
-        input = input.reshape(1, rows);
+        input = input.reshape(1, rows); // This causes a memory leak but it doesn't cause any issues so eh
 
-        Core.inRange(input, new Scalar(0), new Scalar(labDistanceThresholdSquared), input);
+        Core.inRange(input, new Scalar(0), new Scalar(labDistanceThresholdSquared), input); // Check distance
 
-        input.convertTo(input, CvType.CV_8U);
+        input.convertTo(input, CvType.CV_8UC1); // Convert to byte before finding center for efficiency
         Moments m = Imgproc.moments(input, true);
         double m10 = m.m10;
         double m01 = m.m01;
@@ -94,19 +112,22 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
         double averageXPixelPosition = (m10 / m00);
         double averageYPixelPosition = (m01 / m00);
-        averageXPosition = averageXPixelPosition /((double)(cols));
+        averageXPosition = averageXPixelPosition /((double)(cols)); // Map to a 0-1
         averageYPosition = averageYPixelPosition /((double)(rows));
 
         if(debugMode) {
-            Scalar color = new Scalar(127, 255, 127);
-            Imgproc.line(originalImage, new Point(0, averageYPixelPosition), new Point(cols, averageYPixelPosition), color);
-            Imgproc.line(originalImage, new Point(averageXPixelPosition, 0), new Point(averageXPixelPosition, rows), color);
+            Imgproc.line(originalImage, new Point(0, averageYPixelPosition), new Point(cols, averageYPixelPosition), lineColor); // Draw debug lines
+            Imgproc.line(originalImage, new Point(averageXPixelPosition, 0), new Point(averageXPixelPosition, rows), lineColor);
         }
 
         isPipelineReady = true;
 
         input.release();
-        //.convertTo(input, CvType.CV_8U);
+
+        if(video.isOpened()) {
+            video.write(originalImage); // Save video frame
+        }
+
         return originalImage;
     }
 
@@ -153,5 +174,22 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
     public double[] getSetpointLab() {
         return this.setpointLab;
+    }
+
+    public void startVideo() {
+        int counter = 0;
+
+        File f = new File("/storage/emulated/0/FIRST/OpenCV.avi");
+
+        if(f.exists()) {
+            f.renameTo(new File("/storage/emulated/0/FIRST/OpenCV.old.avi"));
+        }
+
+        int fourcc = VideoWriter.fourcc('M', 'J', 'P', 'G');
+        video.open("/storage/emulated/0/FIRST/OpenCV.avi", fourcc, 30f, new Size(320, 240));
+    }
+
+    public void stopVideo() {
+        video.release();
     }
 }
