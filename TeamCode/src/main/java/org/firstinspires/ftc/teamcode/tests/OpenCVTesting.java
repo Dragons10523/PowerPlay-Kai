@@ -12,6 +12,8 @@ public class OpenCVTesting extends AbstractBarcode {
         initializeValues();
         startOpenCV();
 
+        hueTrackingPipeline.setBlobSearch(false); // track circles
+
         waitForStart();
 
         while(!hueTrackingPipeline.isPipelineReady() && opModeIsActive()) sleep(50);

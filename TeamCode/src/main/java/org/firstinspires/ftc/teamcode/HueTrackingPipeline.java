@@ -10,9 +10,17 @@ import androidx.core.app.ActivityCompat;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfKeyPoint;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.features2d.Feature2D;
+import org.opencv.features2d.Features2d;
+import org.opencv.features2d.SimpleBlobDetector;
+import org.opencv.features2d.SimpleBlobDetector_Params;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.opencv.videoio.VideoWriter;
@@ -32,9 +40,13 @@ import java.util.List;
  */
 
 public class HueTrackingPipeline extends OpenCvPipeline {
-    final boolean debugMode = true;
+    final boolean renderLines = true;
+
+    private boolean blobSearch = true;
 
     private double[] centerColorLab;
+    private int maxWidth = 0;
+    private int iter = 0;
     //private double[] centerColorVanilla;
 
     /**
@@ -57,7 +69,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * 0 being royal blue and 375 being firetruck red, the two most opposite colors represented
      * by this colorspace
      */
-    protected final float labDistanceThresholdSquared = 250;
+    protected final float labDistanceThresholdSquared = 400;
 
     private double averageXPosition;
     private double averageYPosition;
@@ -100,35 +112,74 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
         // Add all channels
         Core.reduce(input.reshape(1, cols * rows), input, 1, Core.REDUCE_SUM);
-        input = input.reshape(1, rows); // This causes a memory leak but it doesn't cause any issues so eh
+        Mat reshaped = input.reshape(1, rows); // This causes a memory leak but it doesn't cause any issues so eh
+        input.release();
 
-        Core.inRange(input, new Scalar(0), new Scalar(labDistanceThresholdSquared), input); // Check distance
+        Core.inRange(reshaped, new Scalar(0), new Scalar(labDistanceThresholdSquared), reshaped); // Check distance
 
-        input.convertTo(input, CvType.CV_8UC1); // Convert to byte before finding center for efficiency
-        Moments m = Imgproc.moments(input, true);
-        double m10 = m.m10;
-        double m01 = m.m01;
-        double m00 = m.m00;
+        reshaped.convertTo(reshaped, CvType.CV_8U); // Convert to byte before finding center for efficiency
 
-        double averageXPixelPosition = (m10 / m00);
-        double averageYPixelPosition = (m01 / m00);
-        averageXPosition = averageXPixelPosition /((double)(cols)); // Map to a 0-1
-        averageYPosition = averageYPixelPosition /((double)(rows));
+        Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_OPEN, new Mat());
+        Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_CLOSE, new Mat());
 
-        if(debugMode) {
-            Imgproc.line(originalImage, new Point(0, averageYPixelPosition), new Point(cols, averageYPixelPosition), lineColor); // Draw debug lines
-            Imgproc.line(originalImage, new Point(averageXPixelPosition, 0), new Point(averageXPixelPosition, rows), lineColor);
+        Imgproc.GaussianBlur(reshaped, reshaped, new Size(5.0, 5.0), 0.00);
+
+        if(blobSearch) {
+            Moments m = Imgproc.moments(reshaped, true);
+            reshaped.release();
+
+            double m10 = m.m10;
+            double m01 = m.m01;
+            double m00 = m.m00;
+
+            double averageXPixelPosition = (m10 / m00);
+            double averageYPixelPosition = (m01 / m00);
+            averageXPosition = averageXPixelPosition / ((double) (cols)); // Map to a 0-1
+            averageYPosition = averageYPixelPosition / ((double) (rows));
+
+            if (renderLines) {
+                Imgproc.line(originalImage, new Point(0, averageYPixelPosition), new Point(cols, averageYPixelPosition), lineColor); // Draw debug lines
+                Imgproc.line(originalImage, new Point(averageXPixelPosition, 0), new Point(averageXPixelPosition, rows), lineColor);
+            }
+        } else {
+            List<MatOfPoint> contours = new ArrayList<>();
+            Imgproc.findContours(reshaped, contours, new Mat(), Imgproc.RETR_CCOMP, Imgproc.CHAIN_APPROX_SIMPLE);
+
+            for(MatOfPoint contour : contours) {
+                Point[] contourArray = contour.toArray();
+                if(contourArray.length < 10) {
+                    continue;
+                }
+
+                double area = Imgproc.contourArea(contour);
+                if (area < 50) {
+                    continue;
+                }
+
+                MatOfPoint2f contourMat = new MatOfPoint2f(contourArray);
+                Rect rect = Imgproc.boundingRect(contourMat);
+                if ((area/Imgproc.arcLength(contourMat, true))/rect.width < 0.15) {
+                    continue;
+                }
+
+                Imgproc.rectangle(reshaped, rect, lineColor, 3);
+
+                if(rect.width > maxWidth || iter > 6) {
+                    maxWidth = rect.width;
+                    iter = 0;
+                } else {
+                    iter++;
+                }
+            }
         }
 
         isPipelineReady = true;
-
-        input.release();
 
         if(video.isOpened()) {
             video.write(originalImage); // Save video frame
         }
 
-        return originalImage;
+        return reshaped;
     }
 
     public Double getAverageXPosition() {
@@ -170,10 +221,15 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
     public void setSetpointLab(double[] setpointLab) {
         this.setpointLab = setpointLab;
+        this.setpointLabScalar = new Scalar(setpointLab);
     }
 
     public double[] getSetpointLab() {
         return this.setpointLab;
+    }
+
+    public void setBlobSearch(boolean blobSearch) {
+        this.blobSearch = blobSearch;
     }
 
     public void startVideo() {
