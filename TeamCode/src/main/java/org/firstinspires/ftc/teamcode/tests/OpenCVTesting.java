@@ -12,8 +12,6 @@ public class OpenCVTesting extends AbstractBarcode {
         initializeValues();
         startOpenCV();
 
-        hueTrackingPipeline.setBlobSearch(false); // track circles
-
         waitForStart();
 
         while(!hueTrackingPipeline.isPipelineReady() && opModeIsActive()) sleep(50);
@@ -23,8 +21,10 @@ public class OpenCVTesting extends AbstractBarcode {
         while(opModeIsActive()) {
             double[] centerColor = hueTrackingPipeline.getCenterColorLab();
             telemetry.addData("Center L*A*B*", (100*centerColor[0]/255) + " " + (centerColor[1]-128) + " " + (centerColor[2]-128));
+            telemetry.addData("Pixel Count", hueTrackingPipeline.getPixelCount());
             telemetry.addData("Pipeline Time", ahi.camera.getPipelineTimeMs());
             telemetry.addData("Total Time", ahi.camera.getTotalFrameTimeMs());
+            telemetry.addData("In Range?", hueTrackingPipeline.getPixelCount() > 5500);
             telemetry.addData("FPS", ahi.camera.getFps());
             telemetry.update();
 

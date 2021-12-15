@@ -40,13 +40,9 @@ import java.util.List;
  */
 
 public class HueTrackingPipeline extends OpenCvPipeline {
-    final boolean renderLines = true;
-
-    private boolean blobSearch = true;
+    boolean renderLines = true;
 
     private double[] centerColorLab;
-    private int maxWidth = 0;
-    private int iter = 0;
     //private double[] centerColorVanilla;
 
     /**
@@ -69,10 +65,11 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * 0 being royal blue and 375 being firetruck red, the two most opposite colors represented
      * by this colorspace
      */
-    protected final float labDistanceThresholdSquared = 400;
+    protected final float labDistanceThresholdSquared = 450;
 
     private double averageXPosition;
     private double averageYPosition;
+    private double m00;
 
     private boolean isPipelineReady = false;
 
@@ -119,58 +116,26 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
         reshaped.convertTo(reshaped, CvType.CV_8U); // Convert to byte before finding center for efficiency
 
-        Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_OPEN, new Mat());
+        Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_OPEN, new Mat()); // Denoise image
         Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_CLOSE, new Mat());
+        Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_ERODE, new Mat());
+        Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_DILATE, new Mat(), new Point(-1, -1), 2);
 
-        Imgproc.GaussianBlur(reshaped, reshaped, new Size(5.0, 5.0), 0.00);
+        Moments m = Imgproc.moments(reshaped, true);
+        //reshaped.release();
 
-        if(blobSearch) {
-            Moments m = Imgproc.moments(reshaped, true);
-            reshaped.release();
+        double m10 = m.m10;
+        double m01 = m.m01;
+        m00 = m.m00;
 
-            double m10 = m.m10;
-            double m01 = m.m01;
-            double m00 = m.m00;
+        double averageXPixelPosition = (m10 / m00);
+        double averageYPixelPosition = (m01 / m00);
+        averageXPosition = averageXPixelPosition / ((double) (cols)); // Map to a 0-1
+        averageYPosition = averageYPixelPosition / ((double) (rows));
 
-            double averageXPixelPosition = (m10 / m00);
-            double averageYPixelPosition = (m01 / m00);
-            averageXPosition = averageXPixelPosition / ((double) (cols)); // Map to a 0-1
-            averageYPosition = averageYPixelPosition / ((double) (rows));
-
-            if (renderLines) {
-                Imgproc.line(originalImage, new Point(0, averageYPixelPosition), new Point(cols, averageYPixelPosition), lineColor); // Draw debug lines
-                Imgproc.line(originalImage, new Point(averageXPixelPosition, 0), new Point(averageXPixelPosition, rows), lineColor);
-            }
-        } else {
-            List<MatOfPoint> contours = new ArrayList<>();
-            Imgproc.findContours(reshaped, contours, new Mat(), Imgproc.RETR_CCOMP, Imgproc.CHAIN_APPROX_SIMPLE);
-
-            for(MatOfPoint contour : contours) {
-                Point[] contourArray = contour.toArray();
-                if(contourArray.length < 10) {
-                    continue;
-                }
-
-                double area = Imgproc.contourArea(contour);
-                if (area < 50) {
-                    continue;
-                }
-
-                MatOfPoint2f contourMat = new MatOfPoint2f(contourArray);
-                Rect rect = Imgproc.boundingRect(contourMat);
-                if ((area/Imgproc.arcLength(contourMat, true))/rect.width < 0.15) {
-                    continue;
-                }
-
-                Imgproc.rectangle(reshaped, rect, lineColor, 3);
-
-                if(rect.width > maxWidth || iter > 6) {
-                    maxWidth = rect.width;
-                    iter = 0;
-                } else {
-                    iter++;
-                }
-            }
+        if (renderLines) {
+            Imgproc.line(originalImage, new Point(0, averageYPixelPosition), new Point(cols, averageYPixelPosition), lineColor); // Draw lines
+            Imgproc.line(originalImage, new Point(averageXPixelPosition, 0), new Point(averageXPixelPosition, rows), lineColor);
         }
 
         isPipelineReady = true;
@@ -179,6 +144,12 @@ public class HueTrackingPipeline extends OpenCvPipeline {
             video.write(originalImage); // Save video frame
         }
 
+        Imgproc.cvtColor(reshaped, reshaped, Imgproc.COLOR_GRAY2RGB);
+        if(m00 > 5500) {
+            Imgproc.rectangle(reshaped, new Rect(1, 1, rows, cols), lineColor, 5);
+        }
+
+        originalImage.release();
         return reshaped;
     }
 
@@ -228,8 +199,8 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         return this.setpointLab;
     }
 
-    public void setBlobSearch(boolean blobSearch) {
-        this.blobSearch = blobSearch;
+    public double getPixelCount() {
+        return m00;
     }
 
     public void startVideo() {
@@ -243,6 +214,8 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
         int fourcc = VideoWriter.fourcc('M', 'J', 'P', 'G');
         video.open("/storage/emulated/0/FIRST/OpenCV.avi", fourcc, 30f, new Size(320, 240));
+
+        renderLines = true;
     }
 
     public void stopVideo() {
