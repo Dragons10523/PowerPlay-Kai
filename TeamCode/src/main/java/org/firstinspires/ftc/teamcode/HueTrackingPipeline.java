@@ -122,7 +122,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_DILATE, new Mat(), new Point(-1, -1), 2);
 
         Moments m = Imgproc.moments(reshaped, true);
-        //reshaped.release();
+        reshaped.release();
 
         double m10 = m.m10;
         double m01 = m.m01;
@@ -134,8 +134,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         averageYPosition = averageYPixelPosition / ((double) (rows));
 
         if (renderLines) {
-            Imgproc.line(originalImage, new Point(0, averageYPixelPosition), new Point(cols, averageYPixelPosition), lineColor); // Draw lines
-            Imgproc.line(originalImage, new Point(averageXPixelPosition, 0), new Point(averageXPixelPosition, rows), lineColor);
+            Imgproc.circle(originalImage, new Point(averageXPixelPosition, averageYPixelPosition), 7, lineColor, 2);
         }
 
         isPipelineReady = true;
@@ -144,13 +143,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
             video.write(originalImage); // Save video frame
         }
 
-        Imgproc.cvtColor(reshaped, reshaped, Imgproc.COLOR_GRAY2RGB);
-        if(m00 > 5500) {
-            Imgproc.rectangle(reshaped, new Rect(1, 1, rows, cols), lineColor, 5);
-        }
-
-        originalImage.release();
-        return reshaped;
+        return originalImage;
     }
 
     public Double getAverageXPosition() {
