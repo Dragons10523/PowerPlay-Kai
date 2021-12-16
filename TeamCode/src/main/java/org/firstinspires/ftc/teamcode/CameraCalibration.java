@@ -10,7 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-@Autonomous(name = "CameraCalibration")
+@Autonomous(name = "CameraCalibration", group = "Calibration")
 public class CameraCalibration extends LinearOpMode {
     Ahi ahi;
     CalibrationPipeline calibrationPipeline;
