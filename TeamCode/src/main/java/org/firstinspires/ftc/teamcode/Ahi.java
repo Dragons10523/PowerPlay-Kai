@@ -35,7 +35,7 @@ public class Ahi {
     public Ahi(HardwareMap hwmap) {
         this.hwmap = hwmap;
 
-        rightA = hwmap.get(DcMotor.class, "rightA");
+        /*rightA = hwmap.get(DcMotor.class, "rightA");
         rightB = hwmap.get(DcMotor.class, "rightB");
         leftA = hwmap.get(DcMotor.class, "leftA");
         leftB = hwmap.get(DcMotor.class, "leftB");
@@ -44,6 +44,11 @@ public class Ahi {
         rightB.setDirection(drivetrainReverse ? DcMotor.Direction.FORWARD : DcMotor.Direction.REVERSE);
         leftA.setDirection(drivetrainReverse ? DcMotor.Direction.REVERSE : DcMotor.Direction.FORWARD);
         leftB.setDirection(drivetrainReverse ? DcMotor.Direction.REVERSE : DcMotor.Direction.FORWARD);
+
+        rightA.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftA.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         arm = hwmap.get(DcMotor.class, "arm");
         succc = hwmap.get(DcMotor.class, "intake");
@@ -60,7 +65,7 @@ public class Ahi {
 
         capLift = hwmap.get(DcMotor.class, "capLift");
 
-        ddr = hwmap.get(CRServo.class, "ddr");
+        ddr = hwmap.get(CRServo.class, "ddr");*/
 
         BNO055IMU.Parameters parameters             = new BNO055IMU.Parameters();
         parameters.angleUnit                        = BNO055IMU.AngleUnit.RADIANS;
@@ -73,8 +78,6 @@ public class Ahi {
         imu.initialize(parameters);
 
         WebcamName webcamName = hwmap.get(WebcamName.class, "Webcam 1");
-        //cameraMonitorViewId = hwmap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwmap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
-
     }
 }
