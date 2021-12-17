@@ -117,9 +117,9 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
         switch(fieldSide) {
             case RED:
-                hueTrackingPipeline.setSetpointLab(new double[]{152, 135, 172});
+                hueTrackingPipeline.setSetpointLab(new double[]{78, 165, 162});
             case BLUE:
-                hueTrackingPipeline.setSetpointLab(new double[]{152, 135, 172});
+                hueTrackingPipeline.setSetpointLab(new double[]{50, 134, 105});
         }
 
         while(opModeIsActive()) {
