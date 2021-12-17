@@ -58,7 +58,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
         ahi.camera.setPipeline(hueTrackingPipeline);
 
-        while(!hueTrackingPipeline.isPipelineReady() && opModeIsActive()) {
+        while(!hueTrackingPipeline.isPipelineReady() && !isStopRequested()) {
             sleep(100);
         }
 
