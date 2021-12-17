@@ -90,17 +90,54 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
     public void driveToFreight() {
         double[] originalSetPoint = hueTrackingPipeline.getSetpointLab();
-        hueTrackingPipeline.setSetpointLab(new double[]{194, 128, 198});
+        hueTrackingPipeline.setSetpointLab(new double[]{152, 135, 172});
 
         while(opModeIsActive()) {
-            double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
+            if(hueTrackingPipeline.getPixelCount() > 100) {
+                double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
 
-            drive(0.7+drift, 0.7-drift);
+                drive(0.7 + drift, 0.7 - drift);
 
-            if(hueTrackingPipeline.getAverageYPosition() > 0.6) {
-                break;
+                if (hueTrackingPipeline.getAverageYPosition() > 0.85) {
+                    break;
+                }
+            } else {
+                sleep(33);
+                drive(0, 0);
             }
         }
+
+        drive(0, 0);
+
+        hueTrackingPipeline.setSetpointLab(originalSetPoint);
+    }
+
+    public void driveToShippingHub(FieldSide fieldSide) {
+        double[] originalSetPoint = hueTrackingPipeline.getSetpointLab();
+
+        switch(fieldSide) {
+            case RED:
+                hueTrackingPipeline.setSetpointLab(new double[]{152, 135, 172});
+            case BLUE:
+                hueTrackingPipeline.setSetpointLab(new double[]{152, 135, 172});
+        }
+
+        while(opModeIsActive()) {
+            if(hueTrackingPipeline.getPixelCount() > 100) {
+                double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
+
+                drive(0.7 + drift, 0.7 - drift);
+
+                if (hueTrackingPipeline.getPixelCount() > 5500) {
+                    break;
+                }
+            } else {
+                sleep(33);
+                drive(0, 0);
+            }
+        }
+
+        drive(0, 0);
 
         hueTrackingPipeline.setSetpointLab(originalSetPoint);
     }

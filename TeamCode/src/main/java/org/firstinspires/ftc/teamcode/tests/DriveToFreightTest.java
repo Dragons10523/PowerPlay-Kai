@@ -4,19 +4,20 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.AbstractBarcode;
 
-@Autonomous(name = "Hue Tracking Test", group = "Testing")
-public class HueTrackingTest extends AbstractBarcode {
-
+@Autonomous(name = "DriveToFreightTest", group = "Testing")
+public class DriveToFreightTest extends AbstractBarcode {
     @Override
     public void runOpMode() throws InterruptedException {
-        initialize();
+        initializeValues();
         startOpenCV();
 
         waitForStart();
 
-        while(opModeIsActive()) {
-            telemetry.addData("Frametime", ahi.camera.getPipelineTimeMs());
-            telemetry.update();
-        }
+        driveToFreight();
+        drive(1, 1);
+        runIntake(true);
+        sleep(250);
+        drive(0, 0);
+        runIntake(false);
     }
 }

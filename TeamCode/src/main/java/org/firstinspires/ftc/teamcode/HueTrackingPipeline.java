@@ -10,9 +10,17 @@ import androidx.core.app.ActivityCompat;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfKeyPoint;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.features2d.Feature2D;
+import org.opencv.features2d.Features2d;
+import org.opencv.features2d.SimpleBlobDetector;
+import org.opencv.features2d.SimpleBlobDetector_Params;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.opencv.videoio.VideoWriter;
@@ -32,7 +40,7 @@ import java.util.List;
  */
 
 public class HueTrackingPipeline extends OpenCvPipeline {
-    final boolean debugMode = true;
+    boolean renderLines = true;
 
     private double[] centerColorLab;
     //private double[] centerColorVanilla;
@@ -57,10 +65,11 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * 0 being royal blue and 375 being firetruck red, the two most opposite colors represented
      * by this colorspace
      */
-    protected final float labDistanceThresholdSquared = 250;
+    protected final float labDistanceThresholdSquared = 450;
 
     private double averageXPosition;
     private double averageYPosition;
+    private double m00;
 
     private boolean isPipelineReady = false;
 
@@ -100,29 +109,35 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
         // Add all channels
         Core.reduce(input.reshape(1, cols * rows), input, 1, Core.REDUCE_SUM);
-        input = input.reshape(1, rows); // This causes a memory leak but it doesn't cause any issues so eh
+        Mat reshaped = input.reshape(1, rows); // This causes a memory leak but it doesn't cause any issues so eh
+        input.release();
 
-        Core.inRange(input, new Scalar(0), new Scalar(labDistanceThresholdSquared), input); // Check distance
+        Core.inRange(reshaped, new Scalar(0), new Scalar(labDistanceThresholdSquared), reshaped); // Check distance
 
-        input.convertTo(input, CvType.CV_8UC1); // Convert to byte before finding center for efficiency
-        Moments m = Imgproc.moments(input, true);
+        reshaped.convertTo(reshaped, CvType.CV_8U); // Convert to byte before finding center for efficiency
+
+        Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_OPEN, new Mat()); // Denoise image
+        Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_CLOSE, new Mat());
+        Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_ERODE, new Mat());
+        Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_DILATE, new Mat(), new Point(-1, -1), 2);
+
+        Moments m = Imgproc.moments(reshaped, true);
+        reshaped.release();
+
         double m10 = m.m10;
         double m01 = m.m01;
-        double m00 = m.m00;
+        m00 = m.m00;
 
         double averageXPixelPosition = (m10 / m00);
         double averageYPixelPosition = (m01 / m00);
-        averageXPosition = averageXPixelPosition /((double)(cols)); // Map to a 0-1
-        averageYPosition = averageYPixelPosition /((double)(rows));
+        averageXPosition = averageXPixelPosition / ((double) (cols)); // Map to a 0-1
+        averageYPosition = averageYPixelPosition / ((double) (rows));
 
-        if(debugMode) {
-            Imgproc.line(originalImage, new Point(0, averageYPixelPosition), new Point(cols, averageYPixelPosition), lineColor); // Draw debug lines
-            Imgproc.line(originalImage, new Point(averageXPixelPosition, 0), new Point(averageXPixelPosition, rows), lineColor);
+        if (renderLines) {
+            Imgproc.circle(originalImage, new Point(averageXPixelPosition, averageYPixelPosition), 7, lineColor, 2);
         }
 
         isPipelineReady = true;
-
-        input.release();
 
         if(video.isOpened()) {
             video.write(originalImage); // Save video frame
@@ -170,10 +185,15 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
     public void setSetpointLab(double[] setpointLab) {
         this.setpointLab = setpointLab;
+        this.setpointLabScalar = new Scalar(setpointLab);
     }
 
     public double[] getSetpointLab() {
         return this.setpointLab;
+    }
+
+    public double getPixelCount() {
+        return m00;
     }
 
     public void startVideo() {
@@ -187,6 +207,8 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
         int fourcc = VideoWriter.fourcc('M', 'J', 'P', 'G');
         video.open("/storage/emulated/0/FIRST/OpenCV.avi", fourcc, 30f, new Size(320, 240));
+
+        renderLines = true;
     }
 
     public void stopVideo() {
