@@ -65,7 +65,6 @@ public class CameraCalibration extends LinearOpMode {
 
         try {
             FileOutputStream fos = new FileOutputStream("/storage/emulated/0/FIRST/color.dat");
-
             ByteBuffer data = (ByteBuffer) ByteBuffer.allocate(8 * 3).putDouble(centerColor[0]).putDouble(centerColor[1]).putDouble(centerColor[2]).rewind();
             byte[] dataArray = new byte[8*3];
             data.get(dataArray, 0, dataArray.length);
