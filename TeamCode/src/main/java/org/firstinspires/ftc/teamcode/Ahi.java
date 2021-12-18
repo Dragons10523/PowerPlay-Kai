@@ -21,15 +21,12 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 public class Ahi {
     // Encoder goes in the motor port, A motors for drivetrain and arm motor for manipulation (CH = Control Hub | DH = Driver Hub)
     public DcMotorEx rightA, rightB, leftA, leftB; // Drivetrain (CH 0-3)
-    public DcMotorEx arm;
-    public DcMotor succc, capLift; // Manipulation Motors (DH 0-2)
+    public DcMotor arm, succc, capLift; // Manipulation Motors (DH 0-2)
     public CRServo ddr; // Manipulation Servos (CH 0)
     public Servo flup; // (CH 1)
     public BNO055IMU imu;
 
     public OpenCvCamera camera;
-
-    int cameraMonitorViewId;
 
     public HardwareMap hwmap;
 
@@ -43,23 +40,33 @@ public class Ahi {
         leftA = hwmap.get(DcMotorEx.class, "leftA");
         leftB = hwmap.get(DcMotorEx.class, "leftB");
 
+        rightA.setPIDFCoefficients(DcMotor.RunMode.STOP_AND_RESET_ENCODER, new PIDFCoefficients(1, 1, 1, 1));
+        rightB.setPIDFCoefficients(DcMotor.RunMode.STOP_AND_RESET_ENCODER, new PIDFCoefficients(1, 1, 1, 1));
+        leftA.setPIDFCoefficients(DcMotor.RunMode.STOP_AND_RESET_ENCODER, new PIDFCoefficients(1, 1, 1, 1));
+        leftB.setPIDFCoefficients(DcMotor.RunMode.STOP_AND_RESET_ENCODER, new PIDFCoefficients(1, 1, 1, 1));
+
         rightA.setDirection(drivetrainReverse ? DcMotor.Direction.FORWARD : DcMotor.Direction.REVERSE);
         rightB.setDirection(drivetrainReverse ? DcMotor.Direction.FORWARD : DcMotor.Direction.REVERSE);
         leftA.setDirection(drivetrainReverse ? DcMotor.Direction.REVERSE : DcMotor.Direction.FORWARD);
         leftB.setDirection(drivetrainReverse ? DcMotor.Direction.REVERSE : DcMotor.Direction.FORWARD);
 
-        arm = hwmap.get(DcMotorEx.class, "arm");
+        rightA.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftA.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        arm = hwmap.get(DcMotor.class, "arm");
         succc = hwmap.get(DcMotor.class, "intake");
         flup = hwmap.get(Servo.class, "flup");
 
-        arm.setDirection(DcMotorEx.Direction.FORWARD);
+        arm.setDirection(DcMotor.Direction.FORWARD);
         succc.setDirection(DcMotor.Direction.FORWARD);
 
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         arm.setTargetPosition(0);
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm.setPIDFCoefficients(DcMotorEx.RunMode.RUN_TO_POSITION, new PIDFCoefficients(1, 1, 1, 1));
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         capLift = hwmap.get(DcMotor.class, "capLift");
 
@@ -76,16 +83,6 @@ public class Ahi {
         imu.initialize(parameters);
 
         WebcamName webcamName = hwmap.get(WebcamName.class, "Webcam 1");
-        //cameraMonitorViewId = hwmap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hwmap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
-
-        rightA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightA.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, new PIDFCoefficients(1, 1, 1, 1));
-        rightB.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,  new PIDFCoefficients(1, 1, 1, 1));
-        leftA.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,  new PIDFCoefficients(1, 1, 1, 1));
-        leftB.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION,  new PIDFCoefficients(1, 1, 1, 1));
     }
 }

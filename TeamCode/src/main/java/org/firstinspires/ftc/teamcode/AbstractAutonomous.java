@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -24,62 +25,36 @@ public abstract class AbstractAutonomous extends Control {
     public boolean driveDist(double dist) {
         int ticks = (int)(dist*CONVERSION_FACTOR);
 
-        int leftTarget = ticks+ahi.leftA.getCurrentPosition();
-        int rightTarget = ticks+ahi.rightA.getCurrentPosition();
+        int target = ticks+ahi.leftA.getCurrentPosition();
 
-        // Defining PID variables
-        double kP = 1;
-        double kI = 1;
-        double kD = 1;
+        ahi.leftA.setTargetPosition(target);
+        ahi.leftB.setTargetPosition(target);
+        ahi.rightA.setTargetPosition(target);
+        ahi.rightB.setTargetPosition(target);
 
-        double PLeft = leftTarget-ahi.leftA.getCurrentPosition();
-        double PLeftPrev = PLeft;
-        double ILeft = 0;
-        double DLeft = 0;
+        ahi.leftA.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ahi.leftB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ahi.rightA.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        ahi.rightB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        double PRight = rightTarget-ahi.rightA.getCurrentPosition();
-        double PRightPrev = PRight;
-        double IRight = 0;
-        double DRight = 0;
+        drive(1, 1);
 
-        // Setting up timer for deltaTime
-        ElapsedTime time = new ElapsedTime(); // Potentially change to a global timer
-
-        double lastTime = time.milliseconds();
-        double deltaTime = 0;
-
-        double timeInBounds = 0;
-
-        while(opModeIsActive() && timeInBounds > 300) {
-            deltaTime = time.milliseconds()-lastTime;
-
-            PLeft = leftTarget-ahi.leftA.getCurrentPosition();
-            PRight = rightTarget-ahi.rightA.getCurrentPosition();
-
-            ILeft += PLeft*deltaTime;
-            IRight += PRight*deltaTime;
-
-            try { // In case of divide by zero error
-                DLeft = (PLeft - PLeftPrev) / deltaTime;
-                DRight = (PRight - PRightPrev) / deltaTime;
-            } catch (ArithmeticException e) {
-                DLeft = 0;
-                DRight = 0;
-            }
-
-            drive(kP*PLeft + kI*ILeft + kD*DLeft, kP*PRight + kI*IRight + kD*DRight);
-
-            PRightPrev = PRight;
-            PLeftPrev = PLeft;
-            lastTime = time.milliseconds();
-
-            if(Math.abs(PLeft) < 350 && Math.abs(PRight) < 350) {
-                timeInBounds += deltaTime;
-            } else {
-                timeInBounds = 0;
-            }
+        while(ahi.leftA.isBusy() && ahi.leftB.isBusy() && ahi.rightA.isBusy() && ahi.rightB.isBusy() && opModeIsActive()) {
+            sleep(10);
         }
 
+        if(isStopRequested()) {
+            zero();
+            return true;
+        }
+
+        drive(0, 0);
+
+        ahi.leftA.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        ahi.leftB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        ahi.rightA.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        ahi.rightB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        
         return false;
     }
 
