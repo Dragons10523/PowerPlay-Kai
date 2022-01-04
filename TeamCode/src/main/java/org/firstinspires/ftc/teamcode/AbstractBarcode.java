@@ -93,10 +93,13 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         hueTrackingPipeline.setSetpointLab(new double[]{152, 135, 172});
 
         while(opModeIsActive()) {
+            telemetry.addLine("looping");
             if(hueTrackingPipeline.getPixelCount() > 100) {
                 double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
+                drift *= 3;
 
-                drive(0.7 + drift, 0.7 - drift);
+                telemetry.addData("drift", drift);
+                drive(0.0 + drift, 0.0 - drift);
 
                 if (hueTrackingPipeline.getAverageYPosition() > 0.85) {
                     break;
@@ -104,12 +107,18 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
             } else {
                 sleep(33);
                 drive(0, 0);
+                telemetry.addLine("not enough pixels");
             }
+            telemetry.update();
         }
+        telemetry.addLine("stopped");
+        telemetry.update();
 
         drive(0, 0);
 
         hueTrackingPipeline.setSetpointLab(originalSetPoint);
+
+        protectedSleep(5000);
     }
 
     public void driveToShippingHub(FieldSide fieldSide) {

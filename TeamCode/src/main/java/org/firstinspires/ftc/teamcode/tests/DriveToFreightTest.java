@@ -14,10 +14,10 @@ public class DriveToFreightTest extends AbstractBarcode {
         waitForStart();
 
         driveToFreight();
-        drive(1, 1);
+        /*drive(1, 1);
         runIntake(true);
         sleep(250);
         drive(0, 0);
-        runIntake(false);
+        runIntake(false);*/
     }
 }
