@@ -77,7 +77,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
     Mat originalImage = new Mat();
 
     public HueTrackingPipeline() {
-        this.setpointLab = new double[]{204, 108, 178};
+        this.setpointLab = new double[]{152, 135, 172};
         setpointLabScalar = new Scalar(this.setpointLab);
     }
 
