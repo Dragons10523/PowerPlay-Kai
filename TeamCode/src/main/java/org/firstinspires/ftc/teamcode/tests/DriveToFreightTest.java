@@ -15,9 +15,9 @@ public class DriveToFreightTest extends AbstractBarcode {
 
         driveToFreight();
         drive(1, 1);
-        runIntake(true);
+        runIntake(1);
         sleep(250);
         drive(0, 0);
-        runIntake(false);
+        runIntake(0);
     }
 }

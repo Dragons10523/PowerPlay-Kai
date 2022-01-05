@@ -39,11 +39,11 @@ public abstract class AbstractFreight extends AbstractBarcode {
         while(turningFlag) updateTurnTo();
 
         setFlup(true); // Dump preload
-        runIntake(true);
+        runIntake(1);
         if(protectedSleep(200)) return;
 
         setFlup(false); // Stop intake
-        runIntake(false);
+        runIntake(0);
         armControl(ArmPosition.PICKUP); // Prepare arm for pickup
 
         startTurnTo(onRed ? Math.PI : 0); // Face the freight
@@ -59,12 +59,12 @@ public abstract class AbstractFreight extends AbstractBarcode {
         startTurnTo(onRed ? Math.PI : 0);
         while(turningFlag) updateTurnTo(); // Realign after crossing the barrier
 
-        runIntake(true); // Attempt to grab freight
+        runIntake(1); // Attempt to grab freight
         drive(0.4, 0.4);
         if(protectedSleep(700)) return;
         // TODO: Branching program to detect failure
         drive(0, 0); // Stop attempting to grab freight
-        runIntake(false);
+        runIntake(0);
         if(protectedSleep(200)) return;
 
         startTurnTo(onRed ? 7*Math.PI/6 : -Math.PI/6);
@@ -78,11 +78,11 @@ public abstract class AbstractFreight extends AbstractBarcode {
         while(turningFlag) updateTurnTo();
 
         setFlup(true); // Dump freight
-        runIntake(true);
+        runIntake(1);
         if(protectedSleep(200)) return;
 
         setFlup(false); // Stop intake
-        runIntake(false);
+        runIntake(0);
         armControl(ArmPosition.START);
 
         startTurnTo(onRed ? 7*Math.PI/6 : -Math.PI/6); // Face the barrier

@@ -13,9 +13,9 @@ public class ToolControlTest extends Control {
 
         telemetry.addLine("Testing Intake");
         telemetry.update();
-        runIntake(true);
+        runIntake(1);
         if(protectedSleep(1000)) return;
-        runIntake(false);
+        runIntake(0);
         if(protectedSleep(500)) return;
 
         telemetry.addLine("Testing DDR");

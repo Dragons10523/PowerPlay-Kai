@@ -24,7 +24,7 @@ public abstract class Control extends LinearOpMode {
     }
 
     final int armOffset = 0;
-    final double CONVERSION_FACTOR = 288*(4.0+(2.0/7.0)*Math.PI);
+    final double CONVERSION_FACTOR = 25*(4.0+(2.0/7.0)*Math.PI);
 
     public void initialize() {
         ahi = new Ahi(hardwareMap);
@@ -40,13 +40,13 @@ public abstract class Control extends LinearOpMode {
     public void armControl(ArmPosition armPosition) {
         switch(armPosition) { // 3360 ticks/rotation
             case LOW:
-                ahi.arm.setTargetPosition(2300-armOffset); // 3640
+                ahi.arm.setTargetPosition(500-armOffset); // 2300
                 break;
             case MED:
-                ahi.arm.setTargetPosition(2000-armOffset); // 3300
+                ahi.arm.setTargetPosition(500-armOffset); // 2000
                 break;
             case HIGH:
-                ahi.arm.setTargetPosition(1750-armOffset); // 2960
+                ahi.arm.setTargetPosition(500-armOffset); // 1750
                 break;
             case PICKUP:
                 ahi.arm.setTargetPosition(0-armOffset);
@@ -55,11 +55,11 @@ public abstract class Control extends LinearOpMode {
                 ahi.arm.setTargetPosition(0);
                 break;
         }
-        ahi.arm.setPower(1.0);
+        ahi.arm.setPower(0.5);
     }
 
-    public void runIntake(boolean on) {
-        ahi.succc.setPower(on ? 1.0 : 0.0);
+    public void runIntake(double power) {
+        ahi.succc.setPower(power);
     }
 
     public void playDDR(double power) {
@@ -76,7 +76,7 @@ public abstract class Control extends LinearOpMode {
 
     public void zero() {
         drive(0, 0);
-        runIntake(false);
+        runIntake(0);
         playDDR(0);
         setLiftPower(0);
         ahi.arm.setPower(0);

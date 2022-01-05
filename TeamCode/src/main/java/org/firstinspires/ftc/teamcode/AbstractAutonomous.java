@@ -25,22 +25,31 @@ public abstract class AbstractAutonomous extends Control {
     public boolean driveDist(double dist) {
         int ticks = (int)(dist*CONVERSION_FACTOR);
 
-        int target = ticks+ahi.leftA.getCurrentPosition();
+        ahi.leftA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        ahi.leftB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        ahi.rightA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        ahi.rightB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        ahi.leftA.setTargetPosition(target);
-        ahi.leftB.setTargetPosition(target);
-        ahi.rightA.setTargetPosition(target);
-        ahi.rightB.setTargetPosition(target);
+        ahi.leftA.setTargetPosition(ticks);
+        ahi.leftB.setTargetPosition(ticks);
+        ahi.rightA.setTargetPosition(ticks);
+        ahi.rightB.setTargetPosition(ticks);
 
         ahi.leftA.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ahi.leftB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ahi.rightA.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ahi.rightB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        drive(1, 1);
+        drive(0.5, 0.5);
 
         while(ahi.leftA.isBusy() && ahi.leftB.isBusy() && ahi.rightA.isBusy() && ahi.rightB.isBusy() && opModeIsActive()) {
             sleep(10);
+            telemetry.addData("Left A", ahi.leftA.getCurrentPosition());
+            telemetry.addData("Left B", ahi.leftB.getCurrentPosition());
+            telemetry.addData("Right A", ahi.rightA.getCurrentPosition());
+            telemetry.addData("Right B", ahi.leftB.getCurrentPosition());
+            telemetry.addData("Target", ticks);
+            telemetry.update();
         }
 
         if(isStopRequested()) {
