@@ -13,7 +13,6 @@ public class OpenCVTesting extends AbstractBarcode {
         startOpenCV();
 
         waitForStart();
-
         //hueTrackingPipeline.startVideo();
 
         while(opModeIsActive()) {
@@ -22,6 +21,7 @@ public class OpenCVTesting extends AbstractBarcode {
             telemetry.addData("Pipeline Time", ahi.camera.getPipelineTimeMs());
             telemetry.addData("Total Time", ahi.camera.getTotalFrameTimeMs());
             telemetry.addData("In Range?", hueTrackingPipeline.getPixelCount() > 5500);
+            telemetry.addData("Pixels", hueTrackingPipeline.getPixelCount());
             telemetry.addData("FPS", ahi.camera.getFps());
             telemetry.update();
 
