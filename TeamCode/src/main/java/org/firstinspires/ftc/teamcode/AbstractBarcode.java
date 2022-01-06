@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
@@ -92,22 +94,28 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         double[] originalSetPoint = hueTrackingPipeline.getSetpointLab();
         hueTrackingPipeline.setSetpointLab(new double[]{152, 135, 172});
 
+        ElapsedTime elapsedTime = new ElapsedTime();
+
         while(opModeIsActive()) {
             telemetry.addLine("looping");
             if(hueTrackingPipeline.getPixelCount() > 100) {
                 double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
-                drift *= 3;
+                drift *= 0.7;
 
-                telemetry.addData("drift", drift);
-                drive(0.0 + drift, 0.0 - drift);
+                telemetry.addData("Drift", drift);
+                drive(0.8 + drift, 0.8 - drift);
 
-                if (hueTrackingPipeline.getAverageYPosition() > 0.85) {
-                    break;
+                if (hueTrackingPipeline.getAverageYPosition() < 0.81) {
+                    elapsedTime.reset();
                 }
+
+                if(elapsedTime.milliseconds() > 300) break;
             } else {
-                sleep(33);
                 drive(0, 0);
                 telemetry.addLine("not enough pixels");
+                sleep(33);
+
+                if(elapsedTime.milliseconds() > 500) break;
             }
             telemetry.update();
         }
@@ -118,7 +126,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
         hueTrackingPipeline.setSetpointLab(originalSetPoint);
 
-        protectedSleep(5000);
+        protectedSleep(500);
     }
 
     public void driveToShippingHub(FieldSide fieldSide) {
