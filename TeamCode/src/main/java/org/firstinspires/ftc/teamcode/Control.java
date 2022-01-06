@@ -40,13 +40,13 @@ public abstract class Control extends LinearOpMode {
     public void armControl(ArmPosition armPosition) {
         switch(armPosition) { // 3360 ticks/rotation
             case LOW:
-                ahi.arm.setTargetPosition(500-armOffset); // 2300
+                ahi.arm.setTargetPosition(2300-armOffset); // 2300
                 break;
             case MED:
-                ahi.arm.setTargetPosition(500-armOffset); // 2000
+                ahi.arm.setTargetPosition(2000-armOffset); // 2000
                 break;
             case HIGH:
-                ahi.arm.setTargetPosition(500-armOffset); // 1750
+                ahi.arm.setTargetPosition(1750-armOffset); // 1750
                 break;
             case PICKUP:
                 ahi.arm.setTargetPosition(0-armOffset);
@@ -55,7 +55,7 @@ public abstract class Control extends LinearOpMode {
                 ahi.arm.setTargetPosition(0);
                 break;
         }
-        ahi.arm.setPower(0.5);
+        ahi.arm.setPower(1);
     }
 
     public void runIntake(double power) {

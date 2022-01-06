@@ -63,9 +63,8 @@ public class Ahi {
         succc.setDirection(DcMotor.Direction.FORWARD);
 
         arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        arm.setTargetPosition(0);
         arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setTargetPosition(0);
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         capLift = hwmap.get(DcMotor.class, "capLift");

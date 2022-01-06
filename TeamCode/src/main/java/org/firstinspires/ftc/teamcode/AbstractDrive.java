@@ -49,8 +49,8 @@ public abstract class AbstractDrive extends Control {
             }
 
             if (Math.abs(gamepad2.left_stick_y) > 0.1) {
-                ahi.arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                ahi.arm.setPower(-gamepad2.left_stick_y/2);
+                ahi.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                ahi.arm.setPower(-gamepad2.left_stick_y);
             } else {
                 ahi.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
