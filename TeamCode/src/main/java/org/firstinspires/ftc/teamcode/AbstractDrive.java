@@ -14,8 +14,8 @@ public abstract class AbstractDrive extends Control {
 
         boolean sneak = gamepad1.left_bumper || gamepad1.right_bumper;
 
-        left *= sneak ? 0.3 : 1.0;
-        right *= sneak ? 0.3 : 1.0;
+        left *= sneak ? 0.6 : 1.0;
+        right *= sneak ? 0.6 : 1.0;
 
         drive(left, right);
     }
