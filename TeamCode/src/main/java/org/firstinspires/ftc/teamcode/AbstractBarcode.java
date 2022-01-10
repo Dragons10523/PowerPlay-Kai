@@ -8,6 +8,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Optional;
 
 public abstract class AbstractBarcode extends AbstractAutonomous {
     public HueTrackingPipeline hueTrackingPipeline;
@@ -15,35 +16,16 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
     public void startOpenCV() {
         telemetry.addLine("Starting OpenCV");
 
-        double[] calibrationColor = new double[3];
-        calibrationColor[2] = -1000;
+        double[] calibrationColor = parseCalibrationFile("tse");
 
-        try {
-            FileInputStream fis = new FileInputStream("/storage/emulated/0/FIRST/color.dat"); // Get the color calibration
-            for (int i = 0; i < 3; i++) {
-                byte[] byteArray = new byte[8];
-                int bytesRead = fis.read(byteArray, 0, 8);
-
-                if(bytesRead == -1) {
-                    break;
-                }
-
-                ByteBuffer byteBuffer = ByteBuffer.wrap(byteArray);
-                calibrationColor[i] = byteBuffer.getDouble();
-            }
-            fis.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if(calibrationColor[2] == -1000) { // Default to standard value if calibration failed
+        if(calibrationColor == null) { // Default to standard value if calibration failed
             hueTrackingPipeline = new HueTrackingPipeline();
             telemetry.addLine("Failed to retrieve calibration data from file");
         } else {
             hueTrackingPipeline = new HueTrackingPipeline(calibrationColor);
+            telemetry.addData("Calibration Color", "[" + calibrationColor[0] + ", " + calibrationColor[1] + ", " + calibrationColor[2] + "]");
         }
 
-        telemetry.addData("Calibration Color", "[" + calibrationColor[0] + ", " + calibrationColor[1] + ", " + calibrationColor[2] + "]");
         telemetry.update();
 
         ahi.camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -92,7 +74,11 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
     public void driveToFreight() {
         double[] originalSetPoint = hueTrackingPipeline.getSetpointLab();
-        hueTrackingPipeline.setSetpointLab(new double[]{152, 135, 172});
+
+        double[] calibrationData = parseCalibrationFile("fr8");
+        Optional.ofNullable(calibrationData).orElse(new double[]{152, 135, 172}); // default value if null
+
+        hueTrackingPipeline.setSetpointLab(calibrationData);
 
         ElapsedTime elapsedTime = new ElapsedTime();
 
@@ -132,12 +118,20 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
     public void driveToShippingHub(FieldSide fieldSide) {
         double[] originalSetPoint = hueTrackingPipeline.getSetpointLab();
 
+        double[] calibrationData = new double[3];
+
         switch(fieldSide) {
             case RED:
-                hueTrackingPipeline.setSetpointLab(new double[]{78, 165, 162});
+                calibrationData = parseCalibrationFile("red");
+                Optional.ofNullable(calibrationData).orElse(new double[]{78, 165, 162}); // default value if null
+                break;
             case BLUE:
-                hueTrackingPipeline.setSetpointLab(new double[]{50, 134, 105});
+                calibrationData = parseCalibrationFile("blu");
+                Optional.ofNullable(calibrationData).orElse(new double[]{50, 134, 105});
+                break;
         }
+
+        hueTrackingPipeline.setSetpointLab(calibrationData);
 
         while(opModeIsActive()) {
             if(hueTrackingPipeline.getPixelCount() > 100) {
@@ -157,5 +151,34 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         drive(0, 0);
 
         hueTrackingPipeline.setSetpointLab(originalSetPoint);
+    }
+
+    public double[] parseCalibrationFile(String file) {
+        double[] calibrationColor = new double[3];
+        calibrationColor[2] = -1000;
+
+        try {
+            FileInputStream fis = new FileInputStream("/storage/emulated/0/FIRST/CalibrationData/" + file + ".dat"); // Get the color calibration
+            for (int i = 0; i < 3; i++) {
+                byte[] byteArray = new byte[8];
+                int bytesRead = fis.read(byteArray, 0, 8);
+
+                if(bytesRead == -1) {
+                    break;
+                }
+
+                ByteBuffer byteBuffer = ByteBuffer.wrap(byteArray);
+                calibrationColor[i] = byteBuffer.getDouble();
+            }
+            fis.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if(calibrationColor[2] == -1000) {
+            return null;
+        } else {
+            return calibrationColor;
+        }
     }
 }

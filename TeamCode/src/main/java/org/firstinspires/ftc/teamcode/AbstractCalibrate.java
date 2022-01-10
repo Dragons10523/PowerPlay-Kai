@@ -6,17 +6,16 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-@Autonomous(name = "CameraCalibration", group = "Calibration")
-public class CameraCalibration extends LinearOpMode {
+public abstract class AbstractCalibrate extends LinearOpMode {
     Ahi ahi;
     CalibrationPipeline calibrationPipeline;
 
-    @Override
-    public void runOpMode() throws InterruptedException {
+    public void calibrate(String file) throws InterruptedException {
         ahi = new Ahi(hardwareMap);
 
         calibrationPipeline = new CalibrationPipeline();
@@ -63,8 +62,10 @@ public class CameraCalibration extends LinearOpMode {
             }
         }
 
+        new File("/storage/emulated/0/FIRST/CalibrationData/").mkdirs();
+
         try {
-            FileOutputStream fos = new FileOutputStream("/storage/emulated/0/FIRST/color.dat");
+            FileOutputStream fos = new FileOutputStream("/storage/emulated/0/FIRST/CalibrationData/" + file + ".dat");
             ByteBuffer data = (ByteBuffer) ByteBuffer.allocate(8 * 3).putDouble(centerColor[0]).putDouble(centerColor[1]).putDouble(centerColor[2]).rewind();
             byte[] dataArray = new byte[8*3];
             data.get(dataArray, 0, dataArray.length);
