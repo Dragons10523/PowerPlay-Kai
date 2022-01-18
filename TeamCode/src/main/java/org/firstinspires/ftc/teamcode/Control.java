@@ -20,6 +20,7 @@ public abstract class Control extends LinearOpMode {
         LOW,
         MED,
         HIGH,
+        UP,
         PICKUP
     }
 
@@ -49,7 +50,10 @@ public abstract class Control extends LinearOpMode {
                 ahi.arm.setTargetPosition(1750-armOffset); // 1750
                 break;
             case PICKUP:
-                ahi.arm.setTargetPosition(0-armOffset);
+                ahi.arm.setTargetPosition(50-armOffset);
+                break;
+            case UP:
+                ahi.arm.setTargetPosition(1100-armOffset);
                 break;
             default:
                 ahi.arm.setTargetPosition(0);
