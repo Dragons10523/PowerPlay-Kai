@@ -14,9 +14,13 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
     public HueTrackingPipeline hueTrackingPipeline;
 
     public void startOpenCV() {
+        startOpenCV("tse");
+    }
+
+    public void startOpenCV(String calibFile) {
         telemetry.addLine("Starting OpenCV");
 
-        double[] calibrationColor = parseCalibrationFile("tse");
+        double[] calibrationColor = parseCalibrationFile(calibFile);
 
         if(calibrationColor == null) { // Default to standard value if calibration failed
             hueTrackingPipeline = new HueTrackingPipeline();
@@ -83,12 +87,9 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         ElapsedTime elapsedTime = new ElapsedTime();
 
         while(opModeIsActive()) {
-            telemetry.addLine("looping");
             if(hueTrackingPipeline.getPixelCount() > 100) {
                 double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
                 drift *= 0.7;
-
-                telemetry.addData("Drift", drift);
                 drive(0.8 + drift, 0.8 - drift);
 
                 if (hueTrackingPipeline.getAverageYPosition() < 0.81) {
@@ -98,15 +99,12 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
                 if(elapsedTime.milliseconds() > 300) break;
             } else {
                 drive(0, 0);
-                telemetry.addLine("not enough pixels");
                 sleep(33);
 
                 if(elapsedTime.milliseconds() > 500) break;
             }
             telemetry.update();
         }
-        telemetry.addLine("stopped");
-        telemetry.update();
 
         drive(0, 0);
 
@@ -133,18 +131,27 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
         hueTrackingPipeline.setSetpointLab(calibrationData);
 
+        ElapsedTime elapsedTime = new ElapsedTime();
+
         while(opModeIsActive()) {
+            telemetry.addData("pixels", hueTrackingPipeline.getPixelCount());
+            telemetry.update();
             if(hueTrackingPipeline.getPixelCount() > 100) {
                 double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
+                drift *= 0.7;
 
-                drive(0.7 + drift, 0.7 - drift);
+                drive(0.0 + drift, 0.0 - drift);
 
-                if (hueTrackingPipeline.getPixelCount() > 5500) {
-                    break;
+                if (hueTrackingPipeline.getPixelCount() < 4000) {
+                    elapsedTime.reset();
                 }
+
+                if(elapsedTime.milliseconds() > 300) break;
             } else {
-                sleep(33);
                 drive(0, 0);
+                sleep(33);
+
+                if(elapsedTime.milliseconds() > 500) break;
             }
         }
 
