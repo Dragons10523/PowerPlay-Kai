@@ -40,10 +40,9 @@ import java.util.List;
  */
 
 public class HueTrackingPipeline extends OpenCvPipeline {
-    boolean renderLines = true;
+    private boolean renderLines = true;
 
     private double[] centerColorLab;
-    //private double[] centerColorVanilla;
 
     /**
      * Lab values are
@@ -71,7 +70,10 @@ public class HueTrackingPipeline extends OpenCvPipeline {
     private double averageYPosition;
     private double m00;
 
+    private Rect largestRect;
+
     private boolean isPipelineReady = false;
+    private boolean rectProc = false; // Use rectangle based processing
 
     private VideoWriter video = new VideoWriter();
     Mat originalImage = new Mat();
@@ -121,21 +123,44 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_ERODE, new Mat());
         Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_DILATE, new Mat(), new Point(-1, -1), 2);
 
-        Moments m = Imgproc.moments(reshaped, true);
-        reshaped.release();
+        if(rectProc) {
+            List<MatOfPoint> contours = null;
+            Imgproc.findContours(reshaped, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        double m10 = m.m10;
-        double m01 = m.m01;
-        m00 = m.m00;
+            double maxArea = 0;
+            Rect maxRect = null;
 
-        double averageXPixelPosition = (m10 / m00);
-        double averageYPixelPosition = (m01 / m00);
-        averageXPosition = averageXPixelPosition / ((double) (cols)); // Map to a 0-1
-        averageYPosition = averageYPixelPosition / ((double) (rows));
+            for(MatOfPoint contour : contours) {
+                Rect testRect = Imgproc.boundingRect(contour);
+                if(testRect.area() > maxArea) {
+                    maxRect = testRect;
+                    maxArea = testRect.area();
+                }
+            }
 
-        if (renderLines) {
-            Imgproc.circle(originalImage, new Point(averageXPixelPosition, averageYPixelPosition), 7, lineColor, 2);
+            largestRect = maxRect;
+
+            if (renderLines) {
+                Imgproc.rectangle(originalImage, maxRect, lineColor);
+            }
+        } else {
+            Moments m = Imgproc.moments(reshaped, true);
+            reshaped.release();
+
+            double m10 = m.m10;
+            double m01 = m.m01;
+            m00 = m.m00;
+
+            double averageXPixelPosition = (m10 / m00);
+            double averageYPixelPosition = (m01 / m00);
+            averageXPosition = averageXPixelPosition / ((double) (cols)); // Map to a 0-1
+            averageYPosition = averageYPixelPosition / ((double) (rows));
+
+            if (renderLines) {
+                Imgproc.circle(originalImage, new Point(averageXPixelPosition, averageYPixelPosition), 7, lineColor, 2);
+            }
         }
+
 
         isPipelineReady = true;
 
@@ -152,6 +177,10 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
     public Double getAverageYPosition() {
         return averageYPosition;
+    }
+
+    public Rect getLargestRect() {
+        return largestRect;
     }
 
     public double[] getCenterColorLab() {
@@ -196,6 +225,10 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         return m00;
     }
 
+    public void setRectProc(boolean rect) {
+        rectProc = rect;
+    }
+
     public void startVideo() {
         int counter = 0;
 
@@ -213,5 +246,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
     public void stopVideo() {
         video.release();
+
+        renderLines = false;
     }
 }
