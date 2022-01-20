@@ -18,7 +18,8 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
     }
 
     public void startOpenCV(String calibFile) {
-        telemetry.addLine("Starting OpenCV");
+        telemetry.addLine("Parsing Calibration File");
+        telemetry.update();
 
         double[] calibrationColor = parseCalibrationFile(calibFile);
 
@@ -30,6 +31,9 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
             telemetry.addData("Calibration Color", "[" + calibrationColor[0] + ", " + calibrationColor[1] + ", " + calibrationColor[2] + "]");
         }
 
+        telemetry.update();
+        
+        telemetry.addLine("Opening Camera");
         telemetry.update();
 
         ahi.camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -44,14 +48,19 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
             }
         });
 
+        telemetry.addLine("Setting Pipeline");
+        telemetry.update();
+
         ahi.camera.setPipeline(hueTrackingPipeline);
+
+        telemetry.addLine("Waiting for first frame");
+        telemetry.update();
 
         while(!hueTrackingPipeline.isPipelineReady() && !isStopRequested()) {
             sleep(100);
         }
 
-        telemetry.clearAll();
-
+        telemetry.addLine("OpenCV Started");
         telemetry.update();
     }
 
@@ -142,11 +151,12 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
                 drive(0.0 + drift, 0.0 - drift);
 
-                if (hueTrackingPipeline.getPixelCount() < 4000) {
-                    elapsedTime.reset();
-                }
+                // 40 degree fov
+                double width = hueTrackingPipeline.getLargestRect().width;
+                telemetry.addData("Visible FOV", width);
+                telemetry.update();
 
-                if(elapsedTime.milliseconds() > 300) break;
+                elapsedTime.reset();
             } else {
                 drive(0, 0);
                 sleep(33);
