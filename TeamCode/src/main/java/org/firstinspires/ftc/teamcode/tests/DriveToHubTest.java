@@ -11,6 +11,8 @@ public class DriveToHubTest extends AbstractBarcode {
     public void runOpMode() throws InterruptedException {
         initializeValues();
         startOpenCV("red");
+        
+        hueTrackingPipeline.setRectProc(true);
 
         waitForStart();
 

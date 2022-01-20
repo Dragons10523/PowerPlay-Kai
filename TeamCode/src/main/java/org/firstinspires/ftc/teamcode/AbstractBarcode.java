@@ -143,18 +143,26 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         ElapsedTime elapsedTime = new ElapsedTime();
 
         while(opModeIsActive()) {
-            telemetry.addData("pixels", hueTrackingPipeline.getPixelCount());
-            telemetry.update();
             if(hueTrackingPipeline.getPixelCount() > 100) {
                 double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
-                drift *= 0.7;
+                //drift *= 0.7;
 
-                drive(0.0 + drift, 0.0 - drift);
+                telemetry.addData("Drift", drift);
 
-                // 40 degree fov
                 double width = hueTrackingPipeline.getLargestRect().width;
-                telemetry.addData("Visible FOV", width);
+
+                double speed = 250/width;
+
+                telemetry.addData("Speed", speed);
                 telemetry.update();
+
+                speed = 0;
+
+                drive(speed + drift, speed - drift);
+
+                if(width >= 300) {
+                    break;
+                }
 
                 elapsedTime.reset();
             } else {

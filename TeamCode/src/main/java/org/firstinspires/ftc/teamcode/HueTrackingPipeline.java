@@ -64,7 +64,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * 0 being royal blue and 375 being firetruck red, the two most opposite colors represented
      * by this colorspace
      */
-    protected final float labDistanceThresholdSquared = 450;
+    protected final float labDistanceThresholdSquared = 1600;
 
     private double averageXPosition;
     private double averageYPosition;
@@ -120,43 +120,44 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
         Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_OPEN, new Mat()); // Denoise image
         Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_CLOSE, new Mat());
-        Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_ERODE, new Mat());
-        Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_DILATE, new Mat(), new Point(-1, -1), 2);
+        Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_ERODE, new Mat(), new Point(-1, -1), 2);
+        Imgproc.morphologyEx(reshaped, reshaped, Imgproc.MORPH_DILATE, new Mat(), new Point(-1, -1), 4);
+
+        Moments m = Imgproc.moments(reshaped, true);
+
+        double m10 = m.m10;
+        double m01 = m.m01;
+        m00 = m.m00;
+
+        double averageXPixelPosition = (m10 / m00);
+        double averageYPixelPosition = (m01 / m00);
+        averageXPosition = averageXPixelPosition / ((double) (cols)); // Map to a 0-1
+        averageYPosition = averageYPixelPosition / ((double) (rows));
 
         if(rectProc) {
-            List<MatOfPoint> contours = null;
+            List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
             Imgproc.findContours(reshaped, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-            double maxArea = 0;
-            Rect maxRect = null;
+            reshaped.release();
 
-            for(MatOfPoint contour : contours) {
+            double maxArea = 0;
+            Rect maxRect = new Rect();
+
+            for (MatOfPoint contour : contours) {
                 Rect testRect = Imgproc.boundingRect(contour);
-                if(testRect.area() > maxArea) {
+                if (testRect.area() > maxArea) {
                     maxRect = testRect;
                     maxArea = testRect.area();
                 }
             }
 
             largestRect = maxRect;
+        }
 
-            if (renderLines) {
-                Imgproc.rectangle(originalImage, maxRect, lineColor);
-            }
-        } else {
-            Moments m = Imgproc.moments(reshaped, true);
-            reshaped.release();
-
-            double m10 = m.m10;
-            double m01 = m.m01;
-            m00 = m.m00;
-
-            double averageXPixelPosition = (m10 / m00);
-            double averageYPixelPosition = (m01 / m00);
-            averageXPosition = averageXPixelPosition / ((double) (cols)); // Map to a 0-1
-            averageYPosition = averageYPixelPosition / ((double) (rows));
-
-            if (renderLines) {
+        if (renderLines) {
+            if (rectProc) {
+                Imgproc.rectangle(originalImage, largestRect, lineColor);
+            } else {
                 Imgproc.circle(originalImage, new Point(averageXPixelPosition, averageYPixelPosition), 7, lineColor, 2);
             }
         }
