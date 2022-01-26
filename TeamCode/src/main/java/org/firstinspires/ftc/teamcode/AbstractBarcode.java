@@ -39,7 +39,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         ahi.camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                ahi.camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                ahi.camera.startStreaming(160, 120, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
@@ -143,24 +143,22 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         ElapsedTime elapsedTime = new ElapsedTime();
 
         while(opModeIsActive()) {
-            if(hueTrackingPipeline.getPixelCount() > 100) {
+            if(hueTrackingPipeline.getPixelCount() > 5) {
                 double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
-                //drift *= 0.7;
+                drift *= 2;
 
                 telemetry.addData("Drift", drift);
 
                 double width = hueTrackingPipeline.getLargestRect().width;
 
-                double speed = 250/width;
+                double speed = 40/width;
 
                 telemetry.addData("Speed", speed);
                 telemetry.update();
 
-                speed = 0;
-
                 drive(speed + drift, speed - drift);
 
-                if(width >= 300) {
+                if(width >= 140) {
                     break;
                 }
 
