@@ -96,12 +96,15 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         ElapsedTime elapsedTime = new ElapsedTime();
 
         while(opModeIsActive()) {
-            if(hueTrackingPipeline.getPixelCount() > 100) {
+            if(hueTrackingPipeline.getPixelCount() > 20) {
                 double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
                 drift *= 0.7;
-                drive(0.8 + drift, 0.8 - drift);
 
-                if (hueTrackingPipeline.getAverageYPosition() < 0.81) {
+                double speed = Math.min(1.2, 1.5-hueTrackingPipeline.getAverageYPosition());
+
+                drive(speed + drift, speed - drift);
+
+                if (hueTrackingPipeline.getAverageYPosition() < 0.82) {
                     elapsedTime.reset();
                 }
 
@@ -145,13 +148,15 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         while(opModeIsActive()) {
             if(hueTrackingPipeline.getPixelCount() > 5) {
                 double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
-                drift *= 2;
+                drift *= 3;
 
                 telemetry.addData("Drift", drift);
 
                 double width = hueTrackingPipeline.getLargestRect().width;
 
-                double speed = 40/width;
+                double speed = 35/width;
+
+                speed = Math.min(speed, 1);
 
                 telemetry.addData("Speed", speed);
                 telemetry.update();

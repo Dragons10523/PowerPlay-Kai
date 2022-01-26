@@ -18,6 +18,8 @@ public class DriveToFreightTest extends AbstractBarcode {
         ahi.arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         hueTrackingPipeline.startVideo();
         driveToFreight();
+        drive(0, 0);
+        sleep(500);
         hueTrackingPipeline.stopVideo();
         /*drive(1, 1);
         runIntake(1);

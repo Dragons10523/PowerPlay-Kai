@@ -64,7 +64,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * 0 being royal blue and 375 being firetruck red, the two most opposite colors represented
      * by this colorspace
      */
-    protected final float labDistanceThresholdSquared = 1600;
+    protected final float labDistanceThresholdSquared = 900;
 
     private double averageXPosition;
     private double averageYPosition;
@@ -168,7 +168,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
             video.write(originalImage); // Save video frame
         }
 
-        return reshaped;
+        return originalImage;
     }
 
     public Double getAverageXPosition() {
@@ -239,7 +239,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         }
 
         int fourcc = VideoWriter.fourcc('M', 'J', 'P', 'G');
-        video.open("/storage/emulated/0/FIRST/OpenCV.avi", fourcc, 30f, new Size(320, 240));
+        video.open("/storage/emulated/0/FIRST/OpenCV.avi", fourcc, 30f, new Size(160, 120));
 
         renderLines = true;
     }
