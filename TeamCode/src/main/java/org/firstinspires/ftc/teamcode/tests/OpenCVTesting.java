@@ -15,6 +15,8 @@ public class OpenCVTesting extends AbstractBarcode {
         waitForStart();
         //hueTrackingPipeline.startVideo();
 
+        hueTrackingPipeline.setRectProc(true);
+
         while(opModeIsActive()) {
             double[] centerColor = hueTrackingPipeline.getCenterColorLab();
             telemetry.addData("Center L*A*B*", (100*centerColor[0]/255) + " " + (centerColor[1]-128) + " " + (centerColor[2]-128));
