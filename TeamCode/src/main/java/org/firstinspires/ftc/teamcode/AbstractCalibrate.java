@@ -23,7 +23,7 @@ public abstract class AbstractCalibrate extends LinearOpMode {
         ahi.camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                ahi.camera.startStreaming(640, 360, OpenCvCameraRotation.UPRIGHT);
+                ahi.camera.startStreaming(160, 120, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
