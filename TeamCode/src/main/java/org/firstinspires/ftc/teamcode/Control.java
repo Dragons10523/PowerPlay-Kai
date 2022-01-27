@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /* CLASS SUMMARY:
@@ -25,7 +26,7 @@ public abstract class Control extends LinearOpMode {
     }
 
     final int armOffset = 0;
-    final double CONVERSION_FACTOR = 25/(4.0+(2.0/7.0)*Math.PI);
+    final double CONVERSION_FACTOR = (1120/(43/29))/(5*Math.PI); // ticks per wheel rotation / wheel circumference
 
     public void initialize() {
         ahi = new Ahi(hardwareMap);
@@ -95,5 +96,12 @@ public abstract class Control extends LinearOpMode {
             }
         }
         return false;
+    }
+
+    public void setMotorMode(DcMotor.RunMode mode) {
+        ahi.leftA.setMode(mode);
+        ahi.leftB.setMode(mode);
+        ahi.rightA.setMode(mode);
+        ahi.rightB.setMode(mode);
     }
 }

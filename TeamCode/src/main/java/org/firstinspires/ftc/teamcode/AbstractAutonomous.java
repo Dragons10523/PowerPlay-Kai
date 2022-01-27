@@ -25,32 +25,20 @@ public abstract class AbstractAutonomous extends Control {
     public boolean driveDist(double dist) {
         int ticks = (int)(dist*CONVERSION_FACTOR);
 
-        ahi.leftA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ahi.leftB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ahi.rightA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        ahi.rightB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         ahi.leftA.setTargetPosition(ticks);
         ahi.leftB.setTargetPosition(ticks);
         ahi.rightA.setTargetPosition(ticks);
         ahi.rightB.setTargetPosition(ticks);
 
-        ahi.leftA.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        ahi.leftB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        ahi.rightA.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        ahi.rightB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        drive(0.5, 0.5);
-
-        while(ahi.leftA.isBusy() && ahi.leftB.isBusy() && ahi.rightA.isBusy() && ahi.rightB.isBusy() && opModeIsActive()) {
+        do {
+            double speed = Math.max(0.3, Math.abs(ahi.leftA.getCurrentPosition()-ticks)/400);
+            drive(speed, speed);
             sleep(10);
-            telemetry.addData("Left A", ahi.leftA.getCurrentPosition());
-            telemetry.addData("Left B", ahi.leftB.getCurrentPosition());
-            telemetry.addData("Right A", ahi.rightA.getCurrentPosition());
-            telemetry.addData("Right B", ahi.leftB.getCurrentPosition());
-            telemetry.addData("Target", ticks);
-            telemetry.update();
-        }
+        } while((ahi.leftA.isBusy() || ahi.leftB.isBusy() || ahi.rightA.isBusy() || ahi.rightB.isBusy()) && opModeIsActive());
 
         if(isStopRequested()) {
             zero();
@@ -59,10 +47,7 @@ public abstract class AbstractAutonomous extends Control {
 
         drive(0, 0);
 
-        ahi.leftA.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        ahi.leftB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        ahi.rightA.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        ahi.rightB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        setMotorMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         
         return false;
     }
