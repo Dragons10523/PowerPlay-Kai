@@ -40,11 +40,6 @@ public class Ahi {
         leftA = hwmap.get(DcMotorEx.class, "leftA");
         leftB = hwmap.get(DcMotorEx.class, "leftB");
 
-        /*rightA.setPIDFCoefficients(DcMotor.RunMode.STOP_AND_RESET_ENCODER, new PIDFCoefficients(1, 1, 1, 1));
-        rightB.setPIDFCoefficients(DcMotor.RunMode.STOP_AND_RESET_ENCODER, new PIDFCoefficients(1, 1, 1, 1));
-        leftA.setPIDFCoefficients(DcMotor.RunMode.STOP_AND_RESET_ENCODER, new PIDFCoefficients(1, 1, 1, 1));
-        leftB.setPIDFCoefficients(DcMotor.RunMode.STOP_AND_RESET_ENCODER, new PIDFCoefficients(1, 1, 1, 1));*/
-
         rightA.setDirection(drivetrainReverse ? DcMotor.Direction.FORWARD : DcMotor.Direction.REVERSE);
         rightB.setDirection(drivetrainReverse ? DcMotor.Direction.FORWARD : DcMotor.Direction.REVERSE);
         leftA.setDirection(drivetrainReverse ? DcMotor.Direction.REVERSE : DcMotor.Direction.FORWARD);
