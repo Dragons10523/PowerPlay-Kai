@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.opencv.core.Rect;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
@@ -75,11 +76,11 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         double averageX = hueTrackingPipeline.getAverageXPosition();
 
         if(averageX < 0.333) {
-            armPosition = ArmPosition.HIGH;
+            armPosition = ArmPosition.LOW_FORE;
         } else if(averageX < 0.667) {
-            armPosition = ArmPosition.MED;
+            armPosition = ArmPosition.MED_FORE;
         } else {
-            armPosition = ArmPosition.LOW;
+            armPosition = ArmPosition.HIGH_FORE;
         }
 
         return armPosition;
@@ -126,6 +127,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
     }
 
     public void driveToShippingHub(FieldSide fieldSide) {
+        hueTrackingPipeline.setRectProc(true);
         double[] originalSetPoint = hueTrackingPipeline.getSetpointLab();
 
         double[] calibrationData = new double[3];
@@ -147,12 +149,15 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
         while(opModeIsActive()) {
             if(hueTrackingPipeline.getPixelCount() > 5) {
-                double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
+                Rect rect = hueTrackingPipeline.getLargestRect();
+                double averageX = hueTrackingPipeline.getAverageXPosition();//(rect.x + rect.width)/320f;
+
+                double drift = averageX - 0.5;
                 drift *= 3;
 
                 telemetry.addData("Drift", drift);
 
-                double width = hueTrackingPipeline.getLargestRect().width;
+                double width = rect.width;
 
                 double speed = 35/width;
 
@@ -163,7 +168,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
                 drive(speed + drift, speed - drift);
 
-                if(width >= 140) {
+                if(width >= 130) {
                     break;
                 }
 
@@ -175,6 +180,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
                 if(elapsedTime.milliseconds() > 500) break;
             }
         }
+        hueTrackingPipeline.setRectProc(false);
 
         drive(0, 0);
 

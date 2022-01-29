@@ -19,10 +19,13 @@ public abstract class Control extends LinearOpMode {
     public enum ArmPosition {
         START,
         LOW,
+        LOW_FORE,
         MED,
+        MED_FORE,
         HIGH,
+        HIGH_FORE,
         UP,
-        PICKUP
+        PICKUP,
     }
 
     final int armOffset = 0;
@@ -42,13 +45,22 @@ public abstract class Control extends LinearOpMode {
     public void armControl(ArmPosition armPosition) {
         switch(armPosition) { // 3360 ticks/rotation
             case LOW:
-                ahi.arm.setTargetPosition(400-armOffset); // 2300
+                ahi.arm.setTargetPosition(2300-armOffset);
+                break;
+            case LOW_FORE:
+                ahi.arm.setTargetPosition(400-armOffset);
                 break;
             case MED:
-                ahi.arm.setTargetPosition(600-armOffset); // 2000
+                ahi.arm.setTargetPosition(2000-armOffset);
+                break;
+            case MED_FORE:
+                ahi.arm.setTargetPosition(750-armOffset);
                 break;
             case HIGH:
-                ahi.arm.setTargetPosition(800-armOffset); // 1750
+                ahi.arm.setTargetPosition(1550-armOffset);
+                break;
+            case HIGH_FORE:
+                ahi.arm.setTargetPosition(900-armOffset);
                 break;
             case PICKUP:
                 ahi.arm.setTargetPosition(0-armOffset);
@@ -68,7 +80,7 @@ public abstract class Control extends LinearOpMode {
     }
 
     public void playDDR(double power) {
-        ahi.ddr.setPower(power/2);
+        ahi.ddr.setPower(power*0.8);
     }
 
     public void setFlup(boolean open) {

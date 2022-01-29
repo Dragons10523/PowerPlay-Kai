@@ -64,13 +64,13 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * 0 being royal blue and 375 being firetruck red, the two most opposite colors represented
      * by this colorspace
      */
-    protected final float labDistanceThresholdSquared = 900;
+    protected final float labDistanceThresholdSquared = 1200;
 
     private double averageXPosition;
     private double averageYPosition;
     private double m00;
 
-    private Rect largestRect;
+    private Rect largestRect = new Rect();
 
     private boolean isPipelineReady = false;
     private boolean rectProc = false; // Use rectangle based processing
@@ -97,7 +97,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         int cols = input.cols(); // Cache variables
 
         Mat filtered = new Mat();
-        Imgproc.medianBlur(input, filtered, 15);
+        Imgproc.medianBlur(input, filtered, 21);
         input.release();
 
         /**

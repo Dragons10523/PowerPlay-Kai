@@ -14,7 +14,7 @@ public class CalibrationPipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
-        Imgproc.medianBlur(input, input, 15);
+        Imgproc.medianBlur(input, input, 21);
 
         Imgproc.cvtColor(input, lab, Imgproc.COLOR_RGB2Lab);
 
