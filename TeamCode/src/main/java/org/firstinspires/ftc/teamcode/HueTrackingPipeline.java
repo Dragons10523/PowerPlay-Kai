@@ -96,8 +96,8 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         int rows = input.rows();
         int cols = input.cols(); // Cache variables
 
-        Mat filtered = new Mat();
-        Imgproc.medianBlur(input, filtered, 21);
+        Mat blurred = new Mat();
+        Imgproc.medianBlur(input, blurred, 21);
         input.release();
 
         /**
@@ -105,25 +105,34 @@ public class HueTrackingPipeline extends OpenCvPipeline {
          *         L <- L*255/100, a <- a + 128, b <- b + 128
          *         This will make the OpenCV Limits of all 3 values 0 <-> 255
          */
-        Imgproc.cvtColor(filtered, filtered, Imgproc.COLOR_RGB2Lab); // Color Isolation
-        centerColorLab = filtered.get((int)rows/2, (int)cols/2);
+        Mat CIELab = new Mat();
+        Imgproc.cvtColor(blurred, CIELab, Imgproc.COLOR_RGB2Lab); // Color Isolation
+        blurred.release();
+        centerColorLab = CIELab.get((int)rows/2, (int)cols/2);
 
-        filtered.convertTo(filtered, CvType.CV_32F);
+        CIELab.convertTo(CIELab, CvType.CV_32F);
 
-        Core.subtract(filtered, setpointLabScalar, filtered); // filtered - setpointLab
+        Mat subtracted = new Mat();
+        Core.subtract(CIELab, setpointLabScalar, subtracted); // filtered - setpointLab
+        CIELab.release();
 
-        Core.multiply(filtered, filtered, filtered); // filtered^2
+        Mat squared = new Mat();
+        Core.multiply(subtracted, subtracted, squared); // filtered^2
+        subtracted.release();
 
         // Add all channels
-        Core.reduce(filtered.reshape(1, cols * rows), filtered, 1, Core.REDUCE_SUM);
-        Mat reshaped = filtered.reshape(1, rows); // This causes a memory leak but it doesn't cause any issues so eh
-        //filtered.release();
+        Mat reduced = new Mat();
+        Core.reduce(squared.reshape(1, cols * rows), reduced, 1, Core.REDUCE_SUM);
+        Mat reshaped = reduced.reshape(1, rows); // This causes a memory leak but it doesn't cause any issues so eh
+        reduced.release();
 
-        Core.inRange(reshaped, new Scalar(0), new Scalar(labDistanceThresholdSquared), reshaped); // Check distance
+        Mat range = new Mat();
+        Core.inRange(reshaped, new Scalar(0), new Scalar(labDistanceThresholdSquared), range); // Check distance
+        range.release();
 
-        reshaped.convertTo(reshaped, CvType.CV_8U); // Convert to byte before finding center for efficiency
+        range.convertTo(range, CvType.CV_8U); // Convert to byte before finding center for efficiency
 
-        Moments m = Imgproc.moments(reshaped, true);
+        Moments m = Imgproc.moments(range, true);
 
         double m10 = m.m10;
         double m01 = m.m01;
@@ -136,7 +145,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
         if(rectProc) {
             List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-            Imgproc.findContours(reshaped, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+            Imgproc.findContours(range, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
             double maxArea = 0;
             Rect maxRect = new Rect();
@@ -152,7 +161,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
             largestRect = maxRect;
         }
 
-        //reshaped.release();
+        range.release();
 
         if (renderLines) {
             if (rectProc) {
@@ -198,7 +207,6 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         final double satPoint = 35;
         final double valPoint = 100;
         double lowestPossibleValue = (satValSlope * (hsv[1] - ((satPoint/100)*255))) + ((valPoint/100)*255); // Point slope form
-
         if(lowestPossibleValue > hsv[2]) {
             return false;
         }
