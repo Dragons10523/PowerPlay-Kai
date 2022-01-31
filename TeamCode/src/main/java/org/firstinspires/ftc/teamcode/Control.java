@@ -45,33 +45,34 @@ public abstract class Control extends LinearOpMode {
     public void armControl(ArmPosition armPosition) {
         switch(armPosition) { // 3360 ticks/rotation
             case LOW:
-                ahi.arm.setTargetPosition(2300-armOffset);
+                ahi.arm.setTargetPosition(3833-armOffset);
                 break;
             case LOW_FORE:
-                ahi.arm.setTargetPosition(400-armOffset);
+                ahi.arm.setTargetPosition(667-armOffset);
                 break;
             case MED:
-                ahi.arm.setTargetPosition(2000-armOffset);
+                ahi.arm.setTargetPosition(3333-armOffset);
                 break;
             case MED_FORE:
-                ahi.arm.setTargetPosition(750-armOffset);
+                ahi.arm.setTargetPosition(1250-armOffset);
                 break;
             case HIGH:
-                ahi.arm.setTargetPosition(1550-armOffset);
+                ahi.arm.setTargetPosition(2583-armOffset);
                 break;
             case HIGH_FORE:
-                ahi.arm.setTargetPosition(900-armOffset);
+                ahi.arm.setTargetPosition(1500-armOffset);
                 break;
             case PICKUP:
                 ahi.arm.setTargetPosition(0-armOffset);
                 break;
             case UP:
-                ahi.arm.setTargetPosition(1100-armOffset);
+                ahi.arm.setTargetPosition(1833-armOffset);
                 break;
             default:
                 ahi.arm.setTargetPosition(0);
                 break;
         }
+        ahi.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         ahi.arm.setPower(1);
     }
 
