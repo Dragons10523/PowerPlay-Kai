@@ -15,11 +15,13 @@ public abstract class AbstractFreight extends AbstractBarcode {
 
         waitForStart();
 
+        hueTrackingPipeline.startVideo();
+
         armControl(ArmPosition.UP);
 
-        if(protectedSleep(300)) return;
+        if(protectedSleep(1000)) return;
 
-        fieldOrientation = getFieldOrientation();
+        fieldOrientation = getFieldOrientation(fieldSide);
 
         boolean onRed = fieldSide == FieldSide.RED ? true : false;
 
@@ -27,21 +29,28 @@ public abstract class AbstractFreight extends AbstractBarcode {
         telemetry.addLine("Color: " + fieldSide.toString());
         telemetry.update();
 
-        drive(1, 1);
-        if(protectedSleep(500));
+        drive(.7, .7);
+        if(protectedSleep(300));
         drive(0, 0);
 
-        startTurnTo(onRed ? Math.PI/4 : 3*Math.PI/4);
+        startTurnTo(onRed ? 3*Math.PI/4 : Math.PI/4);
+        while(turningFlag) updateTurnTo();
 
         driveToShippingHub(fieldSide); // Place the preload box
 
+        drive(-.5, -.5);
+        protectedSleep(400);
+        drive(0, 0);
+
         armControl(fieldOrientation);
         if(protectedSleep(500)) return;
-        runIntake(1);
+        runIntake(.5);
         if(protectedSleep(1000)) return;
 
         armControl(ArmPosition.UP);
         runIntake(0);
+
+        if(protectedSleep(400)) return;
 
         /*
 
@@ -85,11 +94,13 @@ public abstract class AbstractFreight extends AbstractBarcode {
             runIntake(0);
         }*/
 
-        drive(-1, -1); // Back up
-        if(protectedSleep(500)) return;
+        drive(-.7, -.7); // Back up
+        if(protectedSleep(400)) return;
         drive(0, 0);
 
-        startTurnTo(onRed ? Math.PI : 0); // Face the freight
+        armControl(ArmPosition.MED_FORE);
+
+        startTurnTo(onRed ? -0.15 : Math.PI+0.15); // Face the freight
         while(turningFlag) updateTurnTo();
 
         driveToFreight();

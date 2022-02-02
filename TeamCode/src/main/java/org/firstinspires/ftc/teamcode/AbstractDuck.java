@@ -17,7 +17,7 @@ public abstract class AbstractDuck extends AbstractBarcode {
 
         waitForStart();
 
-        fieldOrientation = getFieldOrientation();
+        fieldOrientation = getFieldOrientation(fieldSide);
 
         stopOpenCV();
 

@@ -85,7 +85,7 @@ public abstract class AbstractAutonomous extends Control {
         if(power > Math.PI)
             power = (2*Math.PI) - power;
         power *= 0.75 / Math.PI;
-        power += 0.25;
+        power += 0.40;
 
         drive(-power*turnDirection,power*turnDirection);
     }

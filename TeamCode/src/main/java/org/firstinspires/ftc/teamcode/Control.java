@@ -57,7 +57,7 @@ public abstract class Control extends LinearOpMode {
                 ahi.arm.setTargetPosition(1250-armOffset);
                 break;
             case HIGH:
-                ahi.arm.setTargetPosition(2583-armOffset);
+                ahi.arm.setTargetPosition(2500-armOffset); // 2583
                 break;
             case HIGH_FORE:
                 ahi.arm.setTargetPosition(1500-armOffset);

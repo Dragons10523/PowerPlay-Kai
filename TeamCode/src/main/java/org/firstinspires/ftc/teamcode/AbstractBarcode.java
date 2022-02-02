@@ -71,13 +71,17 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         ahi.camera.closeCameraDevice();
     }
 
-    public ArmPosition getFieldOrientation() {
+    public ArmPosition getFieldOrientation(FieldSide fieldSide) {
         ArmPosition armPosition;
         double averageX = hueTrackingPipeline.getAverageXPosition();
 
-        if(averageX < 0.333) {
+        double adjust = fieldSide == FieldSide.RED ? 0.2 : -0.2;
+
+        telemetry.addData("X", averageX);
+
+        if(averageX < 0.333 + adjust) {
             armPosition = ArmPosition.LOW_FORE;
-        } else if(averageX < 0.667) {
+        } else if(averageX < 0.667 + adjust) {
             armPosition = ArmPosition.MED_FORE;
         } else {
             armPosition = ArmPosition.HIGH_FORE;
@@ -97,15 +101,19 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         ElapsedTime elapsedTime = new ElapsedTime();
 
         while(opModeIsActive()) {
-            if(hueTrackingPipeline.getPixelCount() > 20) {
-                double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
-                drift *= 0.7;
+            if(hueTrackingPipeline.getPixelCount() > 5) {
+                telemetry.addData("Pixels", hueTrackingPipeline.getPixelCount());
 
-                double speed = Math.min(1.2, 1.5-hueTrackingPipeline.getAverageYPosition());
+                double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
+                drift *= 0.6;
+
+                double speed = Math.min(1.2, 1.55-hueTrackingPipeline.getAverageYPosition());
 
                 drive(speed + drift, speed - drift);
 
-                if (hueTrackingPipeline.getAverageYPosition() < 0.82) {
+                telemetry.addData("Y", hueTrackingPipeline.getAverageYPosition());
+
+                if (hueTrackingPipeline.getAverageYPosition() < 0.87) {
                     elapsedTime.reset();
                 }
 
@@ -113,8 +121,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
             } else {
                 drive(0, 0);
                 sleep(33);
-
-                if(elapsedTime.milliseconds() > 500) break;
+                if(elapsedTime.milliseconds() > 100) break;
             }
             telemetry.update();
         }
@@ -155,20 +162,16 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
                 double drift = averageX - 0.5;
                 drift *= 3;
 
-                telemetry.addData("Drift", drift);
+                double height = rect.height;
 
-                double width = rect.width;
-
-                double speed = 35/width;
+                double speed = 10/height;
 
                 speed = Math.min(speed, 1);
 
-                telemetry.addData("Speed", speed);
-                telemetry.update();
-
                 drive(speed + drift, speed - drift);
 
-                if(width >= 130) {
+                if(height >= 36) {
+                    drive(0, 0);
                     break;
                 }
 
@@ -177,7 +180,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
                 drive(0, 0);
                 sleep(33);
 
-                if(elapsedTime.milliseconds() > 500) break;
+                if(elapsedTime.milliseconds() > 200) break;
             }
         }
         hueTrackingPipeline.setRectProc(false);
