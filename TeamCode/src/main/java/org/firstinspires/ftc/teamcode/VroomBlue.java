@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
  * contains the main runOpMode function
  * */
 
-@TeleOp(name = "Drive Blue")
-public class DriveBlue extends AbstractDrive {
+@TeleOp(name = "Vroom Vroom Blue")
+public class VroomBlue extends AbstractVroom {
 
     @Override
     public void runOpMode() throws InterruptedException {

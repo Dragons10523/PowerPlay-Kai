@@ -8,7 +8,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public abstract class AbstractDrive extends Control {
+public abstract class AbstractVroom extends Control {
+    boolean lastButtonX = false;
     boolean armWasManual = false;
 
     public void driveLoop() {
@@ -16,6 +17,9 @@ public abstract class AbstractDrive extends Control {
         double right = ahi.drivetrainReverse ? -gamepad1.left_stick_y : -gamepad1.right_stick_y;
 
         boolean sneak = gamepad1.left_bumper || gamepad1.right_bumper;
+
+        left *= left * left; // Cube the inputs (because dealing with negatives when squaring is annoying)
+        right *= right * right;
 
         left *= sneak ? 0.6 : 1.0;
         right *= sneak ? 0.6 : 1.0;
@@ -40,12 +44,19 @@ public abstract class AbstractDrive extends Control {
 
             if (gamepad2.x) {
                 armControl(ArmPosition.PICKUP);
+                lastButtonX = true;
             } else if (gamepad2.a) {
                 armControl(ArmPosition.LOW);
+                lastButtonX = false;
             } else if (gamepad2.b) {
                 armControl(ArmPosition.MED);
+                lastButtonX = false;
             } else if (gamepad2.y) {
                 armControl(ArmPosition.HIGH);
+                lastButtonX = false;
+            } else if (lastButtonX) {
+                armControl(ArmPosition.LOW_FORE);
+                lastButtonX = false;
             }
 
             if (gamepad2.back) {
@@ -58,8 +69,9 @@ public abstract class AbstractDrive extends Control {
             if (Math.abs(gamepad2.left_stick_y) > 0.1) {
                 ahi.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 ahi.arm.setPower(-gamepad2.left_stick_y);
+                lastButtonX = false;
                 armWasManual = true;
-            } else if(armWasManual) {
+            } else if (armWasManual) {
                 ahi.arm.setPower(0);
                 armWasManual = false;
             }
