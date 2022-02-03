@@ -16,14 +16,13 @@ public class OpenCVTesting extends AbstractBarcode {
         //hueTrackingPipeline.startVideo();
 
         hueTrackingPipeline.setRectProc(true);
+        hueTrackingPipeline.setSetpointLab(parseCalibrationFile("blu"));
 
         while(opModeIsActive()) {
             double[] centerColor = hueTrackingPipeline.getCenterColorLab();
-            telemetry.addData("Center L*A*B*", (100*centerColor[0]/255) + " " + (centerColor[1]-128) + " " + (centerColor[2]-128));
             telemetry.addData("Pipeline Time", ahi.camera.getPipelineTimeMs());
             telemetry.addData("Total Time", ahi.camera.getTotalFrameTimeMs());
-            telemetry.addData("In Range?", hueTrackingPipeline.getPixelCount() > 5500);
-            telemetry.addData("Pixels", hueTrackingPipeline.getPixelCount());
+            telemetry.addData("Height", hueTrackingPipeline.getLargestRect().height);
             telemetry.addData("FPS", ahi.camera.getFps());
             telemetry.update();
 
