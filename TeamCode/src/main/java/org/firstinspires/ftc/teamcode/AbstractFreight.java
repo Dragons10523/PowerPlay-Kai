@@ -43,7 +43,7 @@ public abstract class AbstractFreight extends AbstractBarcode {
                 if(protectedSleep(400)) return;
                 break;
             case LOW_FORE:
-                if(protectedSleep(550)) return;
+                if(protectedSleep(400)) return;
                 break;
         }
 

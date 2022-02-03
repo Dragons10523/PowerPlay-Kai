@@ -75,7 +75,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         ArmPosition armPosition;
         double averageX = hueTrackingPipeline.getAverageXPosition();
 
-        double adjust = fieldSide == FieldSide.RED ? 0.2 : -0.2;
+        double adjust = fieldSide == FieldSide.RED ? 0.2 : -0.333;
 
         telemetry.addData("X", averageX);
 
@@ -105,7 +105,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
                 telemetry.addData("Pixels", hueTrackingPipeline.getPixelCount());
 
                 double drift = hueTrackingPipeline.getAverageXPosition() - 0.5;
-                drift *= 0.8;
+                drift *= 0.9;
 
                 double speed = Math.min(1.2, 1.55-hueTrackingPipeline.getAverageYPosition());
 
@@ -113,7 +113,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
                 telemetry.addData("Y", hueTrackingPipeline.getAverageYPosition());
 
-                if (hueTrackingPipeline.getAverageYPosition() < 0.80) {
+                if (hueTrackingPipeline.getAverageYPosition() < 0.85) {
                     elapsedTime.reset();
                 }
 
@@ -160,17 +160,17 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
                 double averageX = hueTrackingPipeline.getAverageXPosition();//(rect.x + rect.width)/320f;
 
                 double drift = averageX - 0.5;
-                drift *= 3;
+                drift *= 2.5;
 
                 double height = rect.height;
 
-                double speed = 7/height;
+                double speed = 10/height;
 
                 speed = Math.min(speed, 1);
 
                 drive(speed + drift, speed - drift);
 
-                if(height >= 41) {
+                if(height >= 54) {
                     telemetry.addData("Height Break", height);
                     drive(0, 0);
                     break;
