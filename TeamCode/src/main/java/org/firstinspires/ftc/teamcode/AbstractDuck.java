@@ -12,95 +12,107 @@ public abstract class AbstractDuck extends AbstractBarcode {
     public void run(FieldSide fieldSide) {
         initializeValues();
         startOpenCV();
-
-        boolean onRed = fieldSide == FieldSide.RED;
+        boolean onRed = fieldSide == FieldSide.RED ? true : false;
 
         waitForStart();
 
-        fieldOrientation = getFieldOrientation(fieldSide);
+        hueTrackingPipeline.startVideo();
+
+        armControl(ArmPosition.UP); // Raise arm for camera to see
+        if(protectedSleep(1000)) return;
+
+        fieldOrientation = getFieldOrientation(fieldSide); // Si
+
+        driveDist(6); // Get away from the wall
+
+        startTurnTo(onRed ? Math.PI : 0); // Turn to face the ducks
+        while(turningFlag) updateTurnTo();
+
+        armControl(ArmPosition.LOW); // Place arm behind the robot
+
+        if(onRed) {
+            driveDist(20); // Go to the carousel
+            startTurnTo(3 * Math.PI / 2); // Put DuckDuck on the carousel
+            while(turningFlag) updateTurnTo();
+            playDDR(1); // Ducks
+        } else {
+            driveDist(24); // Go to the carousel
+            playDDR(1); // Ducks
+        }
+
+        startTurnTo(onRed ? 0 : Math.PI); // Turn to face the shipping hub
+        while(turningFlag) updateTurnTo();
+
+        driveToShippingHub(fieldSide); // Go to the shipping hub
+
+        drive(-.5, -.5);
+        protectedSleep(400); // Back up
+        drive(0, 0);
+
+        armControl(fieldOrientation);
+        if(protectedSleep(500)) return; // Eject the block on the right height
+        runIntake(.5);
+        if(protectedSleep(1000)) return;
+
+        armControl(ArmPosition.UP); // Raise the arm
+        runIntake(0);
+        if(protectedSleep(400)) return;
+
+        /*
+        while(getRuntime() < 20) {
+            armControl(ArmPosition.UP);
+
+            drive(-1, -1); // Back up
+            if(protectedSleep(500)) return;
+            drive(0, 0);
+
+            startTurnTo(onRed ? Math.PI : 0); // Face the freight
+            while(turningFlag) updateTurnTo();
+            if(isStopRequested()) return; // Safety
+
+            driveToFreight(); // Go to the freight
+            if(isStopRequested()) return; // Safety
+
+            armControl(ArmPosition.LOW_FORE);
+            if(protectedSleep(150)) return;
+            armControl(ArmPosition.PICKUP);
+            if(protectedSleep(150)) return;
+
+            drive(0.7, 0.7); // Grab the freight
+            runIntake(-1);
+            if(protectedSleep(500)) return;
+            drive(-1, -1);
+            runIntake(0);
+            if(protectedSleep(100)) return;
+            drive(0, 0);
+
+            startTurnTo(onRed ? 0 : Math.PI); // Face the shiping hub
+            while(turningFlag) updateTurnTo();
+            if(isStopRequested()) return; // Safety
+
+            driveToShippingHub(fieldSide); // Drive to the shipping hub
+            if(isStopRequested()) return; // Safety
+            armControl(ArmPosition.HIGH_FORE);
+            while(ahi.arm.isBusy() && opModeIsActive()) sleep(50);
+            runIntake(0.5);
+            if(protectedSleep(500)) return;
+            runIntake(0);
+        }*/
+
+        drive(-.7, -.7); // Back up
+        if(protectedSleep(400)) return;
+        drive(0, 0);
+
+        armControl(ArmPosition.HIGH_FORE); // Lower arm a bit
+
+        startTurnTo(onRed ? -0.15 : Math.PI+0.15); // Face the freight
+        while(turningFlag) updateTurnTo();
+
+        driveToFreight(); // Go to the freight
+
+        armControl(ArmPosition.PICKUP); // Place the arm down
+        if(protectedSleep(500)) return;
 
         stopOpenCV();
-
-        telemetry.addLine("Target arm pos: " + fieldOrientation.toString());
-        telemetry.update();
-
-        sleep(2000); // for testing only
-
-        if(driveDist(6)) return; // Get away from the wall
-
-        startTurnTo(onRed ? 0 : Math.PI);
-        while(turningFlag) updateTurnTo(); // Turn to face the carousel
-
-        if(driveDist(-18)) return; // Drive up to carousel
-
-        startTurnTo(onRed ? Math.PI/2 : Math.PI);
-        while(turningFlag) updateTurnTo(); // Put the spinner on the carousel
-
-        playDDR(1); // Spin the carousel
-        if(protectedSleep(1500)) return;
-        playDDR(0);
-
-        startTurnTo(onRed ? 7*Math.PI/6 : -Math.PI/6);
-        while(turningFlag) updateTurnTo(); // Turn to face away from the goal
-
-        if(driveDist(-28)) return; // Reverse to the goal
-
-        startTurnTo(onRed ? 5*Math.PI/4 : -Math.PI/4);
-        while(turningFlag) updateTurnTo(); // Turn to face away from the goal
-
-        armControl(fieldOrientation); // Position arm
-        if(protectedSleep(700)) return;
-
-        setFlup(true); // Dump duck
-        runIntake(1);
-        if(protectedSleep(200)) return;
-
-        setFlup(false); // Close and stop intake
-        runIntake(0);
-        armControl(ArmPosition.PICKUP); // Set arm for pickup
-
-        startTurnTo(3*Math.PI/2);
-        while(turningFlag) updateTurnTo(); // Face the wall
-
-        if(driveDist(16)) return; // Drive to the wall
-
-        startTurnTo(onRed ? Math.PI : 0);
-        while(turningFlag) updateTurnTo(); // Face the freight
-
-        if(driveDist(28)) return; // Drive to the barrier
-
-        drive(.7, .7); // Drive over the barrier
-        if(protectedSleep(500)) return;
-        drive(0, 0);
-        if(protectedSleep(200)) return;
-
-        startTurnTo(onRed ? Math.PI : 0);
-        while(turningFlag) updateTurnTo(); // Realign after crossing the barrier
-
-        runIntake(1); // Attempt to grab freight
-        drive(0.4, 0.4);
-        if(protectedSleep(700)) return;
-        // TODO: Branching program to detect failure
-        drive(0, 0); // Stop attempting to grab freight
-        runIntake(0);
-        if(protectedSleep(200)) return;
-
-        startTurnTo(onRed ? 7*Math.PI/6 : -Math.PI/6);
-        while(turningFlag) updateTurnTo(); // Face back towards goal
-
-        if(driveDist(-24)) return; // Drive to goal
-
-        armControl(ArmPosition.HIGH); // Position arm to high goal
-        if(protectedSleep(650)) return;
-
-        setFlup(true); // Dump freight
-        runIntake(1);
-        if(protectedSleep(200)) return;
-
-        setFlup(false); // Stop intake
-        runIntake(0);
-        armControl(ArmPosition.START);
-
-        if(driveDist(24)) return; // Park
     }
 }

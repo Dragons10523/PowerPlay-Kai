@@ -12,48 +12,53 @@ public abstract class AbstractFreight extends AbstractBarcode {
     public void run(FieldSide fieldSide) {
         initializeValues();
         startOpenCV();
+        boolean onRed = fieldSide == FieldSide.RED ? true : false;
 
         waitForStart();
 
         hueTrackingPipeline.startVideo();
 
-        armControl(ArmPosition.UP);
-
+        armControl(ArmPosition.UP); // Raise arm for camera to see
         if(protectedSleep(1000)) return;
 
-        fieldOrientation = getFieldOrientation(fieldSide);
+        fieldOrientation = getFieldOrientation(fieldSide); // Si
 
-        boolean onRed = fieldSide == FieldSide.RED ? true : false;
-
-        telemetry.addLine("Target arm pos: " + fieldOrientation.toString());
-        telemetry.addLine("Color: " + fieldSide.toString());
+        telemetry.addData("Target", fieldOrientation.toString());
         telemetry.update();
 
-        drive(.7, .7);
-        if(protectedSleep(300));
-        drive(0, 0);
+        driveDist(4);
 
-        startTurnTo(onRed ? 3*Math.PI/4 : Math.PI/4);
+        startTurnTo(onRed ? 4*Math.PI/6 : 2*Math.PI/6); // Turn to face the shipping hub
         while(turningFlag) updateTurnTo();
 
-        driveToShippingHub(fieldSide); // Place the preload box
+        driveToShippingHub(fieldSide); // Go to the shipping hub
 
         drive(-.5, -.5);
-        protectedSleep(400);
+
+        switch(fieldOrientation) {
+            case HIGH_FORE:
+                if(protectedSleep(300)) return;
+                break;
+            case MED_FORE:
+                if(protectedSleep(400)) return;
+                break;
+            case LOW_FORE:
+                if(protectedSleep(550)) return;
+                break;
+        }
+
         drive(0, 0);
 
         armControl(fieldOrientation);
-        if(protectedSleep(500)) return;
-        runIntake(.5);
+        if(protectedSleep(500)) return; // Eject the block on the right height
+        runIntake(.6);
         if(protectedSleep(1000)) return;
 
-        armControl(ArmPosition.UP);
+        armControl(ArmPosition.UP); // Raise the arm
         runIntake(0);
-
         if(protectedSleep(400)) return;
 
         /*
-
         while(getRuntime() < 20) {
             armControl(ArmPosition.UP);
 
@@ -98,14 +103,14 @@ public abstract class AbstractFreight extends AbstractBarcode {
         if(protectedSleep(400)) return;
         drive(0, 0);
 
-        armControl(ArmPosition.MED_FORE);
-
         startTurnTo(onRed ? -0.15 : Math.PI+0.15); // Face the freight
         while(turningFlag) updateTurnTo();
 
-        driveToFreight();
+        armControl(ArmPosition.HIGH_FORE); // Lower arm a bit
 
-        armControl(ArmPosition.LOW_FORE);
+        driveToFreight(); // Go to the freight
+
+        armControl(ArmPosition.PICKUP); // Place the arm down
         if(protectedSleep(500)) return;
 
         stopOpenCV();
