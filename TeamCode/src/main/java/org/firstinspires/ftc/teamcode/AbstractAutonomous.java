@@ -35,7 +35,7 @@ public abstract class AbstractAutonomous extends Control {
         setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         do {
-            double speed = Math.max(0.3, Math.abs(ahi.leftA.getCurrentPosition()-ticks)/400);
+            double speed = Math.max(0.3, Math.abs(ahi.leftA.getCurrentPosition()-ticks)/400f);
             drive(speed, speed);
             sleep(10);
         } while((ahi.leftA.isBusy() || ahi.leftB.isBusy() || ahi.rightA.isBusy() || ahi.rightB.isBusy()) && opModeIsActive());
