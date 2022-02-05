@@ -33,9 +33,9 @@ public abstract class AbstractVroom extends Control {
             driveLoop();
 
             if(gamepad2.right_bumper) {
-                playDDR(1);
+                playDDR(fieldDir);
             } else if(gamepad2.left_bumper) {
-                playDDR(-1);
+                playDDR(-fieldDir);
             } else {
                 playDDR(0);
             }
