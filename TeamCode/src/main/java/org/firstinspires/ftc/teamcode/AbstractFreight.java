@@ -18,14 +18,16 @@ public abstract class AbstractFreight extends AbstractBarcode {
 
         hueTrackingPipeline.startVideo();
 
+    // DETECT FIELD ORIENTATION
         armControl(ArmPosition.UP); // Raise arm for camera to see
         if(protectedSleep(1000)) return;
 
-        fieldOrientation = getFieldOrientation(fieldSide); // Si
+        fieldOrientation = getFieldOrientation(fieldSide); // See
 
         telemetry.addData("Target", fieldOrientation.toString());
         telemetry.update();
 
+    // PLACE PRELOAD
         driveDist(4);
 
         startTurnTo(onRed ? 4*Math.PI/6 : 2*Math.PI/6); // Turn to face the shipping hub
@@ -54,55 +56,64 @@ public abstract class AbstractFreight extends AbstractBarcode {
         runIntake(.6);
         if(protectedSleep(1000)) return;
 
+    // MOVE FROM HUB
         armControl(ArmPosition.UP); // Raise the arm
         runIntake(0);
         if(protectedSleep(400)) return;
-
-        /*
-        while(getRuntime() < 20) {
-            armControl(ArmPosition.UP);
-
-            drive(-1, -1); // Back up
-            if(protectedSleep(500)) return;
-            drive(0, 0);
-
-            startTurnTo(onRed ? Math.PI : 0); // Face the freight
-            while(turningFlag) updateTurnTo();
-            if(isStopRequested()) return; // Safety
-
-            driveToFreight(); // Go to the freight
-            if(isStopRequested()) return; // Safety
-
-            armControl(ArmPosition.LOW_FORE);
-            if(protectedSleep(150)) return;
-            armControl(ArmPosition.PICKUP);
-            if(protectedSleep(150)) return;
-
-            drive(0.7, 0.7); // Grab the freight
-            runIntake(-1);
-            if(protectedSleep(500)) return;
-            drive(-1, -1);
-            runIntake(0);
-            if(protectedSleep(100)) return;
-            drive(0, 0);
-
-            startTurnTo(onRed ? 0 : Math.PI); // Face the shiping hub
-            while(turningFlag) updateTurnTo();
-            if(isStopRequested()) return; // Safety
-
-            driveToShippingHub(fieldSide); // Drive to the shipping hub
-            if(isStopRequested()) return; // Safety
-            armControl(ArmPosition.HIGH_FORE);
-            while(ahi.arm.isBusy() && opModeIsActive()) sleep(50);
-            runIntake(0.5);
-            if(protectedSleep(500)) return;
-            runIntake(0);
-        }*/
 
         drive(-.7, -.7); // Back up
         if(protectedSleep(400)) return;
         drive(0, 0);
 
+        /*
+    // GO TO FREIGHT
+        startTurnTo(onRed ? -0.15 : Math.PI+0.15); // Face the freight
+        while(turningFlag) updateTurnTo();
+
+        armControl(ArmPosition.HIGH_FORE); // Lower arm a bit
+
+        driveToFreight(); // Go to the freight
+
+        armControl(ArmPosition.PICKUP); // Place the arm down
+        if(protectedSleep(500)) return;
+
+    // GRAB FREIGHT
+        runIntake(-1); // Start intake
+
+        drive(-1, -1); // Jiggle to grab freight
+        if(protectedSleep(300)) return;
+        drive(1, 1);
+        if(protectedSleep(1000)) return;
+        drive(0, 0);
+
+        runIntake(0); // Stop intake
+
+    // RETURN TO SHIPPING HUB
+        armControl(ArmPosition.HIGH_FORE); // Raise arm
+
+        drive(-1, -1); // back up
+        if(protectedSleep(400)) return;
+        drive(0, 0);
+
+        startTurnTo(onRed ? Math.PI-0.15 : 0.15); // Turn to face shipping hub
+        while(turningFlag) updateTurnTo();
+
+        driveToShippingHub(fieldSide); // Navigate to the shipping hub
+        drive(-.5, -.5);
+        if(protectedSleep(300)) return;
+
+        runIntake(0.6);
+
+    // MOVE FROM HUB
+        armControl(ArmPosition.UP); // Raise the arm
+        runIntake(0);
+        if(protectedSleep(400)) return;
+
+        drive(-.7, -.7); // Back up
+        if(protectedSleep(400)) return;
+        drive(0, 0);*/
+
+    // PARK
         startTurnTo(onRed ? -0.15 : Math.PI+0.15); // Face the freight
         while(turningFlag) updateTurnTo();
 

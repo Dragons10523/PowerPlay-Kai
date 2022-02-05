@@ -21,7 +21,7 @@ public abstract class AbstractDuck extends AbstractBarcode {
         armControl(ArmPosition.UP); // Raise arm for camera to see
         if(protectedSleep(1000)) return;
 
-        fieldOrientation = getFieldOrientation(fieldSide); // Si
+        fieldOrientation = getFieldOrientation(fieldSide); // See
 
         driveDist(6); // Get away from the wall
 
