@@ -16,18 +16,12 @@ public abstract class AbstractVroom extends Control {
         double left = ahi.drivetrainReverse ? -gamepad1.right_stick_y : -gamepad1.left_stick_y;
         double right = ahi.drivetrainReverse ? -gamepad1.left_stick_y : -gamepad1.right_stick_y;
 
-        boolean sneak = gamepad1.left_bumper || gamepad1.right_bumper;
-
-        double speed = (left + right) / 2;
-        double turn = (left - right) / 2;
-
-        speed *= sneak ? 0.6 : 1.0;
-
-        if(ahi.arm.isBusy()) {
-            turn *= .4;
+        if(gamepad1.left_bumper || gamepad1.right_bumper) {
+            left *= 0.6;
+            right *= 0.6;
         }
 
-        drive(speed + turn, speed - turn);
+        drive(left, right);
     }
 
     public void run(FieldSide fieldSide) {
@@ -38,8 +32,14 @@ public abstract class AbstractVroom extends Control {
         while(opModeIsActive()) {
             driveLoop();
 
-            playDDR(gamepad2.right_bumper ? fieldDir : 0.0);
-            playDDR(gamepad2.left_bumper ? -fieldDir : 0.0);
+            if(gamepad2.right_bumper) {
+                playDDR(1);
+            } else if(gamepad2.left_bumper) {
+                playDDR(-1);
+            } else {
+                playDDR(0);
+            }
+
             setFlup(gamepad2.left_trigger < .5);
             setLiftPower(-gamepad2.left_stick_y);
 
