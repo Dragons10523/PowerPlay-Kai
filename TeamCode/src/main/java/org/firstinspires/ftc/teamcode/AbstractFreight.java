@@ -12,7 +12,7 @@ public abstract class AbstractFreight extends AbstractBarcode {
     public void run(FieldSide fieldSide) {
         initializeValues();
         startOpenCV();
-        boolean onRed = fieldSide == FieldSide.RED ? true : false;
+        boolean onRed = fieldSide == FieldSide.RED;
 
         waitForStart();
 
