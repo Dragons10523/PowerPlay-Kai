@@ -134,6 +134,8 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
     }
 
     public void driveToShippingHub(FieldSide fieldSide) {
+        ElapsedTime timer = new ElapsedTime();
+
         hueTrackingPipeline.setRectProc(true);
         double[] originalSetPoint = hueTrackingPipeline.getSetpointLab();
 
@@ -155,6 +157,11 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         ElapsedTime elapsedTime = new ElapsedTime();
 
         while(opModeIsActive()) {
+            if(timer.milliseconds() > 5000) {
+                drive(0, 0);
+                break;
+            }
+
             if(hueTrackingPipeline.getPixelCount() > 5) {
                 Rect rect = hueTrackingPipeline.getLargestRect();
                 double averageX = hueTrackingPipeline.getAverageXPosition();//(rect.x + rect.width)/320f;
