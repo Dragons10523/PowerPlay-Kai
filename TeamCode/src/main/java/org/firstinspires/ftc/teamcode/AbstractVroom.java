@@ -18,13 +18,16 @@ public abstract class AbstractVroom extends Control {
 
         boolean sneak = gamepad1.left_bumper || gamepad1.right_bumper;
 
-        left *= left * left; // Cube the inputs (because dealing with negatives when squaring is annoying)
-        right *= right * right;
+        double speed = (left + right) / 2;
+        double turn = (left - right) / 2;
 
-        left *= sneak ? 0.6 : 1.0;
-        right *= sneak ? 0.6 : 1.0;
+        speed *= sneak ? 0.6 : 1.0;
 
-        drive(left, right);
+        if(ahi.arm.isBusy()) {
+            turn *= .4;
+        }
+
+        drive(speed + turn, speed - turn);
     }
 
     public void run(FieldSide fieldSide) {
