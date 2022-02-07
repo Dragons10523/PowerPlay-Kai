@@ -1,9 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -11,6 +10,7 @@ import java.net.Socket;
 
 // PROGRAM PURELY FOR TESTING AND DEBUGGING, DISABLE DURING COMPETITION
 
+@Disabled
 @TeleOp(name = "ReDUX Server (DISABLE ME)", group = "Debug")
 public class SocketRemote extends LinearOpMode {
 
