@@ -33,10 +33,13 @@ public abstract class AbstractVroom extends Control {
             driveLoop();
 
             if(gamepad2.right_bumper) {
+                telemetry.addLine("right");
                 playDDR(fieldDir);
             } else if(gamepad2.left_bumper) {
+                telemetry.addLine("left");
                 playDDR(-fieldDir);
             } else {
+                telemetry.addLine("none");
                 playDDR(0);
             }
 

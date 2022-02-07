@@ -177,7 +177,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
                 drive(speed + drift, speed - drift);
 
-                if(height >= 54) {
+                if(height >= 52) {
                     telemetry.addData("Height Break", height);
                     drive(0, 0);
                     break;
