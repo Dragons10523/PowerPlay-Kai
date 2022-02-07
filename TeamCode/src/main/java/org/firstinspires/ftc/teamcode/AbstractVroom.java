@@ -40,6 +40,7 @@ public abstract class AbstractVroom extends Control {
 
             playDDR(gamepad2.right_bumper ? fieldDir : 0.0);
             playDDR(gamepad2.left_bumper ? -fieldDir : 0.0);
+
             setFlup(gamepad2.left_trigger < .5);
             setLiftPower(-gamepad2.left_stick_y);
 
