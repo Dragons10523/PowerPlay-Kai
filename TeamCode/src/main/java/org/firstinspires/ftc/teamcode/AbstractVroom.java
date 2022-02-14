@@ -11,6 +11,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public abstract class AbstractVroom extends Control {
     boolean lastButtonX = false;
     boolean armWasManual = false;
+    boolean wasDDR = false;
+
+    ElapsedTime timeSinceDDR;
 
     public void driveLoop() {
         double left = ahi.drivetrainReverse ? -gamepad1.right_stick_y : -gamepad1.left_stick_y;
@@ -28,18 +31,27 @@ public abstract class AbstractVroom extends Control {
         waitForStart();
 
         final double fieldDir = (fieldSide == FieldSide.RED ? -1.0 : 1.0);
+        timeSinceDDR = new ElapsedTime();
 
         while(opModeIsActive()) {
             driveLoop();
 
             if(gamepad2.right_bumper) {
-                telemetry.addLine("right");
                 playDDR(fieldDir);
+                timeSinceDDR.reset();
+                wasDDR = true;
             } else if(gamepad2.left_bumper) {
-                telemetry.addLine("left");
                 playDDR(-fieldDir);
-            } else {
-                telemetry.addLine("none");
+                timeSinceDDR.reset();
+                wasDDR = true;
+            } else if(wasDDR) {
+                if(ahi.ddr.getPower() != 0) {
+                    playDDR(-ahi.ddr.getPower());
+                }
+                wasDDR = false;
+            }
+
+            if(timeSinceDDR.milliseconds() >= 60) {
                 playDDR(0);
             }
 
