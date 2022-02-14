@@ -29,7 +29,7 @@ public abstract class Control extends LinearOpMode {
     }
 
     final int armOffset = 0;
-    final double CONVERSION_FACTOR = (1120/(43/29))/(5*Math.PI); // ticks per wheel rotation / wheel circumference
+    final double CONVERSION_FACTOR = (1120/(43/29))/(6.5*Math.PI); // ticks per wheel rotation / A random number because it is going too far
 
     public void initialize() {
         ahi = new Ahi(hardwareMap);

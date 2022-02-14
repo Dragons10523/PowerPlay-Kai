@@ -171,13 +171,13 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
 
                 double height = rect.height;
 
-                double speed = 10/height;
+                double speed = 13/height;
 
                 speed = Math.min(speed, 1);
 
                 drive(speed + drift, speed - drift);
 
-                if(height >= 52) {
+                if(height >= 56 ) {
                     telemetry.addData("Height Break", height);
                     drive(0, 0);
                     break;

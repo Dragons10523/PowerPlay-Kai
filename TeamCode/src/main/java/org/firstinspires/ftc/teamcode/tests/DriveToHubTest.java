@@ -16,9 +16,14 @@ public class DriveToHubTest extends AbstractBarcode {
 
         waitForStart();
 
+        hueTrackingPipeline.startVideo();
+
         ahi.arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         ahi.arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         driveToShippingHub(FieldSide.RED);
+        drive(0, 0);
+        protectedSleep(500);
+        stopOpenCV();
         /*drive(1, 1);
         runIntake(1);
         sleep(250);

@@ -30,6 +30,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.opencv.core.CvType.CV_32F;
+
 /**
  * The CIELAB (L*a*b*) colorspace is being used because
  * the nonlinear relations for L*, a*, and b* are intended to mimic the nonlinear
@@ -50,7 +52,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * [A] (green <-> red): range usually clamped to +- 128
      * [B] (blue <-> yellow): range usually clamped to +- 128
      */
-    private double[] setpointLab = {204, 108, 178};
+    private double[] setpointLab = {0, 135, 172};
     private Scalar setpointLabScalar = new Scalar(setpointLab);
 
     private final Scalar lineColor = new Scalar(127, 255, 127);
@@ -64,7 +66,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
      * 0 being royal blue and 375 being firetruck red, the two most opposite colors represented
      * by this colorspace
      */
-    protected final float labDistanceThresholdSquared = 900;
+    protected final float labDistanceThresholdSquared = 300;
 
     private double averageXPosition;
     private double averageYPosition;
@@ -79,7 +81,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
     Mat originalImage = new Mat();
 
     public HueTrackingPipeline() {
-        this.setpointLab = new double[]{152, 135, 172};
+        this.setpointLab = new double[]{0, 135, 172};
         setpointLabScalar = new Scalar(this.setpointLab);
     }
 
@@ -104,9 +106,10 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         Mat CIELab = new Mat();
         Imgproc.cvtColor(input, CIELab, Imgproc.COLOR_RGB2Lab); // Color Isolation
         input.release();
-        centerColorLab = CIELab.get((int)rows/2, (int)cols/2);
 
-        CIELab.convertTo(CIELab, CvType.CV_32F);
+        CIELab.convertTo(CIELab, CV_32F);
+
+        centerColorLab = CIELab.get((int)rows/2, (int)cols/2);
 
         Mat subtracted = new Mat();
         Core.subtract(CIELab, setpointLabScalar, subtracted); // filtered - setpointLab
@@ -116,9 +119,23 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         Core.multiply(subtracted, subtracted, squared); // filtered^2
         subtracted.release();
 
+        List<Mat> channels = new ArrayList<Mat>();
+        Core.split(squared, channels);
+        squared.release();
+
+        channels.set(0, Mat.zeros(rows, cols, CV_32F));
+        Mat merged = new Mat();
+        Core.merge(channels, merged);
+
+        channels.get(0).release();
+        channels.get(1).release();
+        channels.get(2).release();
+
         // Add all channels
         Mat reduced = new Mat();
-        Core.reduce(squared.reshape(1, cols * rows), reduced, 1, Core.REDUCE_SUM);
+        Core.reduce(merged.reshape(1, cols * rows), reduced, 1, Core.REDUCE_SUM);
+        merged.release();
+
         Mat reshaped = reduced.reshape(1, rows); // This causes a memory leak but it doesn't cause any issues so eh
         reduced.release();
 
@@ -128,19 +145,13 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         range.convertTo(range, CvType.CV_8UC3); // Convert to byte before finding center for efficiency
 
         Mat denoise1 = new Mat();
-        Imgproc.morphologyEx(range, denoise1, Imgproc.MORPH_OPEN, new Mat()); // Denoise image
+        Imgproc.morphologyEx(range, denoise1, Imgproc.MORPH_OPEN, new Mat());
         range.release();
         Mat denoise2 = new Mat();
         Imgproc.morphologyEx(denoise1, denoise2, Imgproc.MORPH_CLOSE, new Mat());
         denoise1.release();
-        Mat denoise3 = new Mat();
-        Imgproc.morphologyEx(denoise2, denoise3, Imgproc.MORPH_ERODE, new Mat());
-        denoise2.release();
-        Mat denoise4 = new Mat();
-        Imgproc.morphologyEx(denoise3, denoise4, Imgproc.MORPH_DILATE, new Mat(), new Point(-1, -1), 2);
-        denoise3.release();
 
-        Moments m = Imgproc.moments(denoise4, true);
+        Moments m = Imgproc.moments(denoise2, true);
 
         double m10 = m.m10;
         double m01 = m.m01;
@@ -153,7 +164,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
         if(rectProc) {
             List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-            Imgproc.findContours(denoise4, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+            Imgproc.findContours(denoise2, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
             double maxArea = 0;
             Rect maxRect = new Rect();
@@ -169,7 +180,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
             largestRect = maxRect;
         }
 
-        //denoise4.release();
+        denoise2.release();
 
         if (renderLines) {
             if (rectProc) {
@@ -184,8 +195,6 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         if(video.isOpened()) {
             video.write(originalImage); // Save video frame
         }
-
-        denoise4.release();
 
         return originalImage;
     }

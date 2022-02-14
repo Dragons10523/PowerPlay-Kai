@@ -50,6 +50,11 @@ public class Ahi {
         leftA.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        rightA.setTargetPositionTolerance(80);
+        rightB.setTargetPositionTolerance(80);
+        leftA.setTargetPositionTolerance(80);
+        leftB.setTargetPositionTolerance(80);
+
         arm = hwmap.get(DcMotor.class, "arm");
         succc = hwmap.get(DcMotor.class, "intake");
         flup = hwmap.get(Servo.class, "flup");

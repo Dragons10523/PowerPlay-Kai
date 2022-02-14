@@ -41,14 +41,13 @@ public abstract class AbstractCalibrate extends LinearOpMode {
         }
 
         double[] centerColor = calibrationPipeline.getColor();
+
         int frame = 0;
         while(opModeIsActive()) {
             double[] color = calibrationPipeline.getColor();
-            centerColor[0] += color[0];
             centerColor[1] += color[1];
             centerColor[2] += color[2];
 
-            centerColor[0] /= 2;
             centerColor[1] /= 2;
             centerColor[2] /= 2;
 
@@ -61,6 +60,8 @@ public abstract class AbstractCalibrate extends LinearOpMode {
                 sleep(1);
             }
         }
+
+        centerColor[0] = 0;
 
         new File("/storage/emulated/0/FIRST/CalibrationData/").mkdirs();
 
