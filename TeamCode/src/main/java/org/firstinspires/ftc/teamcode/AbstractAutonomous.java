@@ -35,10 +35,18 @@ public abstract class AbstractAutonomous extends Control {
         setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         do {
-            double speed = Math.max(0.3, Math.abs(ahi.leftA.getCurrentPosition()-ticks)/400f);
+            double speed = Math.max(0.3, Math.abs(ahi.leftA.getCurrentPosition()-ticks)/600f);
             drive(speed, speed);
+
+            telemetry.addData("LA", ahi.leftA.getCurrentPosition());
+            telemetry.addData("LB", ahi.leftB.getCurrentPosition());
+            telemetry.addData("RA", ahi.rightA.getCurrentPosition());
+            telemetry.addData("RB", ahi.rightB.getCurrentPosition());
+            telemetry.addData("Target", ticks);
+            telemetry.update();
+
             sleep(10);
-        } while((ahi.leftA.isBusy() || ahi.leftB.isBusy() || ahi.rightA.isBusy() || ahi.rightB.isBusy()) && opModeIsActive());
+        } while(((ahi.leftA.isBusy() && ahi.leftB.isBusy()) || (ahi.rightA.isBusy() && ahi.rightB.isBusy())) && opModeIsActive());
 
         if(isStopRequested()) {
             zero();
