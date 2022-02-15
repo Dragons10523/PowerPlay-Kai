@@ -10,6 +10,8 @@ import androidx.core.app.ActivityCompat;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfFloat;
+import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
@@ -97,14 +99,17 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         int rows = input.rows();
         int cols = input.cols(); // Cache variables
 
+        Mat whiteBalanced = WhiteBalance.whiteBalance(input);
+        input.release();
+
         /**
          *         WARNING: OpenCV is cancerous and converts 8-bit CIELAB values like this:
          *         L <- L*255/100, a <- a + 128, b <- b + 128
          *         This will make the OpenCV Limits of all 3 values 0 <-> 255
          */
         Mat CIELab = new Mat();
-        Imgproc.cvtColor(input, CIELab, Imgproc.COLOR_RGB2Lab); // Color Isolation
-        input.release();
+        Imgproc.cvtColor(whiteBalanced, CIELab, Imgproc.COLOR_RGB2Lab); // Color Isolation
+        whiteBalanced.release();
 
         CIELab.convertTo(CIELab, CvType.CV_16F); // Floatify for upcoming calculations
         centerColorLab = CIELab.get((int)rows/2, (int)cols/2); // Get center color
@@ -117,17 +122,17 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         Core.multiply(subtracted, subtracted, squared); // filtered^2
         subtracted.release();
 
-        List<Mat> channels = new ArrayList<Mat>(); // Split image into L, a, and b channels
-        Core.split(squared, channels);
+        List<Mat> LABChannels = new ArrayList<Mat>(); // Split image into L, a, and b channels
+        Core.split(squared, LABChannels);
         squared.release();
 
-        channels.set(0, Mat.zeros(rows, cols, CvType.CV_16F)); // Set L channel to 0
+        LABChannels.set(0, Mat.zeros(rows, cols, CvType.CV_16F)); // Set L channel to 0
         Mat merged = new Mat();
-        Core.merge(channels, merged); // Merge the channels
+        Core.merge(LABChannels, merged); // Merge the channels
 
-        channels.get(0).release();
-        channels.get(1).release();
-        channels.get(2).release();
+        LABChannels.get(0).release();
+        LABChannels.get(1).release();
+        LABChannels.get(2).release();
 
         // Add all channels
         Mat reduced = new Mat();

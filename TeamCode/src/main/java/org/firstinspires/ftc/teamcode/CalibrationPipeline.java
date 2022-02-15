@@ -8,16 +8,19 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 public class CalibrationPipeline extends OpenCvPipeline {
-    Mat lab = new Mat();
-
     double[] centerColor;
     boolean ready = false;
 
     @Override
     public Mat processFrame(Mat input) {
-        Imgproc.GaussianBlur(input, input, new Size(9, 9), 0);
+        Mat whiteBalanced = WhiteBalance.whiteBalance(input);
+        input.release();
 
-        Imgproc.cvtColor(input, lab, Imgproc.COLOR_RGB2Lab);
+        Imgproc.GaussianBlur(whiteBalanced, whiteBalanced, new Size(9, 9), 0);
+
+        Mat lab = new Mat();
+        Imgproc.cvtColor(whiteBalanced, lab, Imgproc.COLOR_RGB2Lab);
+        whiteBalanced.release();
 
         int halfX = lab.cols()/2;
         int halfY = lab.rows()/3;
