@@ -24,13 +24,12 @@ import org.opencv.features2d.SimpleBlobDetector_Params;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.opencv.videoio.VideoWriter;
+import org.openftc.easyopencv.OpenCvInternalCamera2;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.opencv.core.CvType.CV_32F;
 
 /**
  * The CIELAB (L*a*b*) colorspace is being used because
@@ -107,9 +106,8 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         Imgproc.cvtColor(input, CIELab, Imgproc.COLOR_RGB2Lab); // Color Isolation
         input.release();
 
-        CIELab.convertTo(CIELab, CV_32F);
-
-        centerColorLab = CIELab.get((int)rows/2, (int)cols/2);
+        CIELab.convertTo(CIELab, CvType.CV_16F); // Floatify for upcoming calculations
+        centerColorLab = CIELab.get((int)rows/2, (int)cols/2); // Get center color
 
         Mat subtracted = new Mat();
         Core.subtract(CIELab, setpointLabScalar, subtracted); // filtered - setpointLab
@@ -119,13 +117,13 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         Core.multiply(subtracted, subtracted, squared); // filtered^2
         subtracted.release();
 
-        List<Mat> channels = new ArrayList<Mat>();
+        List<Mat> channels = new ArrayList<Mat>(); // Split image into L, a, and b channels
         Core.split(squared, channels);
         squared.release();
 
-        channels.set(0, Mat.zeros(rows, cols, CV_32F));
+        channels.set(0, Mat.zeros(rows, cols, CvType.CV_16F)); // Set L channel to 0
         Mat merged = new Mat();
-        Core.merge(channels, merged);
+        Core.merge(channels, merged); // Merge the channels
 
         channels.get(0).release();
         channels.get(1).release();
@@ -144,32 +142,32 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
         range.convertTo(range, CvType.CV_8UC3); // Convert to byte before finding center for efficiency
 
-        Mat denoise1 = new Mat();
+        Mat denoise1 = new Mat(); // Basic deniosing
         Imgproc.morphologyEx(range, denoise1, Imgproc.MORPH_OPEN, new Mat());
         range.release();
         Mat denoise2 = new Mat();
         Imgproc.morphologyEx(denoise1, denoise2, Imgproc.MORPH_CLOSE, new Mat());
         denoise1.release();
 
-        Moments m = Imgproc.moments(denoise2, true);
+        Moments m = Imgproc.moments(denoise2, true); // Caluclate the moments of the image
 
         double m10 = m.m10;
         double m01 = m.m01;
         m00 = m.m00;
 
-        double averageXPixelPosition = (m10 / m00);
+        double averageXPixelPosition = (m10 / m00); // Extract X and Y from moments
         double averageYPixelPosition = (m01 / m00);
-        averageXPosition = averageXPixelPosition / ((double) (cols)); // Map to a 0-1
+        averageXPosition = averageXPixelPosition / ((double) (cols)); // Map to UV space
         averageYPosition = averageYPixelPosition / ((double) (rows));
 
         if(rectProc) {
-            List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-            Imgproc.findContours(denoise2, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+            List<MatOfPoint> contours = new ArrayList<MatOfPoint>(); // Find image contours
+            Imgproc.findContours(denoise2, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
 
             double maxArea = 0;
             Rect maxRect = new Rect();
 
-            for (MatOfPoint contour : contours) {
+            for (MatOfPoint contour : contours) { // Sort for largest bounding box
                 Rect testRect = Imgproc.boundingRect(contour);
                 if (testRect.area() > maxArea) {
                     maxRect = testRect;
@@ -182,7 +180,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
         denoise2.release();
 
-        if (renderLines) {
+        if (renderLines) { // Render overlays
             if (rectProc) {
                 Imgproc.rectangle(originalImage, largestRect, lineColor);
             } else {
