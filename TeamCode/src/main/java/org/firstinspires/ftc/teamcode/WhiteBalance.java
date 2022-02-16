@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
@@ -27,9 +28,9 @@ public class WhiteBalance {
         Imgproc.calcHist(channels, new MatOfInt(1), new Mat(), blueHist, new MatOfInt(256), new MatOfFloat(0, 256));
         Imgproc.calcHist(channels, new MatOfInt(2), new Mat(), greenHist, new MatOfInt(256), new MatOfFloat(0, 256));
 
-        correctChannel(channels.get(0), redHist); // Correct each channel
-        correctChannel(channels.get(1), greenHist);
-        correctChannel(channels.get(2), blueHist);
+        channels.set(0, correctChannel(channels.get(0), redHist)); // Correct each channel
+        channels.set(1, correctChannel(channels.get(1), greenHist));
+        channels.set(2, correctChannel(channels.get(2), blueHist));
 
         Mat whiteBalanced = new Mat();
         Core.merge(channels, whiteBalanced); // Merge channels back
@@ -37,12 +38,12 @@ public class WhiteBalance {
         return whiteBalanced;
     }
 
-    private static void correctChannel(Mat channel, Mat hist) {
+    private static Mat correctChannel(Mat channel, Mat hist) {
         float[] histData = new float[(int) (hist.total())]; // Convert histogram matrix into an array
         hist.get(0, 0, histData);
 
-        for(int i = 0; i < 255; i++) { // Make historgram values cumulative
-            histData[i+1] = histData[i];
+        for(int i = 0; i < 254; i++) { // Make historgram values cumulative
+            histData[i+1] += histData[i];
         }
 
         int size = channel.rows() * channel.cols(); // Caching
@@ -52,8 +53,8 @@ public class WhiteBalance {
             min++;
         }
 
-        int max = 0;
-        while(histData[max] < 0.95 * size) { // Find the 5% brightest pixel value
+        int max = 255;
+        while(histData[max] > 0.95 * size) { // Find the 5% brightest pixel value
             max--;
         }
 
@@ -70,6 +71,6 @@ public class WhiteBalance {
         Core.multiply(subtracted, new Scalar(255f/(max-min)), scaled);
         subtracted.release();
 
-        channel = scaled; // Modify channel. This is the "return" statement
+        return scaled;
     }
 }
