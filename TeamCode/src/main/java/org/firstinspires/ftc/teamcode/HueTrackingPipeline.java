@@ -79,7 +79,6 @@ public class HueTrackingPipeline extends OpenCvPipeline {
     private boolean rectProc = false; // Use rectangle based processing
 
     private VideoWriter video = new VideoWriter();
-    Mat originalImage = new Mat();
 
     public HueTrackingPipeline() {
         this.setpointLab = new double[]{0, 135, 172};
@@ -93,7 +92,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
-        originalImage.release();
+        Mat originalImage = new Mat();
         originalImage = input.clone();
 
         int rows = input.rows();
@@ -109,9 +108,9 @@ public class HueTrackingPipeline extends OpenCvPipeline {
          */
         Mat CIELab = new Mat();
         Imgproc.cvtColor(whiteBalanced, CIELab, Imgproc.COLOR_RGB2Lab); // Color Isolation
-        whiteBalanced.release();
+        //whiteBalanced.release();
 
-        CIELab.convertTo(CIELab, CvType.CV_16F); // Floatify for upcoming calculations
+        CIELab.convertTo(CIELab, CvType.CV_32F); // Floatify for upcoming calculations
         centerColorLab = CIELab.get((int)rows/2, (int)cols/2); // Get center color
 
         Mat subtracted = new Mat();
@@ -126,7 +125,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         Core.split(squared, LABChannels);
         squared.release();
 
-        LABChannels.set(0, Mat.zeros(rows, cols, CvType.CV_16F)); // Set L channel to 0
+        LABChannels.set(0, Mat.zeros(rows, cols, LABChannels.get(0).type())); // Set L channel to 0
         Mat merged = new Mat();
         Core.merge(LABChannels, merged); // Merge the channels
 
@@ -196,10 +195,10 @@ public class HueTrackingPipeline extends OpenCvPipeline {
         isPipelineReady = true;
 
         if(video.isOpened()) {
-            video.write(originalImage); // Save video frame
+            video.write(whiteBalanced); // Save video frame
         }
 
-        return originalImage;
+        return whiteBalanced;
     }
 
     public Double getAverageXPosition() {
