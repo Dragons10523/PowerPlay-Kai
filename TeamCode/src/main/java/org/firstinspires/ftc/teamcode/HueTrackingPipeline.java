@@ -1,32 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.app.Application;
-import android.content.Context;
-import android.os.Environment;
-import android.renderscript.Matrix3f;
-
-import androidx.core.app.ActivityCompat;
-
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfFloat;
-import org.opencv.core.MatOfInt;
-import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
-import org.opencv.features2d.Feature2D;
-import org.opencv.features2d.Features2d;
-import org.opencv.features2d.SimpleBlobDetector;
-import org.opencv.features2d.SimpleBlobDetector_Params;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 import org.opencv.videoio.VideoWriter;
-import org.openftc.easyopencv.OpenCvInternalCamera2;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.io.File;
