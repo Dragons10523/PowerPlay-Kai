@@ -16,24 +16,28 @@ public class CalibrationPipeline extends OpenCvPipeline {
         Mat whiteBalanced = WhiteBalance.whiteBalance(input);
         input.release();
 
-        Imgproc.GaussianBlur(whiteBalanced, whiteBalanced, new Size(9, 9), 0);
+        Mat blurred = new Mat();
+        Imgproc.GaussianBlur(whiteBalanced, blurred, new Size(9, 9), 0);;
+        whiteBalanced.release();
 
         Mat lab = new Mat();
-        Imgproc.cvtColor(whiteBalanced, lab, Imgproc.COLOR_RGB2Lab);
-        whiteBalanced.release();
+        Imgproc.cvtColor(blurred, lab, Imgproc.COLOR_RGB2Lab);
+        //blurred.release();
 
         int halfX = lab.cols()/2;
         int halfY = lab.rows()/3;
 
         centerColor = lab.get(halfY, halfX);
 
+        lab.release();
+
         Scalar color = new Scalar(255, 255, 255);
-        Imgproc.line(lab, new Point(0, halfY), new Point(halfX*2, halfY), color);
-        Imgproc.line(lab, new Point(halfX, 0), new Point(halfX, halfY*3), color);
+        Imgproc.line(blurred, new Point(0, halfY), new Point(halfX*2, halfY), color);
+        Imgproc.line(blurred, new Point(halfX, 0), new Point(halfX, halfY*3), color);
 
         ready = true;
 
-        return lab;
+        return blurred;
     }
 
     public boolean isReady(){
