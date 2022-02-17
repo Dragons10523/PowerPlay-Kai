@@ -28,7 +28,8 @@ public abstract class AbstractCalibrate extends LinearOpMode {
 
             @Override
             public void onError(int errorCode) {
-
+                telemetry.addLine("Error code " + errorCode + " while opening the camera");
+                telemetry.update();
             }
         });
 
