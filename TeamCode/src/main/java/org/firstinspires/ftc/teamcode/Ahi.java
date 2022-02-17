@@ -4,9 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -34,7 +32,7 @@ public class Ahi {
 
     public Ahi(HardwareMap hwmap) {
         this.hwmap = hwmap;
-
+/*
         rightA = hwmap.get(DcMotorEx.class, "rightA");
         rightB = hwmap.get(DcMotorEx.class, "rightB");
         leftA = hwmap.get(DcMotorEx.class, "leftA");
@@ -69,7 +67,7 @@ public class Ahi {
 
         capLift = hwmap.get(DcMotor.class, "capLift");
 
-        ddr = hwmap.get(CRServo.class, "ddr");
+        ddr = hwmap.get(CRServo.class, "ddr");*/
 
         BNO055IMU.Parameters parameters             = new BNO055IMU.Parameters();
         parameters.angleUnit                        = BNO055IMU.AngleUnit.RADIANS;

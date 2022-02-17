@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
@@ -23,6 +22,7 @@ public class WhiteBalance {
 
         List<Mat> channels = new ArrayList<>(); // Split into channels
         Core.split(input, channels);
+        input.release();
 
         Imgproc.calcHist(channels, new MatOfInt(0), new Mat(), redHist, new MatOfInt(256), new MatOfFloat(0, 256)); // Get histograms for each channel
         Imgproc.calcHist(channels, new MatOfInt(1), new Mat(), blueHist, new MatOfInt(256), new MatOfFloat(0, 256));
@@ -32,17 +32,26 @@ public class WhiteBalance {
         channels.set(1, correctChannel(channels.get(1), greenHist));
         channels.set(2, correctChannel(channels.get(2), blueHist));
 
+        redHist.release();
+        greenHist.release();
+        blueHist.release();
+
         Mat whiteBalanced = new Mat();
         Core.merge(channels, whiteBalanced); // Merge channels back
+
+        channels.get(0).release();
+        channels.get(1).release();
+        channels.get(2).release();
 
         return whiteBalanced;
     }
 
     private static Mat correctChannel(Mat channel, Mat hist) {
-        float[] histData = new float[(int) (hist.total())]; // Convert histogram matrix into an array
+        float[] histData = new float[(int) (hist.total() * hist.channels())]; // Convert histogram matrix into an array
         hist.get(0, 0, histData);
+        hist.release();
 
-        for(int i = 0; i < 254; i++) { // Make historgram values cumulative
+        for(int i = 0; i < 254; i++) { // Make histogram values cumulative
             histData[i+1] += histData[i];
         }
 

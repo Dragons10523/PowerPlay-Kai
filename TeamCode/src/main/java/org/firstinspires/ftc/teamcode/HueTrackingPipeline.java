@@ -166,7 +166,7 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
         if(rectProc) {
             List<MatOfPoint> contours = new ArrayList<MatOfPoint>(); // Find image contours
-            Imgproc.findContours(denoise2, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
+            Imgproc.findContours(denoise2, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
             double maxArea = 0;
             Rect maxRect = new Rect();
@@ -186,9 +186,9 @@ public class HueTrackingPipeline extends OpenCvPipeline {
 
         if (renderLines) { // Render overlays
             if (rectProc) {
-                Imgproc.rectangle(originalImage, largestRect, lineColor);
+                Imgproc.rectangle(whiteBalanced, largestRect, lineColor);
             } else {
-                Imgproc.circle(originalImage, new Point(averageXPixelPosition, averageYPixelPosition), 7, lineColor, 2);
+                Imgproc.circle(whiteBalanced, new Point(averageXPixelPosition, averageYPixelPosition), 7, lineColor, 2);
             }
         }
 
