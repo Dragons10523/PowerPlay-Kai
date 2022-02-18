@@ -157,7 +157,7 @@ public abstract class AbstractBarcode extends AbstractAutonomous {
         ElapsedTime elapsedTime = new ElapsedTime();
 
         while(opModeIsActive()) {
-            if(timer.milliseconds() > 5000) {
+            if(timer.milliseconds() > 2000) {
                 drive(0, 0);
                 break;
             }
