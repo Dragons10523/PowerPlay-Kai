@@ -13,7 +13,11 @@ public abstract class AbstractVroom extends Control {
     boolean armWasManual = false;
     boolean wasDDR = false;
 
+    double leftRamp = 0;
+    double rightRamp = 0;
+
     ElapsedTime timeSinceDDR;
+    ElapsedTime deltaTimer;
 
     public void driveLoop() {
         double left = ahi.drivetrainReverse ? -gamepad1.right_stick_y : -gamepad1.left_stick_y;
@@ -22,9 +26,20 @@ public abstract class AbstractVroom extends Control {
         if(gamepad1.left_bumper || gamepad1.right_bumper) {
             left *= 0.6;
             right *= 0.6;
-        }
 
-        drive(left, right);
+            double dt = deltaTimer.seconds();
+            deltaTimer.reset();
+
+            rightRamp += (right - rightRamp) * 4 * dt;
+            leftRamp += (left - leftRamp) * 4 * dt;
+
+            drive(leftRamp, rightRamp);
+        } else {
+            leftRamp = left;
+            rightRamp = right;
+
+            drive(left, right);
+        }
     }
 
     public void run(FieldSide fieldSide) {
@@ -32,6 +47,7 @@ public abstract class AbstractVroom extends Control {
 
         final double fieldDir = (fieldSide == FieldSide.RED ? -1.0 : 1.0);
         timeSinceDDR = new ElapsedTime();
+        deltaTimer = new ElapsedTime();
 
         while(opModeIsActive()) {
             driveLoop();
@@ -90,7 +106,9 @@ public abstract class AbstractVroom extends Control {
                 lastButtonX = false;
                 armWasManual = true;
             } else if (armWasManual) {
-                ahi.arm.setPower(0);
+                ahi.arm.setTargetPosition(ahi.arm.getCurrentPosition());
+                ahi.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                ahi.arm.setPower(1);
                 armWasManual = false;
             }
 
