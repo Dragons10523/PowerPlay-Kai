@@ -32,7 +32,7 @@ public class Ahi {
 
     public Ahi(HardwareMap hwmap) {
         this.hwmap = hwmap;
-/*
+
         rightA = hwmap.get(DcMotorEx.class, "rightA");
         rightB = hwmap.get(DcMotorEx.class, "rightB");
         leftA = hwmap.get(DcMotorEx.class, "leftA");
@@ -67,7 +67,7 @@ public class Ahi {
 
         capLift = hwmap.get(DcMotor.class, "capLift");
 
-        ddr = hwmap.get(CRServo.class, "ddr");*/
+        ddr = hwmap.get(CRServo.class, "ddr");
 
         BNO055IMU.Parameters parameters             = new BNO055IMU.Parameters();
         parameters.angleUnit                        = BNO055IMU.AngleUnit.RADIANS;
