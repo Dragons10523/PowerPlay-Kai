@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -13,7 +16,10 @@ import org.openftc.easyopencv.OpenCvWebcam;
 
 public class Kai {
     public DcMotor frontLeft, frontRight, backLeft, backRight;
-    public DcMotor intake;
+
+    public DcMotor turntable, armLiftA, armLiftB;
+    public Servo claw, clawFlup;
+    public CRServo extendScrew, extendPinion;
 
     public BNO055IMU imu;
 
@@ -29,8 +35,20 @@ public class Kai {
         backLeft = hwmap.get(DcMotor.class, "backLeft");
         backRight = hwmap.get(DcMotor.class, "backRight");
 
+        frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        intake = hwmap.get(DcMotor.class, "intake");
+        turntable = hwmap.get(DcMotor.class, "turntable");
+        armLiftA = hwmap.get(DcMotor.class, "armLiftA");
+        armLiftB = hwmap.get(DcMotor.class, "armLiftB");
+
+        claw = hwmap.get(Servo.class, "claw");
+        clawFlup = hwmap.get(Servo.class, "clawFlup");
+
+        extendScrew = hwmap.get(CRServo.class, "extendScrew");
+        extendPinion = hwmap.get(CRServo.class, "extendPinion");
 
         BNO055IMU.Parameters parameters             = new BNO055IMU.Parameters();
         parameters.angleUnit                        = BNO055IMU.AngleUnit.RADIANS;
