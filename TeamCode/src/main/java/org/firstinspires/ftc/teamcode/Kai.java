@@ -76,6 +76,9 @@ public class Kai {
         turntable.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armLiftA.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armLiftB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turntable.setPower(1);
+        armLiftA.setPower(1);
+        armLiftB.setPower(1);
     }
 
     public double getHeading(){

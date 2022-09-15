@@ -20,6 +20,14 @@ public abstract class Control extends OpMode {
         CLOSED
     }
 
+    public enum LiftHeight {
+        HIGH,
+        MID,
+        LOW,
+        GROUND,
+        INTAKE
+    }
+
     @Override
     public void init() {
         this.kai = new Kai(hardwareMap);
@@ -67,6 +75,29 @@ public abstract class Control extends OpMode {
             default:
                 kai.claw.setPosition(1);
         }
+    }
+
+    public void lift(LiftHeight liftHeight) {
+        switch(liftHeight) {
+            case HIGH:
+                setLiftHeight(1000);
+                break;
+            case MID:
+                setLiftHeight(667);
+                break;
+            case LOW:
+                setLiftHeight(333);
+                break;
+            case GROUND:
+            case INTAKE:
+            default:
+                setLiftHeight(0);
+        }
+    }
+
+    public void setLiftHeight(int liftHeight) {
+        kai.armLiftA.setTargetPosition(liftHeight);
+        kai.armLiftB.setTargetPosition(liftHeight);
     }
 
     public void resetHeading() {
