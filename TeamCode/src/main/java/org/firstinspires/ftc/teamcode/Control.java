@@ -38,6 +38,7 @@ public abstract class Control extends OpMode {
         switch(mode) {
             case GLOBAL:
                 angle = kai.getHeading() + thetaAdjustment;
+                break;
             case LOCAL:
             default:
                 angle = 0;
