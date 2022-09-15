@@ -20,7 +20,8 @@ public abstract class Control extends OpMode {
         SLOW_REVERSE
     }
 
-    public void initialize() {
+    @Override
+    public void init() {
         this.kai = new Kai(hardwareMap);
     }
 
