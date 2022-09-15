@@ -15,12 +15,9 @@ public abstract class Control extends OpMode {
         LOCAL
     }
 
-    public enum IntakeValue {
-        ON,
-        OFF,
-        REVERSE,
-        SLOW,
-        SLOW_REVERSE
+    public enum ToggleState {
+        OPEN,
+        CLOSED
     }
 
     @Override
@@ -61,19 +58,13 @@ public abstract class Control extends OpMode {
         );
     }
 
-    public void intake(IntakeValue intakeValue) {
-        switch(intakeValue) {
-            case ON:
-                kai.intake.setPower(1);
-            case REVERSE:
-                kai.intake.setPower(-1);
-            case SLOW:
-                kai.intake.setPower(0.5);
-            case SLOW_REVERSE:
-                kai.intake.setPower(-0.5);
-            case OFF:
+    public void claw(ToggleState clawState) {
+        switch(clawState) {
+            case CLOSED:
+                kai.claw.setPosition(0);
+            case OPEN:
             default:
-                kai.intake.setPower(0);
+                kai.claw.setPosition(1);
         }
     }
 
