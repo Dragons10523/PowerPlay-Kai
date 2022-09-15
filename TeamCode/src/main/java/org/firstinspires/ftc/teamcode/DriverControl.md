@@ -12,5 +12,8 @@
   - Toggle turn assist
 - B Button:
   - Toggle drive assist
+- Back Button:
+  - Recalibrate orientation
+  - Must be aligned in the bottom left corner
 
 # Gamepad 2 (Manipulation)

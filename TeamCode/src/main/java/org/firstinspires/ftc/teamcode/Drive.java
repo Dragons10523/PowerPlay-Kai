@@ -23,6 +23,11 @@ public class Drive extends Control {
         aPrev = gamepad1.a;
         bPrev = gamepad1.b;
 
+        // Calibration
+        if(gamepad1.back) {
+            resetHeading();
+        }
+
         // Turning
         double turn = gamepad1.right_trigger - gamepad1.left_trigger;
         if(assistTurns) {
