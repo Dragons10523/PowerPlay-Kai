@@ -5,6 +5,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvWebcam;
 
@@ -26,6 +29,7 @@ public class Kai {
         backLeft = hwmap.get(DcMotor.class, "backLeft");
         backRight = hwmap.get(DcMotor.class, "backRight");
 
+
         intake = hwmap.get(DcMotor.class, "intake");
 
         BNO055IMU.Parameters parameters             = new BNO055IMU.Parameters();
@@ -40,5 +44,11 @@ public class Kai {
 
         WebcamName frontWebcamName = hwmap.get(WebcamName.class, "Front Camera");
         frontCamera = OpenCvCameraFactory.getInstance().createWebcam(frontWebcamName);
+    }
+
+    public double getHeading(){
+        return imu.getAngularOrientation(AxesReference.INTRINSIC,
+                AxesOrder.ZYX,
+                AngleUnit.RADIANS).firstAngle;
     }
 }
