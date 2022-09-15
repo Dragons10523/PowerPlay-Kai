@@ -5,6 +5,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 public abstract class Control extends OpMode {
     Kai kai;
 
+    final double TAU = Math.PI * 2;
+    final double HALF_PI = Math.PI / 2;
+
     double thetaAdjustment = 0;
 
     public enum DriveMode {
@@ -25,10 +28,6 @@ public abstract class Control extends OpMode {
         this.kai = new Kai(hardwareMap);
     }
 
-    public void resetHeading() {
-        thetaAdjustment = -kai.getHeading();
-    }
-
     public void drive(double flPower, double frPower, double blPower, double brPower) {
         kai.frontLeft.setPower(flPower);
         kai.frontRight.setPower(frPower);
@@ -38,18 +37,18 @@ public abstract class Control extends OpMode {
 
     public void mecanumDrive(double x, double y, double turn, DriveMode mode) {
         // Chose between global or local alignment
-        double theta;
+        double angle;
         switch(mode) {
             case GLOBAL:
-                theta = kai.getHeading() + thetaAdjustment;
+                angle = kai.getHeading() + thetaAdjustment;
             case LOCAL:
             default:
-                theta = 0;
+                angle = 0;
         }
 
-        // Rotation of axes to realign from theta
-        double xAligned = ((x * Math.cos(theta)) + (y * Math.sin(theta)));
-        double yAligned = ((x * (-Math.sin(theta))) + (y * Math.cos(theta)));
+        // Rotation of axes to realign from the angle
+        double xAligned = ((x * Math.cos(angle)) + (y * Math.sin(angle)));
+        double yAligned = ((x * (-Math.sin(angle))) + (y * Math.cos(angle)));
 
         // Calculate the correct motor powers
         double negPowers = (xAligned * 1 + yAligned * 1);
@@ -76,5 +75,25 @@ public abstract class Control extends OpMode {
             default:
                 kai.intake.setPower(0);
         }
+    }
+
+    public void resetHeading() {
+        thetaAdjustment = -kai.getHeading();
+    }
+
+    public double collapseAngle(double angle) {
+        return (((angle % TAU) + TAU) % TAU);
+    }
+
+    public double mapAngle(double angle, double offset) {
+        return mapAngle(angle, 0, TAU, offset);
+    }
+
+    public double mapAngle(double angle, double min, double max, double offset) {
+        return ((((angle + offset) - min) % max + max) % max) + min;
+    }
+
+    public double squaredHypotenuse(double x, double y) {
+        return ((x*x)+(y*y));
     }
 }
