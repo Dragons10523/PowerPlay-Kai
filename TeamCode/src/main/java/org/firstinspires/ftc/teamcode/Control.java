@@ -15,7 +15,7 @@ public abstract class Control extends OpMode {
         LOCAL
     }
 
-    public enum ToggleState {
+    public enum ClawState {
         OPEN,
         CLOSED
     }
@@ -59,7 +59,7 @@ public abstract class Control extends OpMode {
         );
     }
 
-    public void claw(ToggleState clawState) {
+    public void claw(ClawState clawState) {
         switch(clawState) {
             case CLOSED:
                 kai.claw.setPosition(0);
