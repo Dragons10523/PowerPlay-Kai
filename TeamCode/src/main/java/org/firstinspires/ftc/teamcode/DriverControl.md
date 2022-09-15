@@ -3,6 +3,7 @@
   - Drive the robot in the direction of the stick
     - Global mode: drives in the same direction regardless of orientation
     - Local mode: drives relative to the robot
+    - Mode controlled by assist mode, global in assist, local without
   - Assist: Column/Axis alignment
 - Triggers
   - Turn the robot
