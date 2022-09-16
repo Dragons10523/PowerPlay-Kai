@@ -12,8 +12,23 @@
   - Toggle turn assist
 - B Button:
   - Toggle drive assist
+
+# Gamepad 2 (Manipulation)
+- Assist Mode
+  - Y to raise
+  - X to grab
+    - Timed release when near target pole
+  - D-Pad to select a pole
+- Manual Mode
+  - Lift
+    - Y for high
+    - A for mid
+    - B for low
+    - X for intake
+  - Right bumper to toggle claw
+- Left Bumper to toggle assist mode
+
+# All
 - Back Button:
   - Recalibrate orientation
   - Must be aligned in the bottom left corner
-
-# Gamepad 2 (Manipulation)

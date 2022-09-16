@@ -1,27 +1,30 @@
 package org.firstinspires.ftc.teamcode;
 
 public class Drive extends Control {
+    // Assist values
     boolean assistDrive = true;
     boolean assistTurns = true;
+    boolean assistManipulator = true;
 
+    // Numerical values
     double assistTurnPower = 1;
 
-    boolean aPrev = false;
-    boolean bPrev = false;
+    // Prev values
+    boolean assistDrivePrev = false;
+    boolean assistTurnPrev = false;
+    boolean assistManipPrev = false;
+    boolean clawPrev = false;
 
     @Override
     public void loop() {
         // GAMEPAD1
         // Assist Toggles
-        if(gamepad1.a != aPrev && gamepad1.a) {
+        if(gamepad1.a != assistTurnPrev && gamepad1.a) {
             assistDrive = !assistDrive;
         }
-        if(gamepad1.b != bPrev && gamepad1.b) {
+        if(gamepad1.b != assistDrivePrev && gamepad1.b) {
             assistDrive = !assistDrive;
         }
-
-        aPrev = gamepad1.a;
-        bPrev = gamepad1.b;
 
         // Calibration
         if(gamepad1.back) {
@@ -57,5 +60,27 @@ public class Drive extends Control {
         }
 
         mecanumDrive(driveX, driveY, turn, driveMode);
+
+        // GAMEPAD2
+        if(gamepad2.left_bumper != assistManipPrev && gamepad2.left_bumper) {
+            assistManipulator = !assistManipulator;
+        }
+
+        // TODO: claw aim and release
+        boolean claw;
+        if(assistManipulator) {
+            claw = gamepad2.x;
+        } else {
+            claw = gamepad2.right_bumper;
+        }
+
+        if(claw != clawPrev && claw) {
+            toggleClaw();
+        }
+
+        assistTurnPrev = gamepad1.a;
+        assistDrivePrev = gamepad1.b;
+        assistManipPrev = gamepad2.left_bumper;
+        clawPrev = claw;
     }
 }

@@ -17,7 +17,7 @@ public abstract class Control extends OpMode {
 
     public enum ClawState {
         OPEN,
-        CLOSED
+        CLOSE
     }
 
     public enum LiftHeight {
@@ -69,11 +69,19 @@ public abstract class Control extends OpMode {
 
     public void claw(ClawState clawState) {
         switch(clawState) {
-            case CLOSED:
+            case CLOSE:
                 kai.claw.setPosition(0);
             case OPEN:
             default:
                 kai.claw.setPosition(1);
+        }
+    }
+
+    public void toggleClaw() {
+        if(kai.claw.getPosition() != 1) {
+            claw(ClawState.CLOSE);
+        } else {
+            claw(ClawState.OPEN);
         }
     }
 
