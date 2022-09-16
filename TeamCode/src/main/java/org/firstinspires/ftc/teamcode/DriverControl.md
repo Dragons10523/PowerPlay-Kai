@@ -26,6 +26,7 @@
     - B for low
     - X for intake
   - Right bumper to toggle claw
+  - Left Stick to aim
 - Left Bumper to toggle assist mode
 
 # All
