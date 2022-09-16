@@ -4,7 +4,7 @@ public class Drive extends Control {
     // Assist values
     boolean assistDrive = true;
     boolean assistTurns = true;
-    boolean assistManipulator = true;
+    boolean assistManipulator = false;
 
     // Numerical values
     double assistTurnPower = 1;
@@ -72,6 +72,16 @@ public class Drive extends Control {
             claw = gamepad2.x;
         } else {
             claw = gamepad2.right_bumper;
+
+            if(gamepad2.x) {
+                lift(LiftHeight.INTAKE);
+            } else if(gamepad2.y) {
+                lift(LiftHeight.HIGH);
+            } else if(gamepad2.a) {
+                lift(LiftHeight.MID);
+            } else if(gamepad2.b) {
+                lift(LiftHeight.LOW);
+            }
         }
 
         if(claw != clawPrev && claw) {
