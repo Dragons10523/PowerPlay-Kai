@@ -18,7 +18,7 @@ public class Kai {
     public DcMotor frontLeft, frontRight, backLeft, backRight;
 
     public DcMotor turntable, armLiftA, armLiftB;
-    public Servo claw, clawFlup;
+    public Servo claw, clawFlup, clawTwist;
     public CRServo extendScrew, extendPinion;
 
     public BNO055IMU imu;
@@ -42,6 +42,7 @@ public class Kai {
 
         claw = hwmap.get(Servo.class, "claw");
         clawFlup = hwmap.get(Servo.class, "clawFlup");
+        clawTwist = hwmap.get(Servo.class, "clawTwist");
 
         extendScrew = hwmap.get(CRServo.class, "extendScrew");
         extendPinion = hwmap.get(CRServo.class, "extendPinion");
