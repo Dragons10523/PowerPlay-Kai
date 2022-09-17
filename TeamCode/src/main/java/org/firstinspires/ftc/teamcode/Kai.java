@@ -15,6 +15,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 public class Kai {
+    // Also used for deadwheels. Use front motors for both y axis, back left for the x axis
     public DcMotor frontLeft, frontRight, backLeft, backRight;
 
     public DcMotor turntable, armLiftA, armLiftB;
@@ -23,7 +24,7 @@ public class Kai {
 
     public BNO055IMU imu;
 
-    OpenCvWebcam frontCamera;
+    public OpenCvWebcam frontCamera;
 
     public HardwareMap hwmap;
 
@@ -66,6 +67,15 @@ public class Kai {
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        turntable.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armLiftA.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armLiftB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Set up encoders
         turntable.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

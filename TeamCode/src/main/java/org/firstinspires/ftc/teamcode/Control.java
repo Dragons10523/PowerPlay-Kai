@@ -5,8 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 public abstract class Control extends OpMode {
     Kai kai;
 
-    final double TAU = Math.PI * 2;
-    final double HALF_PI = Math.PI / 2;
+    public static final double TAU = Math.PI * 2;
+    public static final double HALF_PI = Math.PI / 2;
 
     double thetaAdjustment = 0;
 

@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+@TeleOp(name = "Drive")
 public class Drive extends Control {
     // Assist values
     boolean assistDrive = true;
@@ -47,7 +50,7 @@ public class Drive extends Control {
 
             // TODO add auto alignment once dead wheels have been added
             // Deadzone for alignment
-            /*if(squaredHypotenuse(driveX, driveY) > 0.03) {
+            if(squaredHypotenuse(driveX, driveY) > 0.03) {
                 double driveAngle = collapseAngle(Math.atan2(driveY, driveX) + kai.getHeading());
                 int driveAlignment = ((int)(driveAngle / HALF_PI)) % 2;
 
@@ -56,7 +59,7 @@ public class Drive extends Control {
                 } else {
                     // Y aligned
                 }
-            }*/
+            }
         }
 
         mecanumDrive(driveX, driveY, turn, driveMode);
