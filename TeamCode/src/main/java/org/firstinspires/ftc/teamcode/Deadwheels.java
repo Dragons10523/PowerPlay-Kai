@@ -3,21 +3,21 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class Deadwheels {
-    private DcMotor leftYMotor;
-    private DcMotor rightYMotor;
-    private DcMotor XMotor;
+    private final DcMotor leftYMotor;
+    private final DcMotor rightYMotor;
+    private final DcMotor XMotor;
 
-    double symmetricCircumference;
-    double asymmetricCircumference;
-    double inchesPerTick;
+    private final double symmetricCircumference;
+    private final double asymmetricCircumference;
+    private final double inchesPerTick;
 
-    int leftYPosPrev;
-    int rightYPosPrev;
-    int XPosPrev;
+    private int leftYPosPrev;
+    private int rightYPosPrev;
+    private int XPosPrev;
 
-    double lastX;
-    double lastY;
-    double lastAngle;
+    double currentX;
+    double currentY;
+    double currentAngle;
 
     // All measurements in inches
     public Deadwheels(DcMotor leftYMotor, DcMotor rightYMotor, DcMotor XMotor, double lateralOffset, double forwardOffset, double inchesPerTick) {
@@ -30,9 +30,9 @@ public class Deadwheels {
     }
 
     public void setTransform(double x, double y, double angle) {
-        lastX = x;
-        lastY = y;
-        lastAngle = angle;
+        currentX = x;
+        currentY = y;
+        currentAngle = angle;
     }
 
     public void wheelLoop() {
@@ -52,13 +52,13 @@ public class Deadwheels {
         double robotXDelta = ((XDelta) * inchesPerTick) - robotTurnXDelta;
         double robotYDelta = (leftYDelta + rightYDelta) * Math.PI;
 
-        double updateAngle = lastAngle + (turnDelta / 2);
+        double updateAngle = currentAngle + (turnDelta / 2);
         double xGlobalDelta = Math.cos(updateAngle) * robotXDelta + Math.sin(updateAngle) * robotYDelta;
         double yGlobalDelta = -Math.sin(updateAngle) * robotXDelta + Math.cos(updateAngle) * robotYDelta;
 
-        lastX += xGlobalDelta;
-        lastY += yGlobalDelta;
-        lastAngle += turnDelta;
+        currentX += xGlobalDelta;
+        currentY += yGlobalDelta;
+        currentAngle += turnDelta;
 
         leftYPosPrev = leftYPos;
         rightYPosPrev = rightYPos;

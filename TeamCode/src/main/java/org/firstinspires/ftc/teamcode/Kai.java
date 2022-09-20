@@ -8,24 +8,22 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 public class Kai {
-    // Also used for deadwheels. Use front motors for both y axis, back left for the x axis
-    public DcMotor frontLeft, frontRight, backLeft, backRight;
+    // Also used for deadwheels. Use back motors for both y axis, front left for the x axis
+    public final DcMotor frontLeft, frontRight, backLeft, backRight;
 
-    public DcMotor turntable, armLiftA, armLiftB;
-    public Servo claw, clawFlup, clawTwist;
-    public CRServo extendScrew, extendPinion;
+    public final DcMotor turntable, armLiftA, armLiftB;
+    public final Servo claw, clawFlup, clawTwist;
+    public final CRServo extendScrew, extendPinion;
 
-    public BNO055IMU imu;
+    public final BNO055IMU imu;
 
     public OpenCvWebcam frontCamera;
 
+    public Deadwheels deadwheels;
     public HardwareMap hwmap;
 
     public Kai(HardwareMap hwmap) {
@@ -90,11 +88,14 @@ public class Kai {
         turntable.setPower(1);
         armLiftA.setPower(1);
         armLiftB.setPower(1);
+
+        deadwheels = new Deadwheels(backLeft, backRight, frontLeft, 7, 0, Math.PI/4096);
     }
 
     public double getHeading(){
-        return imu.getAngularOrientation(AxesReference.INTRINSIC,
+        /*return imu.getAngularOrientation(AxesReference.INTRINSIC,
                 AxesOrder.ZYX,
-                AngleUnit.RADIANS).firstAngle;
+                AngleUnit.RADIANS).firstAngle;*/
+        return deadwheels.currentAngle;
     }
 }
