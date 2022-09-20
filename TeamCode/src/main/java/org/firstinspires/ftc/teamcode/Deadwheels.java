@@ -15,9 +15,15 @@ public class Deadwheels {
     private int rightYPosPrev;
     private int XPosPrev;
 
+    private long lastUpdateTime;
+
     double currentX;
     double currentY;
     double currentAngle;
+
+    double xVelocity;
+    double yVelocity;
+    double angularVelocity;
 
     // All measurements in inches
     public Deadwheels(DcMotor leftYMotor, DcMotor rightYMotor, DcMotor XMotor, double lateralOffset, double forwardOffset, double inchesPerTick) {
@@ -27,6 +33,7 @@ public class Deadwheels {
         this.symmetricCircumference = Control.TAU * lateralOffset;
         this.asymmetricCircumference = Control.TAU * forwardOffset;
         this.inchesPerTick = inchesPerTick;
+        lastUpdateTime = -1;
     }
 
     public void setTransform(double x, double y, double angle) {
@@ -55,6 +62,16 @@ public class Deadwheels {
         double updateAngle = currentAngle + (turnDelta / 2);
         double xGlobalDelta = Math.cos(updateAngle) * robotXDelta + Math.sin(updateAngle) * robotYDelta;
         double yGlobalDelta = -Math.sin(updateAngle) * robotXDelta + Math.cos(updateAngle) * robotYDelta;
+
+        // Calculate velocities
+        long currentUpdateTime = System.currentTimeMillis();
+        if(lastUpdateTime != -1) {
+            double deltaTime = (lastUpdateTime - currentUpdateTime) / 1000f;
+            xVelocity = xGlobalDelta / deltaTime;
+            yVelocity = yGlobalDelta / deltaTime;
+            angularVelocity = turnDelta / deltaTime;
+        }
+        lastUpdateTime = currentUpdateTime;
 
         currentX += xGlobalDelta;
         currentY += yGlobalDelta;
