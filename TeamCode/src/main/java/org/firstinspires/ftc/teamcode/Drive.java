@@ -11,6 +11,7 @@ public class Drive extends Control {
 
     // Numerical values
     double assistTurnPower = 1;
+    double assistDrivePower = 0.7;
 
     // Prev values
     boolean assistDrivePrev = false;
@@ -48,7 +49,6 @@ public class Drive extends Control {
         if(assistDrive) {
             driveMode = DriveMode.GLOBAL;
 
-            // TODO add auto alignment once dead wheels have been added
             // Deadzone for alignment
             if(squaredHypotenuse(driveX, driveY) > 0.03) {
                 double driveAngle = collapseAngle(Math.atan2(driveY, driveX) + kai.getHeading());
@@ -56,8 +56,10 @@ public class Drive extends Control {
 
                 if(driveAlignment == 0) {
                     // X aligned
+                    driveY += (12 - (kai.deadwheels.currentY % 24)) * assistDrivePower;
                 } else {
                     // Y aligned
+                    driveX += (12 - (kai.deadwheels.currentX % 24)) * assistDrivePower;
                 }
             }
         }
