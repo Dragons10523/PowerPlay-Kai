@@ -93,7 +93,7 @@ public class Drive extends Control {
             }
 
             directionPrev = gamepad2.dpad_up || gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right;
-            
+
             for(int i = 0; i < 5; i++) {
                 StringBuilder line = new StringBuilder();
                 for(int j = 0; j < 5; j++) {
@@ -117,6 +117,8 @@ public class Drive extends Control {
                         case HIGH:
                             line.append("H");
                             break;
+                        default:
+                            line.append(" ");
                     }
                 }
                 telemetry.addLine(line.toString());
@@ -125,7 +127,7 @@ public class Drive extends Control {
             claw = gamepad2.right_bumper;
 
             if(gamepad2.x) {
-                lift(GoalHeight.INTAKE);
+                lift(GoalHeight.NONE);
             } else if(gamepad2.y) {
                 lift(GoalHeight.HIGH);
             } else if(gamepad2.a) {

@@ -25,7 +25,7 @@ public abstract class Control extends OpMode {
         MID,
         LOW,
         GROUND,
-        INTAKE
+        NONE
     }
 
     public static final GoalHeight[] FIELD_SETUP = {
@@ -105,7 +105,7 @@ public abstract class Control extends OpMode {
                 setLiftHeight(333);
                 break;
             case GROUND:
-            case INTAKE:
+            case NONE:
             default:
                 setLiftHeight(0);
         }
