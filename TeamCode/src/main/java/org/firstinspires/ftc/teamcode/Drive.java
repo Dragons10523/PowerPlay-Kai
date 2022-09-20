@@ -12,12 +12,14 @@ public class Drive extends Control {
     // Numerical values
     double assistTurnPower = 1;
     double assistDrivePower = 0.7;
+    int selectedPole = 12;
 
     // Prev values
     boolean assistDrivePrev = false;
     boolean assistTurnPrev = false;
     boolean assistManipPrev = false;
     boolean clawPrev = false;
+    boolean directionPrev = false;
 
     @Override
     public void loop() {
@@ -75,23 +77,69 @@ public class Drive extends Control {
         boolean claw;
         if(assistManipulator) {
             claw = gamepad2.x;
+
+            if(!directionPrev) {
+                if(gamepad2.dpad_up) {
+                    selectedPole -= 5;
+                } else if(gamepad2.dpad_down) {
+                    selectedPole += 5;
+                } else if(gamepad2.dpad_left) {
+                    selectedPole -= 1;
+                } else if(gamepad2.dpad_right) {
+                    selectedPole += 1;
+                }
+
+                selectedPole %= 25;
+            }
+
+            directionPrev = gamepad2.dpad_up || gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right;
+            
+            for(int i = 0; i < 5; i++) {
+                StringBuilder line = new StringBuilder();
+                for(int j = 0; j < 5; j++) {
+                    int index = i * 5 + j;
+
+                    if(index == selectedPole) {
+                        line.append("*");
+                        continue;
+                    }
+
+                    switch(FIELD_SETUP[index]) {
+                        case GROUND:
+                            line.append("G");
+                            break;
+                        case LOW:
+                            line.append("L");
+                            break;
+                        case MID:
+                            line.append("M");
+                            break;
+                        case HIGH:
+                            line.append("H");
+                            break;
+                    }
+                }
+                telemetry.addLine(line.toString());
+            }
         } else {
             claw = gamepad2.right_bumper;
 
             if(gamepad2.x) {
-                lift(LiftHeight.INTAKE);
+                lift(GoalHeight.INTAKE);
             } else if(gamepad2.y) {
-                lift(LiftHeight.HIGH);
+                lift(GoalHeight.HIGH);
             } else if(gamepad2.a) {
-                lift(LiftHeight.MID);
+                lift(GoalHeight.MID);
             } else if(gamepad2.b) {
-                lift(LiftHeight.LOW);
+                lift(GoalHeight.LOW);
             }
         }
 
         if(claw != clawPrev && claw) {
             toggleClaw();
         }
+
+        telemetry.update();
 
         assistTurnPrev = gamepad1.a;
         assistDrivePrev = gamepad1.b;

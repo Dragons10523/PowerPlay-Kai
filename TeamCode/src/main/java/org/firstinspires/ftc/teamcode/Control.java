@@ -20,13 +20,21 @@ public abstract class Control extends OpMode {
         CLOSE
     }
 
-    public enum LiftHeight {
+    public enum GoalHeight {
         HIGH,
         MID,
         LOW,
         GROUND,
         INTAKE
     }
+
+    public static final GoalHeight[] FIELD_SETUP = {
+            GoalHeight.GROUND,GoalHeight.LOW, GoalHeight.GROUND,GoalHeight.LOW, GoalHeight.GROUND,
+            GoalHeight.LOW,   GoalHeight.MID, GoalHeight.HIGH,  GoalHeight.MID, GoalHeight.LOW,
+            GoalHeight.GROUND,GoalHeight.HIGH,GoalHeight.GROUND,GoalHeight.HIGH,GoalHeight.GROUND,
+            GoalHeight.LOW,   GoalHeight.MID, GoalHeight.HIGH,  GoalHeight.MID, GoalHeight.LOW,
+            GoalHeight.GROUND,GoalHeight.LOW, GoalHeight.GROUND,GoalHeight.LOW, GoalHeight.GROUND
+    };
 
     @Override
     public void init() {
@@ -85,7 +93,7 @@ public abstract class Control extends OpMode {
         }
     }
 
-    public void lift(LiftHeight liftHeight) {
+    public void lift(GoalHeight liftHeight) {
         switch(liftHeight) {
             case HIGH:
                 setLiftHeight(1000);
