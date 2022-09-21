@@ -93,9 +93,6 @@ public class Kai {
     }
 
     public double getHeading(){
-        /*return imu.getAngularOrientation(AxesReference.INTRINSIC,
-                AxesOrder.ZYX,
-                AngleUnit.RADIANS).firstAngle;*/
         return deadwheels.currentAngle;
     }
 }
