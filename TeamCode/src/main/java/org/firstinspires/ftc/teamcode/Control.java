@@ -11,9 +11,11 @@ public abstract class Control extends OpMode {
     public static final double HALF_PI = Math.PI / 2;
 
     // TODO: Calculate the proper angle to ticks value
-    public static final double TURNTABLE_RAD_TO_TICK = 100;
+    public static final double TURNTABLE_TICKS_PER_RAD = 100;
 
     double thetaAdjustment = 0;
+    // TODO: Find the proper claw extension distance
+    double clawExtension = 10;
 
     public enum DriveMode {
         GLOBAL,
@@ -141,11 +143,40 @@ public abstract class Control extends OpMode {
 
     public void aimClaw(double angle) {
         angle = collapseAngle(angle);
-        kai.turntable.setTargetPosition((int) (angle * TURNTABLE_RAD_TO_TICK));
+        kai.turntable.setTargetPosition((int) (angle * TURNTABLE_TICKS_PER_RAD));
     }
 
-    public double clawAngle() {
-        return kai.turntable.getCurrentPosition() / TURNTABLE_RAD_TO_TICK;
+    public double tableAngle() {
+        return collapseAngle(kai.turntable.getCurrentPosition() / TURNTABLE_TICKS_PER_RAD);
+    }
+
+    public double tableVel() {
+        return kai.turntable.getVelocity() / TURNTABLE_TICKS_PER_RAD;
+    }
+
+    public boolean willConeHit() {
+        double xVel = kai.deadwheels.xVelocity;
+        double yVel = kai.deadwheels.yVelocity;
+        double xPos = kai.deadwheels.currentX;
+        double yPos = kai.deadwheels.currentY;
+
+        double clawAngle = collapseAngle(-kai.deadwheels.currentAngle + tableAngle());
+        double clawRotVel = kai.deadwheels.angularVelocity + tableVel();
+
+        double clawXVel = Math.cos(clawAngle) * clawRotVel * TAU * clawExtension;
+        double clawYVel = -Math.sin(clawAngle) * clawRotVel * TAU * clawExtension;
+        xVel += ((clawXVel * Math.cos(clawAngle)) + (clawYVel * Math.sin(clawAngle)));
+        yVel += ((clawXVel * (-Math.sin(clawAngle))) + (clawYVel * Math.cos(clawAngle)));
+
+        double clawXPos = Math.cos(clawAngle) * TAU * clawExtension;
+        double clawYPos = -Math.sin(clawAngle) * TAU * clawExtension;
+        xPos += ((clawXPos * Math.cos(clawAngle)) + (clawYPos * Math.sin(clawAngle)));
+        yPos += ((clawXPos * -Math.sin(clawAngle)) + (clawYPos * Math.cos(clawAngle)));
+
+        double hitX = xPos + xVel * 0.1;
+        double hitY = yPos + yVel * 0.1;
+
+        return squaredHypotenuse(hitX, hitY) <= 0.6;
     }
 
     public void setLiftHeight(int liftHeight) {

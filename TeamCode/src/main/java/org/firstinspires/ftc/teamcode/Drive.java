@@ -83,6 +83,9 @@ public class Drive extends Control {
             if(clawOpen && gamepad2.x && clawDistance() <= 1.5) {
                 clawOpen = false;
             }
+            if(!clawOpen && gamepad2.x && willConeHit()) {
+                clawOpen = true;
+            }
 
             if(clawOpen != clawOpen()) {
                 toggleClaw();
@@ -118,7 +121,7 @@ public class Drive extends Control {
             GoalHeight poleHeight = FIELD_SETUP[selectedPole];
 
             wantToLower = false;
-            if(Math.abs(clawAngle() % Math.PI) <= 0.06) {
+            if(Math.abs(tableAngle() % Math.PI) <= 0.06) {
                 lift(poleHeight);
             } else {
                 switch(poleHeight) {

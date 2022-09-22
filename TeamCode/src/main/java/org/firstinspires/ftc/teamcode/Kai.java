@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -18,7 +19,8 @@ public class Kai {
     // Also used for deadwheels. Use back motors for both y axis, front left for the x axis
     public final DcMotor frontLeft, frontRight, backLeft, backRight;
 
-    public final DcMotor turntable, armLiftA, armLiftB;
+    public final DcMotorEx turntable;
+    public final DcMotor armLiftA, armLiftB;
     public final Servo claw, clawFlup, clawTwist;
     public final CRServo extendScrew, extendPinion;
 
@@ -40,7 +42,7 @@ public class Kai {
         backLeft = hwmap.get(DcMotor.class, "backLeft");
         backRight = hwmap.get(DcMotor.class, "backRight");
 
-        turntable = hwmap.get(DcMotor.class, "turntable");
+        turntable = hwmap.get(DcMotorEx.class, "turntable");
         armLiftA = hwmap.get(DcMotor.class, "armLiftA");
         armLiftB = hwmap.get(DcMotor.class, "armLiftB");
 
