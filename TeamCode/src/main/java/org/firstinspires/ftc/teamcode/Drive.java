@@ -7,7 +7,7 @@ public class Drive extends Control {
     // Assist values
     boolean assistDrive = true;
     boolean assistTurns = true;
-    boolean assistManipulator = false;
+    boolean assistManipulator = true;
 
     // Numerical values
     double assistTurnPower = 1;
