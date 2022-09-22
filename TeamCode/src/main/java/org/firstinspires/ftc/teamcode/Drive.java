@@ -38,6 +38,7 @@ public class Drive extends Control {
         // Calibration
         if(gamepad1.back) {
             resetHeading();
+            kai.deadwheels.setTransform(0, 0, 0);
         }
 
         // Turning
