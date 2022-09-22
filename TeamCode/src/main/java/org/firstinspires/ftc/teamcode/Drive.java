@@ -77,10 +77,16 @@ public class Drive extends Control {
             assistManipulator = !assistManipulator;
         }
 
-        // TODO: claw aim and release
-        boolean claw;
+        boolean manualClaw = gamepad2.right_bumper;
         if(assistManipulator) {
-            claw = gamepad2.x;
+            boolean clawOpen = clawOpen();
+            if(clawOpen && gamepad2.x && clawDistance() <= 1.5) {
+                clawOpen = false;
+            }
+
+            if(clawOpen != clawOpen()) {
+                toggleClaw();
+            }
 
             // Pole Selection
             if(!directionPrev) {
@@ -125,10 +131,7 @@ public class Drive extends Control {
                         lift(poleHeight);
                 }
             }
-
         } else {
-            claw = gamepad2.right_bumper;
-
             if(gamepad2.x) {
                 lift(GoalHeight.NONE);
             } else if(gamepad2.y) {
@@ -138,10 +141,10 @@ public class Drive extends Control {
             } else if(gamepad2.b) {
                 lift(GoalHeight.LOW);
             }
-        }
 
-        if(claw != clawPrev && claw) {
-            toggleClaw();
+            if(manualClaw != clawPrev && manualClaw) {
+                toggleClaw();
+            }
         }
 
         telemetry.update();
@@ -149,7 +152,7 @@ public class Drive extends Control {
         assistTurnPrev = gamepad1.a;
         assistDrivePrev = gamepad1.b;
         assistManipPrev = gamepad2.left_bumper;
-        clawPrev = claw;
+        clawPrev = manualClaw;
     }
 
     public void displayField() {

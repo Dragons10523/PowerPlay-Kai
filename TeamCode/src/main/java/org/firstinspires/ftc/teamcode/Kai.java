@@ -4,8 +4,11 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.SwitchableLight;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -18,6 +21,8 @@ public class Kai {
     public final DcMotor turntable, armLiftA, armLiftB;
     public final Servo claw, clawFlup, clawTwist;
     public final CRServo extendScrew, extendPinion;
+
+    public final DistanceSensor clawSensor;
 
     public final BNO055IMU imu;
 
@@ -45,6 +50,8 @@ public class Kai {
 
         extendScrew = hwmap.get(CRServo.class, "extendScrew");
         extendPinion = hwmap.get(CRServo.class, "extendPinion");
+
+        clawSensor = hwmap.get(DistanceSensor.class, "clawSensor");
 
         // Set up IMU parameters
         BNO055IMU.Parameters parameters             = new BNO055IMU.Parameters();

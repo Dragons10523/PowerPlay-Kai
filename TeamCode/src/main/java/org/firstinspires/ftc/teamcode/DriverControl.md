@@ -17,6 +17,7 @@
 - Assist Mode
   - Y to raise
   - X to grab
+    - Timed grab with distance sensor
     - Timed release when near target pole
   - D-Pad to select a pole
 - Manual Mode

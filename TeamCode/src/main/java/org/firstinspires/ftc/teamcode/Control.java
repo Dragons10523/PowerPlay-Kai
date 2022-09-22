@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 public abstract class Control extends OpMode {
     Kai kai;
 
@@ -89,11 +91,19 @@ public abstract class Control extends OpMode {
     }
 
     public void toggleClaw() {
-        if(kai.claw.getPosition() != 1) {
+        if(!clawOpen()) {
             claw(ClawState.CLOSE);
         } else {
             claw(ClawState.OPEN);
         }
+    }
+
+    public boolean clawOpen() {
+        return kai.claw.getPosition() != 0;
+    }
+
+    public double clawDistance() {
+        return kai.clawSensor.getDistance(DistanceUnit.INCH);
     }
 
     public void lift(GoalHeight liftHeight) {
