@@ -79,18 +79,6 @@ public class Drive extends Control {
 
         boolean manualClaw = gamepad2.right_bumper;
         if(assistManipulator) {
-            boolean clawOpen = clawOpen();
-            if(clawOpen && gamepad2.x && clawDistance() <= 1.5) {
-                clawOpen = false;
-            }
-            if(!clawOpen && gamepad2.x && willConeHit()) {
-                clawOpen = true;
-            }
-
-            if(clawOpen != clawOpen()) {
-                toggleClaw();
-            }
-
             // Pole Selection
             if(!directionPrev) {
                 if(gamepad2.dpad_up) {
@@ -104,6 +92,18 @@ public class Drive extends Control {
                 }
 
                 selectedPole %= 25;
+            }
+
+            boolean clawOpen = clawOpen();
+            if(clawOpen && gamepad2.x && clawDistance() <= 1.5) {
+                clawOpen = false;
+            }
+            if(!clawOpen && gamepad2.x && willConeHit(selectedPole)) {
+                clawOpen = true;
+            }
+
+            if(clawOpen != clawOpen()) {
+                toggleClaw();
             }
 
             directionPrev = gamepad2.dpad_up || gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right;

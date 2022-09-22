@@ -154,7 +154,7 @@ public abstract class Control extends OpMode {
         return kai.turntable.getVelocity() / TURNTABLE_TICKS_PER_RAD;
     }
 
-    public boolean willConeHit() {
+    public boolean willConeHit(int poleIndex) {
         double xVel = kai.deadwheels.xVelocity;
         double yVel = kai.deadwheels.yVelocity;
         double xPos = kai.deadwheels.currentX;
@@ -173,8 +173,15 @@ public abstract class Control extends OpMode {
         xPos += ((clawXPos * Math.cos(clawAngle)) + (clawYPos * Math.sin(clawAngle)));
         yPos += ((clawXPos * -Math.sin(clawAngle)) + (clawYPos * Math.cos(clawAngle)));
 
-        double hitX = xPos + xVel * 0.1;
-        double hitY = yPos + yVel * 0.1;
+        int poleXIndex = poleIndex % 5;
+        int poleYIndex = poleIndex / 5;
+        poleYIndex = 4 - poleYIndex;
+
+        double poleX = (poleXIndex + 1) * 24;
+        double poleY = (poleYIndex + 1) * 24;
+
+        double hitX = xPos + xVel * 0.1 - poleX;
+        double hitY = yPos + yVel * 0.1 - poleY;
 
         return squaredHypotenuse(hitX, hitY) <= 0.6;
     }
