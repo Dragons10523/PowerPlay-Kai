@@ -8,6 +8,9 @@ public abstract class Control extends OpMode {
     public static final double TAU = Math.PI * 2;
     public static final double HALF_PI = Math.PI / 2;
 
+    // TODO: Calculate the proper angle to ticks value
+    public static final double TURNTABLE_RAD_TO_TICK = 100;
+
     double thetaAdjustment = 0;
 
     public enum DriveMode {
@@ -109,6 +112,30 @@ public abstract class Control extends OpMode {
             default:
                 setLiftHeight(0);
         }
+    }
+
+    public void aimClaw(int poleIndex) {
+        int poleXIndex = poleIndex % 5;
+        int poleYIndex = poleIndex / 5;
+        poleYIndex = 4 - poleYIndex;
+
+        double poleX = (poleXIndex + 1) * 24;
+        double poleY = (poleYIndex + 1) * 24;
+
+        aimClaw(Math.atan2(
+                poleY - kai.deadwheels.currentY,
+                poleX - kai.deadwheels.currentX)
+                - kai.getHeading()
+        );
+    }
+
+    public void aimClaw(double angle) {
+        angle = collapseAngle(angle);
+        kai.turntable.setTargetPosition((int) (angle * TURNTABLE_RAD_TO_TICK));
+    }
+
+    public double clawAngle() {
+        return kai.turntable.getCurrentPosition() / TURNTABLE_RAD_TO_TICK;
     }
 
     public void setLiftHeight(int liftHeight) {

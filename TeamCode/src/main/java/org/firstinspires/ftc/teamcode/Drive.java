@@ -21,6 +21,9 @@ public class Drive extends Control {
     boolean clawPrev = false;
     boolean directionPrev = false;
 
+    // Other
+    boolean wantToLower = false;
+
     @Override
     public void loop() {
         // GAMEPAD1
@@ -78,6 +81,7 @@ public class Drive extends Control {
         if(assistManipulator) {
             claw = gamepad2.x;
 
+            // Pole Selection
             if(!directionPrev) {
                 if(gamepad2.dpad_up) {
                     selectedPole -= 5;
@@ -94,35 +98,33 @@ public class Drive extends Control {
 
             directionPrev = gamepad2.dpad_up || gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right;
 
-            for(int i = 0; i < 5; i++) {
-                StringBuilder line = new StringBuilder();
-                for(int j = 0; j < 5; j++) {
-                    int index = i * 5 + j;
-
-                    if(index == selectedPole) {
-                        line.append("*");
-                        continue;
-                    }
-
-                    switch(FIELD_SETUP[index]) {
-                        case GROUND:
-                            line.append("G");
-                            break;
-                        case LOW:
-                            line.append("L");
-                            break;
-                        case MID:
-                            line.append("M");
-                            break;
-                        case HIGH:
-                            line.append("H");
-                            break;
-                        default:
-                            line.append(" ");
-                    }
-                }
-                telemetry.addLine(line.toString());
+            // TODO: Replace 350 with the wall height
+            if(kai.armLiftA.getTargetPosition() > 350 && kai.armLiftA.getCurrentPosition() > 350 && !wantToLower) {
+                aimClaw(selectedPole);
+            } else {
+                aimClaw(0);
             }
+
+            displayField();
+
+            // Raising the claw
+            GoalHeight poleHeight = FIELD_SETUP[selectedPole];
+
+            wantToLower = false;
+            if(Math.abs(clawAngle() % Math.PI) <= 0.06) {
+                lift(poleHeight);
+            } else {
+                switch(poleHeight) {
+                    case GROUND:
+                    case LOW:
+                    case NONE:
+                        aimClaw(0);
+                        wantToLower = true;
+                    default:
+                        lift(poleHeight);
+                }
+            }
+
         } else {
             claw = gamepad2.right_bumper;
 
@@ -147,5 +149,38 @@ public class Drive extends Control {
         assistDrivePrev = gamepad1.b;
         assistManipPrev = gamepad2.left_bumper;
         clawPrev = claw;
+    }
+
+    public void displayField() {
+        for(int i = 0; i < 5; i++) {
+            StringBuilder line = new StringBuilder();
+            for(int j = 0; j < 5; j++) {
+                int index = i * 5 + j;
+
+                if(index == selectedPole) {
+                    line.append("*");
+                    continue;
+                }
+
+                switch(FIELD_SETUP[index]) {
+                    case GROUND:
+                        line.append("G");
+                        break;
+                    case LOW:
+                        line.append("L");
+                        break;
+                    case MID:
+                        line.append("M");
+                        break;
+                    case HIGH:
+                        line.append("H");
+                        break;
+                    default:
+                        line.append(" ");
+                }
+            }
+
+            telemetry.addLine(line.toString());
+        }
     }
 }
