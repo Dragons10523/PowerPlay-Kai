@@ -134,10 +134,24 @@ public abstract class Control extends OpMode {
         double poleX = (poleXIndex + 1) * 24;
         double poleY = (poleYIndex + 1) * 24;
 
+        // RC means robot centered
+        double poleXRC = poleX - kai.deadwheels.currentX;
+        double poleYRC = poleY - kai.deadwheels.currentY;
+
+        double velX = kai.deadwheels.xVelocity;
+        double velY = kai.deadwheels.yVelocity;
+
+        double targetX = poleXRC - velX;
+        double targetY = poleYRC - velY;
+
+        double currentAngle = kai.getHeading();
+
+        double robotX = Math.cos(currentAngle) * targetX + Math.sin(currentAngle) * targetY;
+        double robotY = -Math.sin(currentAngle) * targetX + Math.cos(currentAngle) * targetY;
+
         aimClaw(Math.atan2(
-                poleY - kai.deadwheels.currentY,
-                poleX - kai.deadwheels.currentX)
-                - kai.getHeading()
+                robotX,
+                robotY)
         );
     }
 
