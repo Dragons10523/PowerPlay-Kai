@@ -14,8 +14,6 @@ public abstract class Control extends OpMode {
     public static final double TURNTABLE_TICKS_PER_RAD = 100;
 
     double thetaAdjustment = 0;
-    // TODO: Find the proper claw extension distance
-    double clawExtension = 10;
 
     public enum DriveMode {
         GLOBAL,
@@ -131,6 +129,7 @@ public abstract class Control extends OpMode {
         int poleYIndex = poleIndex / 5;
         poleYIndex = 4 - poleYIndex;
 
+        // Calculate the pole position
         double poleX = (poleXIndex + 1) * 24;
         double poleY = (poleYIndex + 1) * 24;
 
@@ -141,18 +140,27 @@ public abstract class Control extends OpMode {
         double velX = kai.deadwheels.xVelocity;
         double velY = kai.deadwheels.yVelocity;
 
+        // Calculate the position to target in field space
         double targetX = poleXRC - velX;
         double targetY = poleYRC - velY;
 
         double currentAngle = kai.getHeading();
 
+        // Convert the target position from field space to robot space
         double robotX = Math.cos(currentAngle) * targetX + Math.sin(currentAngle) * targetY;
         double robotY = -Math.sin(currentAngle) * targetX + Math.cos(currentAngle) * targetY;
 
-        aimClaw(Math.atan2(
-                robotX,
-                robotY)
-        );
+        double targetAngle = Math.atan2(robotX, robotY);
+
+        int flipValues = 1;
+        if(Math.abs(mapAngle(targetAngle - tableAngle(), 0)) > 95) {
+            flipValues = -1;
+        }
+
+        // Set the extension distance
+        setExtensionDistance(flipValues * Math.hypot(robotX, robotY));
+        // Aim
+        aimClaw(flipValues * targetAngle);
     }
 
     public void aimClaw(double angle) {
@@ -161,7 +169,11 @@ public abstract class Control extends OpMode {
     }
 
     public double tableAngle() {
-        return collapseAngle(kai.turntable.getCurrentPosition() / TURNTABLE_TICKS_PER_RAD);
+        double angleMultiplier = 1;
+        if(getExtensionTarget() < 0) {
+            angleMultiplier *= -1;
+        }
+        return collapseAngle(angleMultiplier * kai.turntable.getCurrentPosition() / TURNTABLE_TICKS_PER_RAD);
     }
 
     public double tableVel() {
@@ -177,6 +189,7 @@ public abstract class Control extends OpMode {
         double clawAngle = collapseAngle(-kai.getHeading() + tableAngle());
         double clawRotVel = kai.deadwheels.angularVelocity + tableVel();
 
+        double clawExtension = getExtensionCurrent();
         double clawXVel = Math.cos(clawAngle) * clawRotVel * TAU * clawExtension;
         double clawYVel = -Math.sin(clawAngle) * clawRotVel * TAU * clawExtension;
         xVel += clawXVel;
@@ -205,6 +218,21 @@ public abstract class Control extends OpMode {
         kai.armLiftB.setTargetPosition(liftHeight);
     }
 
+    public void setExtensionDistance(double distance) {
+        // TODO: Replace 1000 with the proper conversion value
+        kai.horizontalLift.setTargetPosition((int) (distance * 1000));
+    }
+
+    public double getExtensionTarget() {
+        // TODO: Don't forget me!
+        return kai.horizontalLift.getTargetPosition() / 1000.0;
+    }
+
+    public double getExtensionCurrent() {
+        // TODO: Don't forget me either!
+        return kai.horizontalLift.getCurrentPosition() / 1000.0;
+    }
+
     public void resetHeading() {
         thetaAdjustment = -kai.getHeading();
     }
@@ -214,7 +242,7 @@ public abstract class Control extends OpMode {
     }
 
     public double mapAngle(double angle, double offset) {
-        return mapAngle(angle, 0, TAU, offset);
+        return mapAngle(angle, -Math.PI, Math.PI, offset);
     }
 
     public double mapAngle(double angle, double min, double max, double offset) {

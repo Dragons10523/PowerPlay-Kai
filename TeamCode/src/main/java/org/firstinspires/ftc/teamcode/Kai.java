@@ -19,10 +19,10 @@ public class Kai {
     // Also used for deadwheels. Use back motors for both y axis, front left for the x axis
     public final DcMotor frontLeft, frontRight, backLeft, backRight;
 
+    public final DcMotor horizontalLift;
     public final DcMotorEx turntable;
     public final DcMotor armLiftA, armLiftB;
     public final Servo claw, clawFlup, clawTwist;
-    public final CRServo extendScrew, extendPinion;
 
     public final DistanceSensor clawSensor;
 
@@ -42,6 +42,7 @@ public class Kai {
         backLeft = hwmap.get(DcMotor.class, "backLeft");
         backRight = hwmap.get(DcMotor.class, "backRight");
 
+        horizontalLift = hwmap.get(DcMotor.class, "horizontalLift");
         turntable = hwmap.get(DcMotorEx.class, "turntable");
         armLiftA = hwmap.get(DcMotor.class, "armLiftA");
         armLiftB = hwmap.get(DcMotor.class, "armLiftB");
@@ -49,9 +50,6 @@ public class Kai {
         claw = hwmap.get(Servo.class, "claw");
         clawFlup = hwmap.get(Servo.class, "clawFlup");
         clawTwist = hwmap.get(Servo.class, "clawTwist");
-
-        extendScrew = hwmap.get(CRServo.class, "extendScrew");
-        extendPinion = hwmap.get(CRServo.class, "extendPinion");
 
         clawSensor = hwmap.get(DistanceSensor.class, "clawSensor");
 
@@ -85,15 +83,22 @@ public class Kai {
         armLiftB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Set up encoders
+        horizontalLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turntable.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armLiftA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armLiftB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        horizontalLift.setTargetPosition(0);
         turntable.setTargetPosition(0);
         armLiftA.setTargetPosition(0);
         armLiftB.setTargetPosition(0);
+
+        horizontalLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turntable.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armLiftA.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armLiftB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        horizontalLift.setPower(1);
         turntable.setPower(1);
         armLiftA.setPower(1);
         armLiftB.setPower(1);
