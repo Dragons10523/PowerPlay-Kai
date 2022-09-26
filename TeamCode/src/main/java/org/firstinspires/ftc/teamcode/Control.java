@@ -174,7 +174,7 @@ public abstract class Control extends OpMode {
         double xPos = kai.deadwheels.currentX;
         double yPos = kai.deadwheels.currentY;
 
-        double clawAngle = collapseAngle(-kai.deadwheels.currentAngle + tableAngle());
+        double clawAngle = collapseAngle(-kai.getHeading() + tableAngle());
         double clawRotVel = kai.deadwheels.angularVelocity + tableVel();
 
         double clawXVel = Math.cos(clawAngle) * clawRotVel * TAU * clawExtension;
