@@ -165,13 +165,13 @@ public abstract class Control extends OpMode {
 
         double clawXVel = Math.cos(clawAngle) * clawRotVel * TAU * clawExtension;
         double clawYVel = -Math.sin(clawAngle) * clawRotVel * TAU * clawExtension;
-        xVel += ((clawXVel * Math.cos(clawAngle)) + (clawYVel * Math.sin(clawAngle)));
-        yVel += ((clawXVel * (-Math.sin(clawAngle))) + (clawYVel * Math.cos(clawAngle)));
+        xVel += clawXVel;
+        yVel += clawYVel;
 
         double clawXPos = Math.cos(clawAngle) * TAU * clawExtension;
         double clawYPos = -Math.sin(clawAngle) * TAU * clawExtension;
-        xPos += ((clawXPos * Math.cos(clawAngle)) + (clawYPos * Math.sin(clawAngle)));
-        yPos += ((clawXPos * -Math.sin(clawAngle)) + (clawYPos * Math.cos(clawAngle)));
+        xPos += clawXPos;
+        yPos += clawYPos;
 
         int poleXIndex = poleIndex % 5;
         int poleYIndex = poleIndex / 5;
