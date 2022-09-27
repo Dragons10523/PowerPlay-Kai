@@ -3,9 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class Deadwheels {
-    private final DcMotor leftYMotor;
-    private final DcMotor rightYMotor;
-    private final DcMotor XMotor;
+    private final DcMotor leftYEncoder;
+    private final DcMotor rightYEncoder;
+    private final DcMotor XEncoder;
 
     private final double symmetricCircumference;
     private final double asymmetricCircumference;
@@ -26,10 +26,10 @@ public class Deadwheels {
     double angularVelocity;
 
     // All measurements in inches
-    public Deadwheels(DcMotor leftYMotor, DcMotor rightYMotor, DcMotor XMotor, double lateralOffset, double forwardOffset, double inchesPerTick) {
-        this.leftYMotor = leftYMotor;
-        this.rightYMotor = rightYMotor;
-        this.XMotor = XMotor;
+    public Deadwheels(DcMotor leftYEncoder, DcMotor rightYEncoder, DcMotor XEncoder, double lateralOffset, double forwardOffset, double inchesPerTick) {
+        this.leftYEncoder = leftYEncoder;
+        this.rightYEncoder = rightYEncoder;
+        this.XEncoder = XEncoder;
         this.symmetricCircumference = Control.TAU * lateralOffset;
         this.asymmetricCircumference = Control.TAU * forwardOffset;
         this.inchesPerTick = inchesPerTick;
@@ -40,12 +40,13 @@ public class Deadwheels {
         currentX = x;
         currentY = y;
         currentAngle = angle;
+        lastUpdateTime = -1;
     }
 
     public void wheelLoop() {
-        int leftYPos = leftYMotor.getCurrentPosition();
-        int rightYPos = rightYMotor.getCurrentPosition();
-        int XPos = XMotor.getCurrentPosition();
+        int leftYPos = leftYEncoder.getCurrentPosition();
+        int rightYPos = rightYEncoder.getCurrentPosition();
+        int XPos = XEncoder.getCurrentPosition();
 
         // Invert left so directions are the same
         int leftYDelta = -(leftYPos - leftYPosPrev);
