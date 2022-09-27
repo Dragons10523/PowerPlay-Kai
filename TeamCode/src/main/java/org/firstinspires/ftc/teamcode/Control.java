@@ -13,8 +13,6 @@ public abstract class Control extends OpMode {
     // TODO: Calculate the proper angle to ticks value
     public static final double TURNTABLE_TICKS_PER_RAD = 100;
 
-    double thetaAdjustment = 0;
-
     public enum DriveMode {
         GLOBAL,
         LOCAL
@@ -63,7 +61,7 @@ public abstract class Control extends OpMode {
         double angle;
         switch(mode) {
             case GLOBAL:
-                angle = kai.getHeading() + thetaAdjustment;
+                angle = kai.getHeading();
                 break;
             case LOCAL:
             default:
@@ -236,10 +234,6 @@ public abstract class Control extends OpMode {
     public double getExtensionCurrent() {
         // TODO: Don't forget me either!
         return kai.horizontalLift.getCurrentPosition() / 1000.0;
-    }
-
-    public void resetHeading() {
-        thetaAdjustment = -kai.getHeading();
     }
 
     public double collapseAngle(double angle) {
