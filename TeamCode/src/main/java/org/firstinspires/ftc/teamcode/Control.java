@@ -46,6 +46,11 @@ public abstract class Control extends OpMode {
         this.kai = new Kai(hardwareMap);
     }
 
+    @Override
+    public void loop() {
+        kai.deadwheels.wheelLoop();
+    }
+
     public void drive(double flPower, double frPower, double blPower, double brPower) {
         kai.frontLeft.setPower(flPower);
         kai.frontRight.setPower(frPower);

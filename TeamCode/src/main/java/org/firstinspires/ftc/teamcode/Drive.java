@@ -26,6 +26,8 @@ public class Drive extends Control {
 
     @Override
     public void loop() {
+        super.loop();
+
         // GAMEPAD1
         // Assist Toggles
         if(gamepad1.a != assistTurnPrev && gamepad1.a) {
