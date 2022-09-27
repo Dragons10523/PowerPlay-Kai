@@ -49,7 +49,7 @@ public class Deadwheels {
         int XPos = XEncoder.getCurrentPosition();
 
         // Invert left so directions are the same
-        int leftYDelta = -(leftYPos - leftYPosPrev);
+        int leftYDelta = leftYPos - leftYPosPrev;
         int rightYDelta = rightYPos - rightYPosPrev;
         int XDelta = XPos - XPosPrev;
 
