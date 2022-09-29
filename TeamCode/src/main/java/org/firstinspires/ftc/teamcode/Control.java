@@ -61,6 +61,11 @@ public abstract class Control extends OpMode {
         kai.deadwheels.wheelLoop();
     }
 
+    @Override
+    public void stop() {
+        stopAllMovement();
+    }
+
     public void drive(double flPower, double frPower, double blPower, double brPower) {
         kai.frontLeft.setPower(flPower);
         kai.frontRight.setPower(frPower);
@@ -286,6 +291,14 @@ public abstract class Control extends OpMode {
             default:
                 kai.clawTwist.setPosition(backwardsOffset);
         }
+    }
+
+    public void stopAllMovement() {
+        drive(0, 0, 0, 0);
+        kai.horizontalLift.setPower(0);
+        kai.turntable.setPower(0);
+        kai.armLiftA.setPower(0);
+        kai.armLiftB.setPower(0);
     }
 
     public double collapseAngle(double angle) {

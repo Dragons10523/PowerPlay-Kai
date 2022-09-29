@@ -78,6 +78,7 @@ public class Kai {
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        horizontalLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         turntable.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armLiftA.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armLiftB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
