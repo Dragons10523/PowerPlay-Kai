@@ -171,7 +171,7 @@ public abstract class Control extends OpMode {
         boolean flippedValues = false;
         int extensionMult = 1;
         int angleOffset = 0;
-        if(Math.abs(mapAngle(targetAngle - tableAngle(), 0)) > 95) {
+        if(Math.abs(mapAngle(targetAngle - tableAngle(), 0)) > 1.65) {
             flippedValues = true;
         }
         if(getExtensionTarget() < 0) {
