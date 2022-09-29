@@ -24,6 +24,16 @@ public abstract class Control extends OpMode {
         CLOSE
     }
 
+    public enum FlipState {
+        FOREWARDS,
+        BACKWARDS
+    }
+
+    public enum WristState {
+        NORMAL,
+        FLIPPED
+    }
+
     public enum GoalHeight {
         HIGH,
         MID,
@@ -170,6 +180,9 @@ public abstract class Control extends OpMode {
         if(flippedValues) {
             extensionMult = -1;
             angleOffset = 180;
+            flipClaw(FlipState.BACKWARDS);
+        } else {
+            flipClaw(FlipState.FOREWARDS);
         }
 
         // Set the extension distance
@@ -246,6 +259,33 @@ public abstract class Control extends OpMode {
     public double getExtensionCurrent() {
         // TODO: Don't forget me either!
         return kai.horizontalLift.getCurrentPosition() / 1000.0;
+    }
+
+    public void flipClaw(FlipState flip) {
+        switch(flip) {
+            case BACKWARDS:
+                kai.clawFlup.setPosition(1);
+                break;
+            case FOREWARDS:
+            default:
+                kai.clawFlup.setPosition(0);
+        }
+    }
+
+    public void orientClaw(WristState wrist) {
+        int backwardsOffset = 0;
+        if(kai.clawFlup.getPosition() != 0) {
+            backwardsOffset = 1;
+        }
+
+        switch(wrist) {
+            case FLIPPED:
+                kai.clawTwist.setPosition(1 - backwardsOffset);
+                break;
+            case NORMAL:
+            default:
+                kai.clawTwist.setPosition(backwardsOffset);
+        }
     }
 
     public double collapseAngle(double angle) {

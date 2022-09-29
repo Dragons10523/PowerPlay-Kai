@@ -115,6 +115,7 @@ public class Drive extends Control {
             } else {
                 aimClaw(0);
             }
+            orientClaw(WristState.NORMAL);
 
             displayField();
 
@@ -148,6 +149,12 @@ public class Drive extends Control {
 
             if(manualClaw != clawPrev && manualClaw) {
                 toggleClaw();
+            }
+
+            if(gamepad2.dpad_down) {
+                orientClaw(WristState.FLIPPED);
+            } else if(gamepad2.dpad_up) {
+                orientClaw(WristState.NORMAL);
             }
         }
 

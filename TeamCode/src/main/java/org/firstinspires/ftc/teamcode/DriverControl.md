@@ -34,6 +34,8 @@
     - X for intake
   - Right bumper to toggle claw
   - Left Stick to aim
+  - Down on the D-Pad to flip the claw upside down
+  - Up on the D-Pad to flip the claw right side up
 - Left Bumper to toggle assist mode
 
 # All
