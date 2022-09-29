@@ -20,6 +20,12 @@
     - Timed grab with distance sensor
     - Timed release when near target pole
   - D-Pad to select a pole
+    - Displayed on driver hub
+    GLGLG
+    LMHML
+    GH*HG
+    LMHML
+    GLGLG
 - Manual Mode
   - Lift
     - Y for high
