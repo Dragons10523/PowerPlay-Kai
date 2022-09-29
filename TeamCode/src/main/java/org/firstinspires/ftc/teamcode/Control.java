@@ -25,7 +25,7 @@ public abstract class Control extends OpMode {
     }
 
     public enum FlipState {
-        FOREWARDS,
+        FORWARDS,
         BACKWARDS
     }
 
@@ -182,7 +182,7 @@ public abstract class Control extends OpMode {
             angleOffset = 180;
             flipClaw(FlipState.BACKWARDS);
         } else {
-            flipClaw(FlipState.FOREWARDS);
+            flipClaw(FlipState.FORWARDS);
         }
 
         // Set the extension distance
@@ -266,7 +266,7 @@ public abstract class Control extends OpMode {
             case BACKWARDS:
                 kai.clawFlup.setPosition(1);
                 break;
-            case FOREWARDS:
+            case FORWARDS:
             default:
                 kai.clawFlup.setPosition(0);
         }
