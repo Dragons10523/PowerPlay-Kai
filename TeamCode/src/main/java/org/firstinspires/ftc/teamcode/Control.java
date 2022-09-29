@@ -157,15 +157,25 @@ public abstract class Control extends OpMode {
 
         double targetAngle = Math.atan2(robotX, robotY);
 
-        int flipValues = 1;
+        // Claw Flipping
+        boolean flippedValues = false;
+        int extensionMult = 1;
+        int angleOffset = 0;
         if(Math.abs(mapAngle(targetAngle - tableAngle(), 0)) > 95) {
-            flipValues = -1;
+            flippedValues = true;
+        }
+        if(getExtensionTarget() < 0) {
+            flippedValues = !flippedValues;
+        }
+        if(flippedValues) {
+            extensionMult = -1;
+            angleOffset = 180;
         }
 
         // Set the extension distance
-        setExtensionDistance(flipValues * Math.hypot(robotX, robotY));
+        setExtensionDistance(extensionMult * Math.hypot(robotX, robotY));
         // Aim
-        aimClaw(flipValues * targetAngle);
+        aimClaw(angleOffset + targetAngle);
     }
 
     public void aimClaw(double angle) {
