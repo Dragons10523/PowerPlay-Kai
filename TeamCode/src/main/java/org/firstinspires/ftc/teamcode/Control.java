@@ -169,7 +169,7 @@ public abstract class Control extends OpMode {
     }
 
     public void aimClaw(double angle) {
-        angle = collapseAngle(angle);
+        angle = mapAngle(angle, 0);
         kai.turntable.setTargetPosition((int) (angle * TURNTABLE_TICKS_PER_RAD));
     }
 
