@@ -6,7 +6,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public abstract class Control extends OpMode {
     Kai kai;
-    DStar dStar;
 
     public static final double TAU = Math.PI * 2;
     public static final double HALF_PI = Math.PI / 2;
@@ -53,7 +52,6 @@ public abstract class Control extends OpMode {
     @Override
     public void init() {
         this.kai = new Kai(hardwareMap);
-        this.dStar = new DStar(6, 6, 0, 0);
     }
 
     @Override
