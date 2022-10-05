@@ -24,6 +24,7 @@ public class Kai {
     public final DcMotor armLiftA, armLiftB;
     public final Servo claw, clawFlup, clawTwist;
 
+    public final DistanceSensor frontDist, rightDist, leftDist, backDist;
     public final DistanceSensor clawSensor;
 
     public final BNO055IMU imu;
@@ -50,6 +51,11 @@ public class Kai {
         claw = hwmap.get(Servo.class, "claw");
         clawFlup = hwmap.get(Servo.class, "clawFlup");
         clawTwist = hwmap.get(Servo.class, "clawTwist");
+
+        frontDist = hwmap.get(DistanceSensor.class, "frontDist");
+        rightDist = hwmap.get(DistanceSensor.class, "rightDist");
+        leftDist = hwmap.get(DistanceSensor.class, "leftDist");
+        backDist = hwmap.get(DistanceSensor.class, "backDist");
 
         clawSensor = hwmap.get(DistanceSensor.class, "clawSensor");
 
@@ -108,6 +114,7 @@ public class Kai {
     }
 
     public double getHeading(){
+        // Maf angles, not game
         return deadwheels.currentAngle;
     }
 }

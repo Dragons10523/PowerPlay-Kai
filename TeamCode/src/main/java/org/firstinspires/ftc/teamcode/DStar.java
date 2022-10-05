@@ -6,6 +6,7 @@ import java.util.List;
 public class DStar {
     Node[] nodeArray;
     List<Integer> openList;
+    List<Integer> obstacles;
 
     private int gridX;
     private int gridY;
@@ -65,6 +66,23 @@ public class DStar {
         processOpenList();
     }
 
+    public void markBlocked(int node) {
+        nodeArray[node].obstacle = true;
+        nodeArray[node].state = Node.NodeState.OPEN;
+        openList.add(node);
+        obstacles.add(node);
+        processOpenList();
+    }
+
+    public void markOpen(int node) {
+        nodeArray[node].cost = -1;
+        nodeArray[node].obstacle = false;
+        nodeArray[node].state = Node.NodeState.OPEN;
+        openList.add(node);
+        obstacles.remove((Object)node);
+        processOpenList();
+    }
+
     public void processOpenList() {
         while(openList.size() > 0) {
             List<Integer> processList = new ArrayList<>(openList);
@@ -105,6 +123,8 @@ public class DStar {
     }
 
     private int getNodeCost(Node node) {
+        if(node.obstacle) return node.cost = nodeArray.length;
+
         if(node.state == Node.NodeState.CLOSED) return node.cost;
 
         if(node.cost != 0) {
@@ -127,6 +147,7 @@ public class DStar {
                 node.nextNode = neighborIdx;
                 node.state = Node.NodeState.RAISE;
                 costChanged = true;
+                break;
             }
         }
 
