@@ -4,6 +4,9 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AbstractAuto extends Control {
     DStar dStar;
 
@@ -33,7 +36,48 @@ public class AbstractAuto extends Control {
 
     // TODO: Handle D* Values
     public void moveToTile(int nodeIndex) {
+        this.dStar.updateEnd(nodeIndex);
+        checkPathing();
 
+        List<Integer> compressedPath = new ArrayList<>();
+
+        {
+            int tileX;
+            int tileY;
+            int prevTileX = -1;
+            int prevTileY = -1;
+            int prevDirection = 0; // 1 for X, 2 for Y
+
+            for (Integer nodeCheck : this.dStar.getFullPath()) {
+                tileX = nodeCheck % 6;
+                tileY = (int) Math.floor(nodeCheck / 6f);
+
+                if (tileX == prevTileX) {
+                    if (prevDirection == 2) {
+                        compressedPath.add(nodeCheck);
+                    }
+                    prevDirection = 1;
+                } else if (tileY == prevTileY) {
+                    if (prevDirection == 1) {
+                        compressedPath.add(nodeCheck);
+                    }
+                    prevDirection = 2;
+                }
+
+                prevTileX = tileX;
+                prevTileY = tileY;
+            }
+        }
+
+        for (Integer cornerNode : compressedPath) {
+            int nodeX = cornerNode % 6;
+            int nodeY = (int) Math.floor(cornerNode / 6f);
+
+            if(moveToTile(nodeX, nodeY)) {
+                moveToTile(nodeIndex);
+                return;
+            }
+        }
     }
 
     // Returns true on robot detected

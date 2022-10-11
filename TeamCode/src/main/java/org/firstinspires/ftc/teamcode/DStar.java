@@ -48,6 +48,23 @@ public class DStar {
         }
     }
 
+    public List<Integer> getFullPath() {
+        List<Integer> path = new ArrayList<>();
+        int currentNode = start;
+
+        while(true) {
+            path.add(currentNode);
+
+            if(getNodeCost(nodeArray[currentNode]) == 0) {
+                break;
+            }
+
+            currentNode = nodeArray[currentNode].nextNode;
+        }
+
+        return path;
+    }
+
     public void updateStart(int start) {
         nodeArray[this.start].cost = -1;
         nodeArray[this.start].state = Node.NodeState.OPEN;
