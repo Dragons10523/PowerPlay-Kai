@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -36,6 +37,8 @@ public class AbstractAuto extends Control {
 
     // TODO: Handle D* Values
     public void moveToTile(int nodeIndex) {
+        if(isStopRequested) return;
+
         this.dStar.updateEnd(nodeIndex);
         checkPathing();
 
@@ -93,6 +96,8 @@ public class AbstractAuto extends Control {
 
     // Returns true on robot detected
     public boolean moveToTile(int X, int Y) {
+        if(isStopRequested) return false; // Returning false so we don't get Stack Overflows from recursion
+
         int xInch = X * 24 + 12;
         int yInch = Y * 24 + 12;
 
@@ -100,6 +105,8 @@ public class AbstractAuto extends Control {
         if(checkPathing()) return true;
         double yAdjust = 12 - (kai.deadwheels.currentY % 24);
         while(Math.abs(yAdjust) > 4) {
+            if(isStopRequested) return false;
+
             mecanumDrive(0, yAdjust * .4, 0, DriveMode.GLOBAL);
 
             if(checkPathing()) return true;
@@ -109,6 +116,8 @@ public class AbstractAuto extends Control {
         // Go to the right row
         double xAdjust = xInch - kai.deadwheels.currentX;
         while(Math.abs(xAdjust) > 4) {
+            if(isStopRequested) return false;
+
             mecanumDrive(xAdjust, yAdjust, 0, DriveMode.GLOBAL) ;
 
             if(checkPathing()) return true;
@@ -119,6 +128,8 @@ public class AbstractAuto extends Control {
         // Go to the right column
         yAdjust = yInch - kai.deadwheels.currentY;
         while(Math.abs(yAdjust) > 4) {
+            if(isStopRequested) return false;
+
             mecanumDrive(xAdjust, yAdjust, 0, DriveMode.GLOBAL) ;
 
             if(checkPathing()) return true;

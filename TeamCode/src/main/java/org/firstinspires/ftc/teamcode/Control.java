@@ -13,6 +13,8 @@ public abstract class Control extends OpMode {
     // TODO: Calculate the proper angle to ticks value
     public static final double TURNTABLE_TICKS_PER_RAD = 100;
 
+    public boolean isStopRequested = false;
+
     public enum DriveMode {
         GLOBAL,
         LOCAL
@@ -61,6 +63,9 @@ public abstract class Control extends OpMode {
 
     @Override
     public void stop() {
+        if(isStopRequested) return;
+
+        isStopRequested = true;
         stopAllMovement();
     }
 
