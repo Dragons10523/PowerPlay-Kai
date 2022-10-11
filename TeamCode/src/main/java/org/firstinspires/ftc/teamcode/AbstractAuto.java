@@ -48,18 +48,22 @@ public class AbstractAuto extends Control {
             int prevTileY = -1;
             int prevDirection = 0; // 1 for X, 2 for Y
 
-            for (Integer nodeCheck : this.dStar.getFullPath()) {
+            List<Integer> fullPath = this.dStar.getFullPath();
+
+            for (int i = 0; i < fullPath.size(); i++) {
+                int nodeCheck = fullPath.get(i);
+
                 tileX = nodeCheck % 6;
                 tileY = (int) Math.floor(nodeCheck / 6f);
 
                 if (tileX == prevTileX) {
                     if (prevDirection == 2) {
-                        compressedPath.add(nodeCheck);
+                        compressedPath.add(fullPath.get(i - 1));
                     }
                     prevDirection = 1;
                 } else if (tileY == prevTileY) {
                     if (prevDirection == 1) {
-                        compressedPath.add(nodeCheck);
+                        compressedPath.add(fullPath.get(i - 1));
                     }
                     prevDirection = 2;
                 }
