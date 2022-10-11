@@ -49,6 +49,8 @@ public class DStar {
     }
 
     public List<Integer> getFullPath() {
+        processOpenList();
+
         List<Integer> path = new ArrayList<>();
         int currentNode = start;
 
