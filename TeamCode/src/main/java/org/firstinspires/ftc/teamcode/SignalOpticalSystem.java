@@ -1,14 +1,19 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.annotation.SuppressLint;
+
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 import org.openftc.easyopencv.OpenCvPipeline;
+
+import java.io.File;
 
 public class SignalOpticalSystem extends OpenCvPipeline {
     public static final int CAMERA_WIDTH = 360;
@@ -26,9 +31,11 @@ public class SignalOpticalSystem extends OpenCvPipeline {
             new Scalar(60,  255, 255)  // MAGENTA
     };
 
+    private boolean isReady = false;
+    private boolean takePicture = false;
+    private String picturePath = "";
     private CascadeClassifier cascadeClassifier;
     private SignalOrientation signalOrientation = SignalOrientation.RIGHT;
-    private boolean isReady = false;
 
     public SignalOpticalSystem() {
         cascadeClassifier = new CascadeClassifier("/storage/emulated/0/FIRST/imageClassifier.xml");
@@ -42,6 +49,20 @@ public class SignalOpticalSystem extends OpenCvPipeline {
         return isReady;
     }
 
+    @SuppressLint("DefaultLocale")
+    public void takePicture() {
+        int imageNumber = 0;
+
+        File f = null;
+        do {
+            f = new File(String.format("/storage/emulated/0/FIRST/signalImage%3d.jpg", imageNumber));
+        } while (f.exists());
+
+        picturePath = f.getPath();
+
+        takePicture = true;
+    }
+
     @Override
     public Mat processFrame(Mat input) {
         int maxScore = 0;
@@ -50,12 +71,18 @@ public class SignalOpticalSystem extends OpenCvPipeline {
         MatOfRect detectedInstances = new MatOfRect();
         cascadeClassifier.detectMultiScale(input, detectedInstances);
 
-        Rect largestRectangle = new Rect();
+        Rect largestRectangle = new Rect(0, 0, 0, 0);
         Rect[] instancesArray = detectedInstances.toArray();
         for(Rect instance : instancesArray) {
             if(instance.area() > largestRectangle.area()) {
                 largestRectangle = instance;
             }
+        }
+
+        if(largestRectangle.area() == 0) {
+            if(isReady) return input; // Return early if nothing was detected from last time
+
+            largestRectangle = new Rect(135, 75, 90, 90); // Default value if noting is detected
         }
 
         Mat subMat = input.submat(largestRectangle);
@@ -85,6 +112,12 @@ public class SignalOpticalSystem extends OpenCvPipeline {
             case 2:
             default:
                 signalOrientation = SignalOrientation.RIGHT;
+        }
+
+        if(takePicture) {
+            takePicture = false;
+
+            Imgcodecs.imwrite(picturePath, input);
         }
 
         isReady = true;
