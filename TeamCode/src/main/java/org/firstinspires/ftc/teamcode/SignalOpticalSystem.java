@@ -56,6 +56,7 @@ public class SignalOpticalSystem extends OpenCvPipeline {
         File f = null;
         do {
             f = new File(String.format("/storage/emulated/0/FIRST/signalImage%3d.jpg", imageNumber));
+            imageNumber++;
         } while (f.exists());
 
         picturePath = f.getPath();
@@ -85,7 +86,7 @@ public class SignalOpticalSystem extends OpenCvPipeline {
             largestRectangle = new Rect(135, 75, 90, 90); // Default value if noting is detected
         }
 
-        Mat subMat = input.submat(largestRectangle);
+        Mat subMat = input.submat(largestRectangle); // Image cropping
         Imgproc.rectangle(input, largestRectangle, new Scalar(64, 255, 64));
 
         for(int i = 0; i < COLOR_CHECKS.length; i++) {
