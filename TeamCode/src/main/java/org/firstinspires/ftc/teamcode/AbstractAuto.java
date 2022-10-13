@@ -34,7 +34,6 @@ public class AbstractAuto extends Control {
         };
     }
 
-    // TODO: Handle D* Values
     public void moveToTile(int nodeIndex) {
         if(isStopRequested) return;
 
