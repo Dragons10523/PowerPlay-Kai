@@ -16,6 +16,11 @@ public abstract class AbstractAuto extends Control {
 
     @Override
     public void init() {
+        signalOpticalSystem = new SignalOpticalSystem();
+        kai.frontCamera.setPipeline(signalOpticalSystem);
+        kai.frontCamera.startStreaming(SignalOpticalSystem.CAMERA_WIDTH, SignalOpticalSystem.CAMERA_HEIGHT);
+        telemetry.addLine("Robot is Starting");
+        telemetry.update();
         super.init();
         this.dStar = new DStar(6, 6, 0, 0);
 
@@ -28,7 +33,9 @@ public abstract class AbstractAuto extends Control {
                 {0, 0, Control.HALF_PI}
         };
 
-        signalOpticalSystem = new SignalOpticalSystem();
+        while(!signalOpticalSystem.isReady()) sleep(100);
+        telemetry.addLine("Robot is Ready");
+        telemetry.update();
     }
 
     public void liftToStack(int stackHeight) {
