@@ -2,11 +2,15 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 @Autonomous(name = "Auto Right", preselectTeleOp = "Drive")
 public class AutonomousRightSide extends AbstractAuto {
     @Override public void loop() {
         if(isStopRequested) return;
         super.loop();
+
+        boolean robotInterrupt = false;
 
         int conesInStack = 5;
 
@@ -16,11 +20,28 @@ public class AutonomousRightSide extends AbstractAuto {
         SignalOpticalSystem.SignalOrientation signalOrientation = signalOpticalSystem.getSignalOrientation();
 
         while(getRuntime() < 25) {
-            moveToTile(4, 2);
+            if(!robotInterrupt) {
+                moveToTile(4, 2);
+                if(kai.frontDist.getDistance(DistanceUnit.INCH) < 24) {
+                    robotInterrupt = true;
+                    moveToTile(3, 2);
+                }
+            } else {
+                moveToTile(3, 2);
+            }
+
             lift(GoalHeight.HIGH);
-            aimClaw(13);
-            while(!willConeHit(13)) {
-                sleep(100);
+
+            if(robotInterrupt) {
+                aimClaw(17);
+                while(!willConeHit(17)) {
+                    sleep(100);
+                }
+            } else {
+                aimClaw(13);
+                while (!willConeHit(13)) {
+                    sleep(100);
+                }
             }
             claw(ClawState.OPEN);
             sleep(250);
