@@ -7,17 +7,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbstractAuto extends Control {
+public abstract class AbstractAuto extends Control {
     DStar dStar;
 
     private DistanceSensor[] robotSensors;
     private double[][] sensorOffsets;
-
-    // This is needed to end auto because we are using OpMode now
-    @Override
-    public void loop() {
-        requestOpModeStop();
-    }
 
     @Override
     public void init() {
