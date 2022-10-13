@@ -27,8 +27,8 @@ public class SignalOpticalSystem extends OpenCvPipeline {
 
     private final Scalar[] COLOR_CHECKS = {
             new Scalar(180,  255, 255), // CYAN
-            new Scalar(300, 255, 255), // YELLOW
-            new Scalar(60,  255, 255)  // MAGENTA
+            new Scalar(300, 255, 255),  // YELLOW
+            new Scalar(60,  255, 255)   // MAGENTA
     };
 
     private boolean isReady = false;
