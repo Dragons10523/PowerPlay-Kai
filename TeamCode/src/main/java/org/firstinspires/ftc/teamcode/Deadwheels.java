@@ -37,8 +37,8 @@ public class Deadwheels {
     }
 
     public void setTransform(double x, double y, double angle) {
-        currentX = x;
-        currentY = y;
+        currentX = (x * 24) + 12;
+        currentY = (y * 24) + 12;
         currentAngle = angle;
         lastUpdateTime = -1;
     }

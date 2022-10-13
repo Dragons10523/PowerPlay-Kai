@@ -67,7 +67,7 @@ public class SignalOpticalSystem extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
         int maxScore = 0;
-        int maxScoreIndex = 2;
+        int maxScoreIndex = 1;
 
         MatOfRect detectedInstances = new MatOfRect();
         cascadeClassifier.detectMultiScale(input, detectedInstances);
@@ -107,12 +107,12 @@ public class SignalOpticalSystem extends OpenCvPipeline {
             case 0:
                 signalOrientation = SignalOrientation.LEFT;
                 break;
-            case 1:
-                signalOrientation = SignalOrientation.MIDDLE;
-                break;
             case 2:
-            default:
                 signalOrientation = SignalOrientation.RIGHT;
+                break;
+            case 1:
+            default:
+                signalOrientation = SignalOrientation.MIDDLE;
         }
 
         if(takePicture) {

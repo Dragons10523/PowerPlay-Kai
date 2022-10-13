@@ -319,4 +319,12 @@ public abstract class Control extends OpMode {
     public double squaredHypotenuse(double x, double y) {
         return ((x*x)+(y*y));
     }
+
+    public void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

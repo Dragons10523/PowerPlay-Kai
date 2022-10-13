@@ -10,6 +10,7 @@ import java.util.List;
 public abstract class AbstractAuto extends Control {
     DStar dStar;
 
+    protected SignalOpticalSystem signalOpticalSystem;
     private DistanceSensor[] robotSensors;
     private double[][] sensorOffsets;
 
@@ -26,6 +27,13 @@ public abstract class AbstractAuto extends Control {
                 {0, 0, Math.PI},
                 {0, 0, Control.HALF_PI}
         };
+
+        signalOpticalSystem = new SignalOpticalSystem();
+    }
+
+    public void liftToStack(int stackHeight) {
+        // TODO: Calibrate real values
+        setLiftHeight(1000 + (10 * stackHeight));
     }
 
     public void moveToTile(int nodeIndex) {
