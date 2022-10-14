@@ -12,9 +12,9 @@ public class AutonomousLeftSide extends AbstractAuto {
 
         boolean robotInterrupt = false;
 
-        int conesInStack = 5;
+        int conesInStack = 4;
 
-        kai.deadwheels.setTransform(1, 0, 0); // Set initial location to (4, 0)
+        kai.deadwheels.setTransform(1, 0, 0); // Set initial location to (1, 0)
 
         while(!signalOpticalSystem.isReady()) sleep(10);
         SignalOpticalSystem.SignalOrientation signalOrientation = signalOpticalSystem.getSignalOrientation();
@@ -45,7 +45,7 @@ public class AutonomousLeftSide extends AbstractAuto {
             claw(ClawState.OPEN);
             sleep(250);
 
-            if(conesInStack <= 0) break;
+            if(conesInStack < 0) break;
 
             aimAtStack();
             sleep(250);

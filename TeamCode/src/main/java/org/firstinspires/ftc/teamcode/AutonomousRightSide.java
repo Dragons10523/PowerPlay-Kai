@@ -12,7 +12,7 @@ public class AutonomousRightSide extends AbstractAuto {
 
         boolean robotInterrupt = false;
 
-        int conesInStack = 5;
+        int conesInStack = 4;
 
         kai.deadwheels.setTransform(1, 0, 0); // Set initial location to (4, 0)
 
@@ -46,7 +46,7 @@ public class AutonomousRightSide extends AbstractAuto {
             claw(ClawState.OPEN);
             sleep(250);
 
-            if(conesInStack <= 0) break;
+            if(conesInStack < 0) break;
 
             aimAtStack();
             sleep(250);

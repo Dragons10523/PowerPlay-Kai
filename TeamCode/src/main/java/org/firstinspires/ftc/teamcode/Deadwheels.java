@@ -17,13 +17,13 @@ public class Deadwheels {
 
     private long lastUpdateTime;
 
-    double currentX;
-    double currentY;
-    double currentAngle;
+    public double currentX;
+    public double currentY;
+    public double currentAngle;
 
-    double xVelocity;
-    double yVelocity;
-    double angularVelocity;
+    public double xVelocity;
+    public double yVelocity;
+    public double angularVelocity;
 
     // All measurements in inches
     public Deadwheels(DcMotor leftYEncoder, DcMotor rightYEncoder, DcMotor XEncoder, double lateralOffset, double forwardOffset, double inchesPerTick) {

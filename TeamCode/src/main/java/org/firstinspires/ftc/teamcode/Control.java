@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public abstract class Control extends OpMode {
-    Kai kai;
+    public Kai kai;
 
     public static final double TAU = Math.PI * 2;
     public static final double HALF_PI = Math.PI / 2;
