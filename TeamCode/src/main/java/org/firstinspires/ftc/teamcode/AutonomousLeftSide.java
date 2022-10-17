@@ -16,7 +16,7 @@ public class AutonomousLeftSide extends AbstractAuto {
 
         kai.deadwheels.setTransform(1, 0, 0); // Set initial location to (1, 0)
 
-        while(!signalOpticalSystem.isReady()) sleep(10);
+        while(signalOpticalSystem.passes < 5) sleep(10);
         SignalOpticalSystem.SignalOrientation signalOrientation = signalOpticalSystem.getSignalOrientation();
 
         while(getRuntime() < 25) {
