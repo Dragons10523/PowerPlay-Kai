@@ -31,7 +31,7 @@ public class SignalOpticalSystem extends OpenCvPipeline {
             new Scalar(60,  255, 255)   // MAGENTA
     };
 
-    private boolean isReady = false;
+    public int passes = 0;
     private boolean takePicture = false;
     private String picturePath = "";
     private CascadeClassifier cascadeClassifier;
@@ -46,7 +46,7 @@ public class SignalOpticalSystem extends OpenCvPipeline {
     }
 
     public boolean isReady() {
-        return isReady;
+        return passes > 0;
     }
 
     @SuppressLint("DefaultLocale")
@@ -72,22 +72,35 @@ public class SignalOpticalSystem extends OpenCvPipeline {
         MatOfRect detectedInstances = new MatOfRect();
         cascadeClassifier.detectMultiScale(input, detectedInstances);
 
-        Rect largestRectangle = new Rect(0, 0, 0, 0);
+        // Get the largest most centered rectangle
+        Rect centeredRectangle = new Rect(0, 0, 0, 0);
+        double rectangleScore = Double.POSITIVE_INFINITY;
         Rect[] instancesArray = detectedInstances.toArray();
         for(Rect instance : instancesArray) {
-            if(instance.area() > largestRectangle.area()) {
-                largestRectangle = instance;
+            float centerX = instance.x + (instance.width/2f);
+            float centerY = instance.y + (instance.height/2f);
+
+            double score = Control.squaredHypotenuse(centerX - (CAMERA_WIDTH/2), centerY - (CAMERA_HEIGHT/2));
+            double area = instance.area();
+
+            if(score > rectangleScore) {
+                continue;
+            } else if(score == rectangleScore && area < centeredRectangle.area()) {
+                continue;
             }
+
+            rectangleScore = score;
+            centeredRectangle = instance;
         }
 
-        if(largestRectangle.area() == 0) {
-            if(isReady) return input; // Return early if nothing was detected from last time
+        if(centeredRectangle.area() == 0) {
+            if(isReady()) return input; // Return early if nothing was detected from last time
 
-            largestRectangle = new Rect(135, 75, 90, 90); // Default value if noting is detected
+            centeredRectangle = new Rect(135, 75, 90, 90); // Default value if noting is detected
         }
 
-        Mat subMat = input.submat(largestRectangle); // Image cropping
-        Imgproc.rectangle(input, largestRectangle, new Scalar(64, 255, 64));
+        Mat subMat = input.submat(centeredRectangle); // Image cropping
+        Imgproc.rectangle(input, centeredRectangle, new Scalar(64, 255, 64));
 
         for(int i = 0; i < COLOR_CHECKS.length; i++) {
             Scalar colorCheck = COLOR_CHECKS[i];
@@ -121,7 +134,7 @@ public class SignalOpticalSystem extends OpenCvPipeline {
             Imgcodecs.imwrite(picturePath, input);
         }
 
-        isReady = true;
+        passes++;
 
         return input;
     }

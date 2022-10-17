@@ -316,7 +316,7 @@ public abstract class Control extends OpMode {
         return ((((angle + offset) - min) % max + max) % max) + min;
     }
 
-    public double squaredHypotenuse(double x, double y) {
+    public static double squaredHypotenuse(double x, double y) {
         return ((x*x)+(y*y));
     }
 
