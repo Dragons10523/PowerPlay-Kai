@@ -18,6 +18,7 @@ public class AutonomousRightSide extends AbstractAuto {
 
         while(signalOpticalSystem.passes < 5) sleep(10);
         SignalOpticalSystem.SignalOrientation signalOrientation = signalOpticalSystem.getSignalOrientation();
+        kai.frontCamera.closeCameraDevice();
 
         while(getRuntime() < 25) {
             if(!robotInterrupt) {
