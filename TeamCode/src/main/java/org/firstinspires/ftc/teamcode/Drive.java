@@ -1,9 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "Drive")
 public class Drive extends Control {
+    public final boolean INTENSIVE_PRACTICE = false;
+
     // Assist values
     boolean assistDrive = true;
     boolean assistTurns = true;
@@ -23,6 +27,11 @@ public class Drive extends Control {
 
     // Other
     boolean wantToLower = false;
+
+    // Intensive driver practice variables
+    ElapsedTime practiceTimer = new ElapsedTime();
+    double timeUntilEvent = -1;
+    boolean clawSensorBroken = false;
 
     @Override
     public void loop() {
@@ -96,7 +105,7 @@ public class Drive extends Control {
             }
 
             boolean clawOpen = clawOpen();
-            if(clawOpen && gamepad2.x && clawDistance() <= 1.5) {
+            if(clawOpen && gamepad2.x && clawDistance() <= 1.5 && !clawSensorBroken) {
                 clawOpen = false;
             }
             if(!clawOpen && gamepad2.x && willConeHit(selectedPole)) {
@@ -156,6 +165,67 @@ public class Drive extends Control {
             } else if(gamepad2.dpad_up) {
                 orientClaw(WristState.NORMAL);
             }
+        }
+
+        // Intensive Practice Things
+        if(INTENSIVE_PRACTICE && practiceTimer.seconds() >= timeUntilEvent) {
+            practiceTimer.reset();
+
+            if(timeUntilEvent != -1) {
+                // random value 0-5 inclusive
+                int eventValue = (int) Math.floor(Math.random() * 5);
+
+                DcMotor[] driveTrain = {kai.frontLeft, kai.frontRight, kai.backLeft, kai.backRight};
+                DcMotor[] liftMotors = {kai.armLiftA, kai.armLiftB};
+                switch(eventValue) {
+                    // Randomly set motors to float
+                    case 0:
+                        for(DcMotor motor : driveTrain) {
+                            int willBreak = (int) Math.floor(Math.random() * 2);
+                            if(willBreak == 0) {
+                                motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                            }
+                        }
+                        break;
+                    // Randomly set motors and encoders to break
+                    case 1:
+                        for(DcMotor motor : driveTrain) {
+                            int willBreak = (int) Math.floor(Math.random() * 4);
+                            if(willBreak == 0) {
+                                motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                            }
+                        }
+                        break;
+                    // Randomly break one of the lift motors
+                    case 2:
+                        for(DcMotor motor : liftMotors) {
+                            int willBreak = (int) Math.floor(Math.random() * 3);
+                            if(willBreak == 0) {
+                                motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                                motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                            }
+                        }
+                        break;
+                    // Randomly poke the deadwheels
+                    case 3:
+                        int willBreak = (int) Math.floor(Math.random() * 2);
+
+                        if(willBreak == 0) {
+                            kai.deadwheels.currentAngle += .1*(Math.random()-.5);
+                        }
+
+                        kai.deadwheels.currentX += 2*(Math.random()-.5);
+                        kai.deadwheels.currentY += 2*(Math.random()-.5);
+                        break;
+                    // Break the claw sensor
+                    case 4:
+                        clawSensorBroken = true;
+                        break;
+                }
+            }
+
+            // Random value between 10 and 120
+            timeUntilEvent = Math.random() * 130 + 10;
         }
 
         telemetry.update();
