@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -31,9 +33,11 @@ public abstract class AbstractAuto extends Control {
                 kai.frontCamera.startStreaming(SignalOpticalSystem.CAMERA_WIDTH, SignalOpticalSystem.CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
             }
 
+            @SuppressLint("DefaultLocale")
             @Override
             public void onError(int errorCode) {
-
+                telemetry.addLine(String.format("Robot startup failed with error code %d", errorCode));
+                telemetry.update();
             }
         });
 
