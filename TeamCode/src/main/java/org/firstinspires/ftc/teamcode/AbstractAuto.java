@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +18,28 @@ public abstract class AbstractAuto extends Control {
 
     @Override
     public void init() {
-        signalOpticalSystem = new SignalOpticalSystem();
-        kai.frontCamera.setPipeline(signalOpticalSystem);
-        kai.frontCamera.startStreaming(SignalOpticalSystem.CAMERA_WIDTH, SignalOpticalSystem.CAMERA_HEIGHT);
-        telemetry.addLine("Robot is Starting");
+        telemetry.addLine("Robot is Starting...");
         telemetry.update();
+
+        signalOpticalSystem = new SignalOpticalSystem();
+
+        telemetry.addLine("Opening camera...");
+        telemetry.update();
+        kai.frontCamera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                kai.frontCamera.startStreaming(SignalOpticalSystem.CAMERA_WIDTH, SignalOpticalSystem.CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+
+            }
+        });
+
+        telemetry.addLine("Setting up systems...");
+        telemetry.update();
+        kai.frontCamera.setPipeline(signalOpticalSystem);
         super.init();
         this.dStar = new DStar(6, 6, 0, 0);
 
@@ -34,7 +53,7 @@ public abstract class AbstractAuto extends Control {
         };
 
         while(!signalOpticalSystem.isReady()) sleep(100);
-        telemetry.addLine("Robot is Ready");
+        telemetry.addLine("Robot is Ready!");
         telemetry.update();
     }
 
