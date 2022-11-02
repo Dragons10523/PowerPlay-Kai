@@ -6,9 +6,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Autonomous(name = "Auto Left", preselectTeleOp = "Drive")
 public class AutonomousLeftSide extends AbstractAuto {
-    @Override public void loop() {
+    @Override public void start() {
         if(isStopRequested) return;
-        super.loop();
+        super.start();
 
         boolean robotInterrupt = false;
 

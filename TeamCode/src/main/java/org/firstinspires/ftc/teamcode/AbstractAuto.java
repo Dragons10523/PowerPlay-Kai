@@ -61,6 +61,11 @@ public abstract class AbstractAuto extends Control {
         telemetry.update();
     }
 
+    @Override
+    public void loop() {
+        requestOpModeStop();
+    }
+
     public void liftToStack(int stackHeight) {
         // TODO: Calibrate real values
         setLiftHeight(1000 + (10 * stackHeight));
