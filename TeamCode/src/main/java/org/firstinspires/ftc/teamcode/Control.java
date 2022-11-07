@@ -3,12 +3,10 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.utils.VecUtils;
 
 public abstract class Control extends OpMode {
     public Kai kai;
-
-    public static final double TAU = Math.PI * 2;
-    public static final double HALF_PI = Math.PI / 2;
 
     // TODO: Calculate the proper angle to ticks value
     public static final double TURNTABLE_TICKS_PER_RAD = 100;
@@ -226,13 +224,13 @@ public abstract class Control extends OpMode {
         double clawRotVel = kai.deadwheels.angularVelocity + tableVel();
 
         double clawExtension = getExtensionCurrent();
-        double clawXVel = Math.cos(clawAngle) * clawRotVel * TAU * clawExtension;
-        double clawYVel = -Math.sin(clawAngle) * clawRotVel * TAU * clawExtension;
+        double clawXVel = Math.cos(clawAngle) * clawRotVel * VecUtils.TAU * clawExtension;
+        double clawYVel = -Math.sin(clawAngle) * clawRotVel * VecUtils.TAU * clawExtension;
         xVel += clawXVel;
         yVel += clawYVel;
 
-        double clawXPos = Math.cos(clawAngle) * TAU * clawExtension;
-        double clawYPos = -Math.sin(clawAngle) * TAU * clawExtension;
+        double clawXPos = Math.cos(clawAngle) * VecUtils.TAU * clawExtension;
+        double clawYPos = -Math.sin(clawAngle) * VecUtils.TAU * clawExtension;
         xPos += clawXPos;
         yPos += clawYPos;
 
@@ -305,7 +303,7 @@ public abstract class Control extends OpMode {
     }
 
     public double collapseAngle(double angle) {
-        return (((angle % TAU) + TAU) % TAU);
+        return (((angle % VecUtils.TAU) + VecUtils.TAU) % VecUtils.TAU);
     }
 
     public double mapAngle(double angle, double offset) {

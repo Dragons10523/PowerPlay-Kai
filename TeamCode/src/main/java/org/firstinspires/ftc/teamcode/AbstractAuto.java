@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.utils.VecUtils;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
@@ -50,10 +51,10 @@ public abstract class AbstractAuto extends Control {
         robotSensors = new DistanceSensor[]{kai.frontDist, kai.rightDist, kai.leftDist, kai.backDist};
         // X, Y, Angle
         sensorOffsets = new double[][]{
-                {0, 0, -Control.HALF_PI},
+                {0, 0, -VecUtils.HALF_PI},
                 {0, 0, 0},
                 {0, 0, Math.PI},
-                {0, 0, Control.HALF_PI}
+                {0, 0, VecUtils.HALF_PI}
         };
 
         while(!signalOpticalSystem.isReady()) sleep(100);

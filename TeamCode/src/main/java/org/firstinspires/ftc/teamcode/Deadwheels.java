@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.utils.VecUtils;
+
 public class Deadwheels {
     private final DcMotor leftYEncoder;
     private final DcMotor rightYEncoder;
@@ -30,8 +32,8 @@ public class Deadwheels {
         this.leftYEncoder = leftYEncoder;
         this.rightYEncoder = rightYEncoder;
         this.XEncoder = XEncoder;
-        this.symmetricCircumference = Control.TAU * lateralOffset;
-        this.asymmetricCircumference = Control.TAU * forwardOffset;
+        this.symmetricCircumference = VecUtils.TAU * lateralOffset;
+        this.asymmetricCircumference = VecUtils.TAU * forwardOffset;
         this.inchesPerTick = inchesPerTick;
         lastUpdateTime = -1;
     }
@@ -54,9 +56,9 @@ public class Deadwheels {
         int XDelta = XPos - XPosPrev;
 
         // Positive turning right, negative for left
-        double turnDelta = ((((rightYDelta - leftYDelta) / 2d) * inchesPerTick) / symmetricCircumference) * Control.TAU;
+        double turnDelta = ((((rightYDelta - leftYDelta) / 2d) * inchesPerTick) / symmetricCircumference) * VecUtils.TAU;
 
-        double robotTurnXDelta = (turnDelta / Control.TAU) * asymmetricCircumference;
+        double robotTurnXDelta = (turnDelta / VecUtils.TAU) * asymmetricCircumference;
         double robotXDelta = ((XDelta) * inchesPerTick) - robotTurnXDelta;
         double robotYDelta = (leftYDelta + rightYDelta) * Math.PI;
 
