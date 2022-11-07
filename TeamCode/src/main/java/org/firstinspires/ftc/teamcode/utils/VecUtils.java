@@ -15,4 +15,8 @@ public class VecUtils {
 
         return originalVector;
     }
+
+    public static double getVectorAngle(VectorF vector) {
+        return Math.atan2(vector.get(1), vector.get(0));
+    }
 }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.utils.VecUtils;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -143,7 +144,7 @@ public abstract class AbstractAuto extends Control {
         while(Math.abs(yAdjust) > 4) {
             if(isStopRequested) return false;
 
-            mecanumDrive(0, yAdjust * .4, 0, DriveMode.GLOBAL);
+            mecanumDrive(0, (float) (yAdjust * .4), 0, DriveMode.GLOBAL);
 
             if(checkPathing()) return true;
             yAdjust = 12 - (kai.deadwheels.currentY % 24);
@@ -154,7 +155,7 @@ public abstract class AbstractAuto extends Control {
         while(Math.abs(xAdjust) > 4) {
             if(isStopRequested) return false;
 
-            mecanumDrive(xAdjust, yAdjust, 0, DriveMode.GLOBAL) ;
+            mecanumDrive((float) xAdjust, (float) yAdjust, 0, DriveMode.GLOBAL) ;
 
             if(checkPathing()) return true;
             xAdjust = xInch - kai.deadwheels.currentX;
@@ -166,7 +167,7 @@ public abstract class AbstractAuto extends Control {
         while(Math.abs(yAdjust) > 4) {
             if(isStopRequested) return false;
 
-            mecanumDrive(xAdjust, yAdjust, 0, DriveMode.GLOBAL) ;
+            mecanumDrive((float) xAdjust, (float) yAdjust, 0, DriveMode.GLOBAL) ;
 
             if(checkPathing()) return true;
             xAdjust = xInch - kai.deadwheels.currentX;

@@ -14,8 +14,8 @@ public class DriveAlignTest extends Control {
     public void loop() {
         super.loop();
 
-        double driveX = gamepad1.left_stick_x;
-        double driveY = -gamepad1.left_stick_y;
+        float driveX = gamepad1.left_stick_x;
+        float driveY = -gamepad1.left_stick_y;
         DriveMode driveMode = DriveMode.LOCAL;
 
         driveMode = DriveMode.GLOBAL;

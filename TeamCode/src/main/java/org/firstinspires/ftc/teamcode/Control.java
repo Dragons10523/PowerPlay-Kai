@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.utils.VecUtils;
 
@@ -67,7 +68,7 @@ public abstract class Control extends OpMode {
         stopAllMovement();
     }
 
-    public void mecanumDrive(double x, double y, double turn, DriveMode mode) {
+    public void mecanumDrive(float x, float y, double turn, DriveMode mode) {
         // Chose between global or local alignment
         double angle;
         switch(mode) {
@@ -79,11 +80,9 @@ public abstract class Control extends OpMode {
                 angle = 0;
         }
 
-        // Rotation of axes to realign from the angle
-        float xAligned = (float) ((x * Math.cos(angle)) + (y * Math.sin(angle)));
-        float yAligned = (float) ((x * (-Math.sin(angle))) + (y * Math.cos(angle)));
+        VectorF vec = VecUtils.rotateVector(new VectorF(x, y), angle);
 
-        kai.drivetrain.drive(yAligned, xAligned, turn);
+        kai.drivetrain.drive(vec.get(0), vec.get(1), turn);
     }
 
     public void claw(ClawState clawState) {
@@ -136,27 +135,21 @@ public abstract class Control extends OpMode {
         poleYIndex = 4 - poleYIndex;
 
         // Calculate the pole position
-        double poleX = (poleXIndex + 1) * 24;
-        double poleY = (poleYIndex + 1) * 24;
+        float poleX = (poleXIndex + 1) * 24;
+        float poleY = (poleYIndex + 1) * 24;
 
-        // RC means robot centered
-        double poleXRC = poleX - kai.deadwheels.currentX;
-        double poleYRC = poleY - kai.deadwheels.currentY;
-
-        double velX = kai.deadwheels.xVelocity;
-        double velY = kai.deadwheels.yVelocity;
+        VectorF poleVec = new VectorF((float) (poleX - kai.deadwheels.currentX), (float) (poleY - kai.deadwheels.currentY));
+        VectorF velVec = new VectorF((float) kai.deadwheels.xVelocity, (float) kai.deadwheels.yVelocity);
 
         // Calculate the position to target in field space
-        double targetX = poleXRC - velX;
-        double targetY = poleYRC - velY;
+        VectorF targetVec = poleVec.subtracted(velVec);
 
         double currentAngle = kai.getHeading();
 
         // Convert the target position from field space to robot space
-        double robotX = Math.cos(currentAngle) * targetX + Math.sin(currentAngle) * targetY;
-        double robotY = -Math.sin(currentAngle) * targetX + Math.cos(currentAngle) * targetY;
+        VectorF robotVec = VecUtils.rotateVector(targetVec, currentAngle);
 
-        double targetAngle = Math.atan2(robotX, robotY);
+        double targetAngle = VecUtils.getVectorAngle(robotVec);
 
         // Claw Flipping
         boolean flippedValues = false;
@@ -177,7 +170,7 @@ public abstract class Control extends OpMode {
         }
 
         // Set the extension distance
-        setExtensionDistance(extensionMult * Math.hypot(robotX, robotY));
+        setExtensionDistance(extensionMult * robotVec.length());
         // Aim
         aimClaw(angleOffset + targetAngle);
     }
