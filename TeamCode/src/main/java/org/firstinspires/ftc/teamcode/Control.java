@@ -67,13 +67,6 @@ public abstract class Control extends OpMode {
         stopAllMovement();
     }
 
-    public void drive(double flPower, double frPower, double blPower, double brPower) {
-        kai.frontLeft.setPower(flPower);
-        kai.frontRight.setPower(frPower);
-        kai.backLeft.setPower(blPower);
-        kai.backRight.setPower(brPower);
-    }
-
     public void mecanumDrive(double x, double y, double turn, DriveMode mode) {
         // Chose between global or local alignment
         double angle;
@@ -87,18 +80,10 @@ public abstract class Control extends OpMode {
         }
 
         // Rotation of axes to realign from the angle
-        double xAligned = ((x * Math.cos(angle)) + (y * Math.sin(angle)));
-        double yAligned = ((x * (-Math.sin(angle))) + (y * Math.cos(angle)));
+        float xAligned = (float) ((x * Math.cos(angle)) + (y * Math.sin(angle)));
+        float yAligned = (float) ((x * (-Math.sin(angle))) + (y * Math.cos(angle)));
 
-        // Calculate the correct motor powers
-        double negPowers = (xAligned * 1 + yAligned * 1);
-        double posPowers = (xAligned * -1 + yAligned * 1);
-
-        // Apply the motor powers on diagonals
-        drive(
-                negPowers + turn, posPowers - turn,
-                posPowers + turn, negPowers - turn
-        );
+        kai.drivetrain.drive(yAligned, xAligned, turn);
     }
 
     public void claw(ClawState clawState) {
@@ -295,7 +280,7 @@ public abstract class Control extends OpMode {
     }
 
     public void stopAllMovement() {
-        drive(0, 0, 0, 0);
+        kai.drivetrain.drive(0, 0);
         kai.horizontalLift.setPower(0);
         kai.turntable.setPower(0);
         kai.armLiftA.setPower(0);

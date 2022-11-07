@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public abstract class AbstractDrivetrain {
-    DcMotor[] driveMotors;
+    public DcMotor[] driveMotors;
 
     public AbstractDrivetrain(DcMotor frontLeft, DcMotor frontRight, DcMotor backLeft, DcMotor backRight) {
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -18,5 +18,17 @@ public abstract class AbstractDrivetrain {
         driveMotors[1].setPower(forwards - turn);
         driveMotors[2].setPower(forwards + turn);
         driveMotors[3].setPower(forwards - turn);
+    }
+
+    public void setMode(DcMotor.RunMode mode) {
+        for(DcMotor motor : driveMotors) {
+            motor.setMode(mode);
+        }
+    }
+
+    public void setZeroBehavior(DcMotor.ZeroPowerBehavior behavior) {
+        for(DcMotor motor : driveMotors) {
+            motor.setZeroPowerBehavior(behavior);
+        }
     }
 }

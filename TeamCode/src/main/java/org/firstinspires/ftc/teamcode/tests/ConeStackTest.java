@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.tests;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.AbstractAuto;
+import org.firstinspires.ftc.teamcode.utils.VecUtils;
 
 @TeleOp(name = "ConeTest", group = "Test")
 public class ConeStackTest extends AbstractAuto {
@@ -24,12 +25,12 @@ public class ConeStackTest extends AbstractAuto {
 
         // Turning
         double turn = gamepad1.right_trigger - gamepad1.left_trigger;
-        turn += assistTurnPower * mapAngle(kai.getHeading(), -HALF_PI, HALF_PI, 0);
+        turn += assistTurnPower * mapAngle(kai.getHeading(), -VecUtils.HALF_PI, VecUtils.HALF_PI, 0);
 
         // Deadzone for alignment
         if(squaredHypotenuse(driveX, driveY) > 0.03) {
             double driveAngle = collapseAngle(Math.atan2(driveY, driveX) + kai.getHeading());
-            int driveAlignment = ((int)(driveAngle / HALF_PI)) % 2;
+            int driveAlignment = ((int)(driveAngle / VecUtils.HALF_PI)) % 2;
 
             if(driveAlignment == 0) {
                 // X aligned

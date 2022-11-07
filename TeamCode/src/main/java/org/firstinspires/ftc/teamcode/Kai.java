@@ -9,12 +9,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.utils.drivetrain.MecanumDrivetrain;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 public class Kai {
     // Also used for deadwheels. Use back motors for both y axis, front left for the x axis
-    public final DcMotor frontLeft, frontRight, backLeft, backRight;
+    public final MecanumDrivetrain drivetrain;
 
     public final DcMotor horizontalLift;
     public final DcMotorEx turntable;
@@ -35,10 +36,10 @@ public class Kai {
         this.hwmap = hwmap;
 
         // Map electronics
-        frontLeft = hwmap.get(DcMotor.class, "frontLeft");
-        frontRight = hwmap.get(DcMotor.class, "frontRight");
-        backLeft = hwmap.get(DcMotor.class, "backLeft");
-        backRight = hwmap.get(DcMotor.class, "backRight");
+        drivetrain = new MecanumDrivetrain(
+                hwmap.get(DcMotor.class, "frontLeft"), hwmap.get(DcMotor.class, "frontRight"),
+                hwmap.get(DcMotor.class, "backLeft"), hwmap.get(DcMotor.class, "backRight")
+        );
 
         horizontalLift = hwmap.get(DcMotor.class, "horizontalLift");
         turntable = hwmap.get(DcMotorEx.class, "turntable");
@@ -70,16 +71,8 @@ public class Kai {
         WebcamName frontWebcamName = hwmap.get(WebcamName.class, "Front Camera");
         frontCamera = OpenCvCameraFactory.getInstance().createWebcam(frontWebcamName);
 
-        // Set motor directions
-        frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        // Set motor behavior
+        drivetrain.setZeroBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         horizontalLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         turntable.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -107,7 +100,7 @@ public class Kai {
         armLiftA.setPower(1);
         armLiftB.setPower(1);
 
-        deadwheels = new Deadwheels(backLeft, backRight, frontLeft, 7, 0, Math.PI/4096);
+        deadwheels = new Deadwheels(drivetrain.driveMotors[2], drivetrain.driveMotors[3], drivetrain.driveMotors[0], 7, 0, Math.PI/4096);
     }
 
     public double getHeading(){

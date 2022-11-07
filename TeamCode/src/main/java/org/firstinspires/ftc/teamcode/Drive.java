@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.utils.VecUtils;
+
 @TeleOp(name = "Drive")
 public class Drive extends Control {
     public final boolean INTENSIVE_PRACTICE = false;
@@ -54,7 +56,7 @@ public class Drive extends Control {
         // Turning
         double turn = gamepad1.right_trigger - gamepad1.left_trigger;
         if(assistTurns) {
-            turn += assistTurnPower * mapAngle(kai.getHeading(), -HALF_PI, HALF_PI, 0);
+            turn += assistTurnPower * mapAngle(kai.getHeading(), -VecUtils.HALF_PI, VecUtils.HALF_PI, 0);
         }
 
         // Driving
@@ -68,7 +70,7 @@ public class Drive extends Control {
             // Deadzone for alignment
             if(squaredHypotenuse(driveX, driveY) > 0.03) {
                 double driveAngle = collapseAngle(Math.atan2(driveY, driveX) + kai.getHeading());
-                int driveAlignment = ((int)(driveAngle / HALF_PI)) % 2;
+                int driveAlignment = ((int)(driveAngle / VecUtils.HALF_PI)) % 2;
 
                 if(driveAlignment == 0) {
                     // X aligned
@@ -175,12 +177,11 @@ public class Drive extends Control {
                 // random value 0-5 inclusive
                 int eventValue = (int) Math.floor(Math.random() * 5);
 
-                DcMotor[] driveTrain = {kai.frontLeft, kai.frontRight, kai.backLeft, kai.backRight};
                 DcMotor[] liftMotors = {kai.armLiftA, kai.armLiftB};
                 switch(eventValue) {
                     // Randomly set motors to float
                     case 0:
-                        for(DcMotor motor : driveTrain) {
+                        for(DcMotor motor : kai.drivetrain.driveMotors) {
                             int willBreak = (int) Math.floor(Math.random() * 2);
                             if(willBreak == 0) {
                                 motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -189,7 +190,7 @@ public class Drive extends Control {
                         break;
                     // Randomly set motors and encoders to break
                     case 1:
-                        for(DcMotor motor : driveTrain) {
+                        for(DcMotor motor : kai.drivetrain.driveMotors) {
                             int willBreak = (int) Math.floor(Math.random() * 4);
                             if(willBreak == 0) {
                                 motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
