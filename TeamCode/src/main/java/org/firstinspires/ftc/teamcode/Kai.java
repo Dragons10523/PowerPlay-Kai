@@ -50,12 +50,17 @@ public class Kai {
         clawFlup = hwmap.get(Servo.class, "clawFlup");
         clawTwist = hwmap.get(Servo.class, "clawTwist");
 
-        frontDist = hwmap.get(DistanceSensor.class, "frontDist");
+        /*frontDist = hwmap.get(DistanceSensor.class, "frontDist");
         rightDist = hwmap.get(DistanceSensor.class, "rightDist");
         leftDist = hwmap.get(DistanceSensor.class, "leftDist");
         backDist = hwmap.get(DistanceSensor.class, "backDist");
 
-        clawSensor = hwmap.get(DistanceSensor.class, "clawSensor");
+        clawSensor = hwmap.get(DistanceSensor.class, "clawSensor");*/
+        frontDist = null;
+                rightDist = null ;
+                        leftDist = null;
+                                backDist = null;
+                                        clawSensor = null;
 
         // Set up IMU parameters
         BNO055IMU.Parameters parameters             = new BNO055IMU.Parameters();
@@ -68,8 +73,9 @@ public class Kai {
         imu = hwmap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-        WebcamName frontWebcamName = hwmap.get(WebcamName.class, "Front Camera");
-        frontCamera = OpenCvCameraFactory.getInstance().createWebcam(frontWebcamName);
+        WebcamName frontWebcamName = hwmap.get(WebcamName.class, "Webcam 1");
+        //frontCamera = OpenCvCameraFactory.getInstance().createWebcam(frontWebcamName);
+        frontCamera = null;
 
         // Set motor behavior
         drivetrain.setZeroBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -105,6 +111,7 @@ public class Kai {
 
     public double getHeading(){
         // Maf angles, not game
+        //return imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
         return deadwheels.currentAngle;
     }
 }
