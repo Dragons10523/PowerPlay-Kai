@@ -289,7 +289,8 @@ public abstract class Control extends OpMode {
     }
 
     public double mapAngle(double angle, double min, double max, double offset) {
-        return ((((angle + offset) - min) % max + max) % max) + min;
+        double dist = max - min;
+        return ((((angle + offset) - min) % dist + dist) % dist) + min;
     }
 
     public static double squaredHypotenuse(double x, double y) {
