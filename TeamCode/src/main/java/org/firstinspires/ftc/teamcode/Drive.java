@@ -11,9 +11,9 @@ public class Drive extends Control {
     public final boolean INTENSIVE_PRACTICE = false;
 
     // Assist values
-    boolean assistDrive = true;
-    boolean assistTurns = true;
-    boolean assistManipulator = true;
+    boolean assistDrive = false;
+    boolean assistTurns = false;
+    boolean assistManipulator = false;
 
     // Numerical values
     double assistTurnPower = 1;
@@ -55,8 +55,8 @@ public class Drive extends Control {
 
         // Turning
         double turn = gamepad1.right_trigger - gamepad1.left_trigger;
-        if(assistTurns) {
-            turn += assistTurnPower * mapAngle(kai.getHeading(), -VecUtils.HALF_PI, VecUtils.HALF_PI, 0);
+        if(assistTurns && Math.abs(turn) <= .1) {
+            turn += assistTurnPower * mapAngle(kai.getHeading(), -VecUtils.HALF_PI/2, VecUtils.HALF_PI/2, 0);
         }
 
         // Driving
