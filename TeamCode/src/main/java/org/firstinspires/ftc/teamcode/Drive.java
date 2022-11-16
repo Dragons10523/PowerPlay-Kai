@@ -36,6 +36,12 @@ public class Drive extends Control {
     boolean clawSensorBroken = false;
 
     @Override
+    public void start() {
+        super.start();
+        armControl.shouldRun = true;
+    }
+
+    @Override
     public void loop() {
         super.loop();
 
@@ -110,60 +116,41 @@ public class Drive extends Control {
                 selectedPole %= 25;
             }
 
-            boolean clawOpen = clawOpen();
+            armControl.setTarget(Control.poleIdxToPos(selectedPole));
+
+            boolean clawOpen = armControl.isClawOpen();
             if(clawOpen && gamepad2.x && clawDistance() <= 1.5 && !clawSensorBroken) {
                 clawOpen = false;
             }
-            if(!clawOpen && gamepad2.x && willConeHit(selectedPole)) {
+            if(!clawOpen && gamepad2.x && armControl.willConeHit(selectedPole)) {
                 clawOpen = true;
             }
 
-            if(clawOpen != clawOpen()) {
-                toggleClaw();
+            if(clawOpen != armControl.isClawOpen()) {
+                armControl.toggleClaw();
             }
 
             directionPrev = gamepad2.dpad_up || gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right;
 
-            // TODO: Replace 350 with the wall height
-            if(kai.armLiftA.getTargetPosition() > 350 && kai.armLiftA.getCurrentPosition() > 350 && !wantToLower) {
-                aimClaw(selectedPole);
-            } else {
-                aimClaw(0);
-            }
             orientClaw(WristState.NORMAL);
 
             displayField();
 
             // Raising the claw
             GoalHeight poleHeight = FIELD_SETUP[selectedPole];
-
-            wantToLower = false;
-            if(Math.abs(tableAngle() % Math.PI) <= 0.06) {
-                lift(poleHeight);
-            } else {
-                switch(poleHeight) {
-                    case GROUND:
-                    case LOW:
-                    case NONE:
-                        aimClaw(0);
-                        wantToLower = true;
-                    default:
-                        lift(poleHeight);
-                }
-            }
         } else {
             if(gamepad2.x) {
-                lift(GoalHeight.NONE);
+                armControl.setLiftHeight(GoalHeight.NONE);
             } else if(gamepad2.y) {
-                lift(GoalHeight.HIGH);
+                armControl.setLiftHeight(GoalHeight.HIGH);
             } else if(gamepad2.a) {
-                lift(GoalHeight.MID);
+                armControl.setLiftHeight(GoalHeight.MID);
             } else if(gamepad2.b) {
-                lift(GoalHeight.LOW);
+                armControl.setLiftHeight(GoalHeight.LOW);
             }
 
             if(manualClaw != clawPrev && manualClaw) {
-                toggleClaw();
+                armControl.toggleClaw();
             }
 
             if(gamepad2.dpad_down) {

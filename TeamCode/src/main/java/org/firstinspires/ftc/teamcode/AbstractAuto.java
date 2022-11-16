@@ -20,6 +20,11 @@ public abstract class AbstractAuto extends Control {
     private DistanceSensor[] robotSensors;
     private double[][] sensorOffsets;
 
+    public enum FieldSide {
+        LEFT,
+        RIGHT
+    }
+
     @Override
     public void init() {
         telemetry.addLine("Robot is Starting...");
@@ -64,13 +69,18 @@ public abstract class AbstractAuto extends Control {
     }
 
     @Override
+    public void start() {
+        armControl.shouldRun = true;
+    }
+
+    @Override
     public void loop() {
         requestOpModeStop();
     }
 
     public void liftToStack(int stackHeight) {
         // TODO: Calibrate real values
-        setLiftHeight(1000 + (10 * stackHeight));
+        armControl.coneStack = 1000 + (10 * stackHeight);
     }
 
     public void moveToTile(int nodeIndex) {
@@ -241,5 +251,14 @@ public abstract class AbstractAuto extends Control {
             }
         }
         return false;
+    }
+
+    public void aimAtStack() {
+        armControl.aimClaw(
+                Math.atan2(
+                        60 - kai.deadwheels.currentY,
+                        0 - kai.deadwheels.currentX
+                ) - kai.deadwheels.currentAngle
+        );
     }
 }

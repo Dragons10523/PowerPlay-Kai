@@ -23,7 +23,7 @@ public class Kai {
     public final DcMotor horizontalLift;
     public final DcMotorEx turntable;
     public final DcMotor armLiftA, armLiftB;
-    public final Servo claw, clawFlup, clawTwist;
+    public final Servo claw, clawTwist;
 
     public final DistanceSensor frontDist, rightDist, leftDist, backDist;
     public final DistanceSensor clawSensor;
@@ -50,20 +50,14 @@ public class Kai {
         armLiftB = hwmap.get(DcMotor.class, "armLiftB");
 
         claw = hwmap.get(Servo.class, "claw");
-        clawFlup = hwmap.get(Servo.class, "clawFlup");
         clawTwist = hwmap.get(Servo.class, "clawTwist");
 
-        /*frontDist = hwmap.get(DistanceSensor.class, "frontDist");
+        frontDist = hwmap.get(DistanceSensor.class, "frontDist");
         rightDist = hwmap.get(DistanceSensor.class, "rightDist");
         leftDist = hwmap.get(DistanceSensor.class, "leftDist");
         backDist = hwmap.get(DistanceSensor.class, "backDist");
 
-        clawSensor = hwmap.get(DistanceSensor.class, "clawSensor");*/
-        frontDist = null;
-                rightDist = null ;
-                        leftDist = null;
-                                backDist = null;
-                                        clawSensor = null;
+        clawSensor = hwmap.get(DistanceSensor.class, "clawSensor");
 
         // Set up IMU parameters
         BNO055IMU.Parameters parameters             = new BNO055IMU.Parameters();
@@ -114,7 +108,7 @@ public class Kai {
 
     public double getHeading(){
         // Maf angles, not game
-        return imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
-        //return deadwheels.currentAngle;
+        //return imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
+        return deadwheels.currentAngle;
     }
 }

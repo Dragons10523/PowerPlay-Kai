@@ -10,6 +10,12 @@ public class AimingTest extends Control {
     boolean directionPrev = false;
 
     @Override
+    public void start() {
+        super.start();
+        armControl.shouldRun = true;
+    }
+
+    @Override
     public void loop() {
         super.loop();
 
@@ -28,7 +34,7 @@ public class AimingTest extends Control {
 
         directionPrev = gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_left || gamepad1.dpad_right;
 
-        aimClaw(selectedPole);
+        armControl.setTarget(Control.poleIdxToPos(selectedPole));
 
         displayField();
     }

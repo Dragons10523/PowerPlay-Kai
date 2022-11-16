@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.teamcode.utils.VecUtils;
 
 public class Deadwheels {
@@ -36,6 +37,10 @@ public class Deadwheels {
         this.asymmetricCircumference = VecUtils.TAU * forwardOffset;
         this.inchesPerTick = inchesPerTick;
         lastUpdateTime = -1;
+    }
+
+    public void setTransform(VectorF position, double angle) {
+        setTransform(position.get(0), position.get(1), angle);
     }
 
     public void setTransform(double x, double y, double angle) {
