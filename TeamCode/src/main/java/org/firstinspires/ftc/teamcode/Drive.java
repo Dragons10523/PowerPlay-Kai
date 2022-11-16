@@ -12,11 +12,11 @@ public class Drive extends Control {
 
     // Assist values
     boolean assistDrive = false;
-    boolean assistTurns = false;
+    boolean assistTurns = true;
     boolean assistManipulator = false;
 
     // Numerical values
-    double assistTurnPower = 1;
+    double assistTurnPower = 1.6;
     double assistDrivePower = 0.7;
     int selectedPole = 12;
 
@@ -55,9 +55,13 @@ public class Drive extends Control {
 
         // Turning
         double turn = gamepad1.right_trigger - gamepad1.left_trigger;
-        if(assistTurns && Math.abs(turn) <= .1) {
-            turn += assistTurnPower * mapAngle(kai.getHeading(), -VecUtils.HALF_PI/2, VecUtils.HALF_PI/2, 0);
+        if(assistTurns) {// && Math.abs(turn) <= .1) {
+            telemetry.addData("Angle", (int) Math.toDegrees(kai.getHeading()));
+            double addend = -mapAngle(kai.getHeading(), -VecUtils.HALF_PI/2, VecUtils.HALF_PI/2, 0);
+            turn += addend * addend * assistTurnPower;
         }
+
+        telemetry.addData("Turn", turn);
 
         // Driving
         float driveX = gamepad1.left_stick_x;
