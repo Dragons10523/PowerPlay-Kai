@@ -3,16 +3,26 @@ package org.firstinspires.ftc.teamcode;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.teamcode.utils.VecUtils;
 
+// This class is meant to handle "blocking" to prevent any possibly dangerous movements from happening
 public class ArmControl extends Thread {
     // TODO: Calculate the proper angle to ticks value
     public static final double TURNTABLE_TICKS_PER_RAD = 100;
+    // TODO: Replace 1000 with the proper conversion value
+    public static final double EXTENSION_TICKS_PER_INCH = 1000;
+
+    public static final int GROUND_GOAL_HEIGHT = 0;
+    public static final int LOW_GOAL_HEIGHT = 333;
+    public static final int MID_GOAL_HEIGHT = 667;
+    public static final int HIGH_GOAL_HEIGHT = 1000;
 
     public Control control;
     public boolean shouldRun = false;
     public int coneStack = -1;
 
-    private VectorF target;
-    private Control.GoalHeight liftHeight;
+    protected VectorF target;
+    protected Control.GoalHeight liftHeight;
+    protected Control.GoalHeight prevLiftHeight;
+    protected int extensionDistance;
 
     public ArmControl(Control control) {
         this.control = control;
@@ -24,6 +34,7 @@ public class ArmControl extends Thread {
                 if(shouldRun) {
                     aimClaw();
                     lift();
+                    moveExtensionWhenSafe();
                 }
             }
         } catch (Exception e) {
@@ -43,7 +54,8 @@ public class ArmControl extends Thread {
         this.liftHeight = liftHeight;
     }
 
-    private void aimClaw() {
+    protected void aimClaw() {
+        // Blocked by the lift target
         if(liftHeight == Control.GoalHeight.GROUND || liftHeight == Control.GoalHeight.NONE) {
             aimClaw(0);
             return;
@@ -63,7 +75,7 @@ public class ArmControl extends Thread {
         double targetAngle = VecUtils.getVectorAngle(robotVec);
 
         // Set the extension distance
-        setExtensionDistance(robotVec.length());
+        extensionDistance = robotVec.length();
         // Aim
         aimClaw(targetAngle);
     }
@@ -106,26 +118,38 @@ public class ArmControl extends Thread {
     }
 
     // TODO: calibrate lift heights
-    public void lift() {
+    protected void lift() {
+        // Blocked by the extension's current position
+        if(control.kai.liftExtension.getCurrentPosition() >= 10) {
+            return;
+        }
+
+        // Blocked by the turntable's current position
+        if(Math.abs(control.kai.turntable.getCurrentPosition()) >= 10 || control.kai.turntable.isBusy()) {
+            return;
+        }
+
         switch(liftHeight) {
             case HIGH:
-                setLiftHeight(1000);
+                setLiftHeight(HIGH_GOAL_HEIGHT);
                 break;
             case MID:
-                setLiftHeight(667);
+                setLiftHeight(MID_GOAL_HEIGHT);
                 break;
             case LOW:
-                setLiftHeight(333);
+                setLiftHeight(LOW_GOAL_HEIGHT);
                 break;
             case GROUND:
             case NONE:
             default:
                 if(Math.abs(tableAngle()) > 0.08) {
-                    setLiftHeight(300);
+                    setLiftHeight(LOW_GOAL_HEIGHT);
                     break;
                 }
-                setLiftHeight(0);
+                setLiftHeight(GROUND_GOAL_HEIGHT);
         }
+
+        prevLiftHeight = liftHeight;
     }
 
     public void claw(Control.ClawState clawState) {
@@ -155,24 +179,34 @@ public class ArmControl extends Thread {
         control.kai.turntable.setTargetPosition((int) (angle * TURNTABLE_TICKS_PER_RAD));
     }
 
+    protected void moveExtensionWhenSafe() {
+        // Lift blocks all
+        if(getLiftCurrentLiftHeight() > getGoalHeight(liftHeight) - 100) {
+            control.kai.liftExtension.setTargetPosition(extensionDistance);
+        } else if(prevLiftHeight != liftHeight) {
+            control.kai.liftExtension.setTargetPosition(0);
+        }
+    }
+
     public void setExtensionDistance(double distance) {
-        // TODO: Replace 1000 with the proper conversion value
-        control.kai.horizontalLift.setTargetPosition((int) (distance * 1000));
+        extensionDistance = (int)(distance * EXTENSION_TICKS_PER_INCH);
     }
 
     public double getExtensionTarget() {
-        // TODO: Don't forget me!
-        return control.kai.horizontalLift.getTargetPosition() / 1000.0;
+        return extensionDistance / EXTENSION_TICKS_PER_INCH;
     }
 
     public double getExtensionCurrent() {
-        // TODO: Don't forget me either!
-        return control.kai.horizontalLift.getCurrentPosition() / 1000.0;
+        return control.kai.liftExtension.getCurrentPosition() / EXTENSION_TICKS_PER_INCH;
     }
 
     public void setLiftHeight(int liftHeight) {
         control.kai.armLiftA.setTargetPosition(liftHeight);
         control.kai.armLiftB.setTargetPosition(liftHeight);
+    }
+
+    public int getLiftCurrentLiftHeight() {
+        return control.kai.armLiftA.getCurrentPosition();
     }
 
     public double tableAngle() {
@@ -181,5 +215,20 @@ public class ArmControl extends Thread {
 
     public double tableVel() {
         return control.kai.turntable.getVelocity() / TURNTABLE_TICKS_PER_RAD;
+    }
+
+    public int getGoalHeight(Control.GoalHeight goalHeight) {
+        switch (goalHeight) {
+            case LOW:
+                return LOW_GOAL_HEIGHT;
+            case MID:
+                return MID_GOAL_HEIGHT;
+            case HIGH:
+                return HIGH_GOAL_HEIGHT;
+            case NONE:
+            case GROUND:
+            default:
+                return GROUND_GOAL_HEIGHT;
+        }
     }
 }

@@ -117,7 +117,7 @@ public abstract class Control extends OpMode {
 
     public void stopAllMovement() {
         if(kai == null) return;
-        kai.horizontalLift.setPower(0);
+        kai.liftExtension.setPower(0);
         kai.turntable.setPower(0);
         kai.armLiftA.setPower(0);
         kai.armLiftB.setPower(0);

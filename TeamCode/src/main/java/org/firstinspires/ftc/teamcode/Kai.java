@@ -3,25 +3,20 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.teamcode.utils.drivetrain.MecanumDrivetrain;
-import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 public class Kai {
     // Also used for deadwheels. Use back motors for both y axis, front left for the x axis
     public final MecanumDrivetrain drivetrain;
 
-    public final DcMotor horizontalLift;
+    public final DcMotor liftExtension;
     public final DcMotorEx turntable;
     public final DcMotor armLiftA, armLiftB;
     public final Servo claw, clawTwist;
@@ -45,7 +40,7 @@ public class Kai {
                 hwmap.get(DcMotor.class, "backLeft"), hwmap.get(DcMotor.class, "backRight")
         );
 
-        horizontalLift = hwmap.get(DcMotor.class, "horizontalLift");
+        liftExtension = hwmap.get(DcMotor.class, "horizontalLift");
         turntable = hwmap.get(DcMotorEx.class, "turntable");
         armLiftA = hwmap.get(DcMotor.class, "armLiftA");
         armLiftB = hwmap.get(DcMotor.class, "armLiftB");
@@ -78,18 +73,18 @@ public class Kai {
         // Set motor behavior
         drivetrain.setZeroBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        horizontalLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        liftExtension.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         turntable.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armLiftA.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armLiftB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Set up encoders
-        horizontalLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turntable.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armLiftA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armLiftB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        horizontalLift.setTargetPosition(0);
+        liftExtension.setTargetPosition(0);
         turntable.setTargetPosition(0);
         armLiftA.setTargetPosition(0);
         armLiftB.setTargetPosition(0);
@@ -97,12 +92,12 @@ public class Kai {
         turntable.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(1.31, 0.131, 0.03, 13.1));
         turntable.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, new PIDFCoefficients(2, 0, 0, 0));
 
-        horizontalLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        liftExtension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turntable.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armLiftA.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armLiftB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        horizontalLift.setPower(1);
+        liftExtension.setPower(1);
         turntable.setPower(1);
         armLiftA.setPower(1);
         armLiftB.setPower(1);
