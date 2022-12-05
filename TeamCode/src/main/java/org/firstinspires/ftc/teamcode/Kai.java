@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -23,8 +22,6 @@ public class Kai {
 
     public final DistanceSensor frontDist, rightDist, leftDist, backDist;
     public final DistanceSensor clawSensor;
-
-    public final BNO055IMU imu;
 
     public OpenCvWebcam frontCamera;
 
@@ -54,17 +51,6 @@ public class Kai {
         backDist = hwmap.get(DistanceSensor.class, "backDist");
 
         clawSensor = hwmap.get(DistanceSensor.class, "clawSensor");
-
-        // Set up IMU parameters
-        BNO055IMU.Parameters parameters             = new BNO055IMU.Parameters();
-        parameters.angleUnit                        = BNO055IMU.AngleUnit.RADIANS;
-        parameters.accelUnit                        = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile              = "AdafruitIMUCalibration.json";
-        parameters.loggingEnabled                   = false;
-        parameters.loggingTag                       = "IMU";
-
-        imu = hwmap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
 
         WebcamName frontWebcamName = hwmap.get(WebcamName.class, "Webcam 1");
         //frontCamera = OpenCvCameraFactory.getInstance().createWebcam(frontWebcamName);
