@@ -93,7 +93,6 @@ public class Kai {
 
     public double getHeading(){
         // Maf angles, not game
-        //return imu.getAngularOrientation(AxesReference.EXTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS).firstAngle;
         return deadwheels.currentAngle;
     }
 }
