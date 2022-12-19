@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Control;
+import org.firstinspires.ftc.teamcode.processors.Control;
 
 @TeleOp(name = "Global", group = "Test")
 public class GlobalDriveTest extends Control {

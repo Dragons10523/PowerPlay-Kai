@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.AutoControl;
-import org.firstinspires.ftc.teamcode.SignalOpticalSystem;
+import org.firstinspires.ftc.teamcode.processors.AutoControl;
+import org.firstinspires.ftc.teamcode.processors.SignalOpticalSystem;
 
 @Autonomous(name = "SignalTest", group = "Test")
 public class SignalTest extends AutoControl {

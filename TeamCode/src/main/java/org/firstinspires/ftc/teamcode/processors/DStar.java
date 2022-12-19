@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.processors;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DStar {
-    Node[] nodeArray;
-    List<Integer> openList;
-    List<Integer> obstacles;
+    public Node[] nodeArray;
+    private List<Integer> openList;
+    public List<Integer> obstacles;
 
     public final int GRID_X;
     public final int GRID_Y;

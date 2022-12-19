@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.processors;
 
 import android.annotation.SuppressLint;
 
@@ -6,11 +6,13 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.processors.Control;
+import org.firstinspires.ftc.teamcode.processors.DStar;
+import org.firstinspires.ftc.teamcode.processors.SignalOpticalSystem;
 import org.firstinspires.ftc.teamcode.utils.VecUtils;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AutoControl extends Control {

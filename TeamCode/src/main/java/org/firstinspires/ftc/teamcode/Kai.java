@@ -12,6 +12,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.utils.drivetrain.MecanumDrivetrain;
 import org.openftc.easyopencv.OpenCvWebcam;
 
+import org.firstinspires.ftc.teamcode.processors.Deadwheels;
+
 public class Kai {
     // Also used for deadwheels. Use back motors for both y axis, front left for the x axis
     public final MecanumDrivetrain drivetrain;

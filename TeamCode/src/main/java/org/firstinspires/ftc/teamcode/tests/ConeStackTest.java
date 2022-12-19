@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.AutoControl;
+import org.firstinspires.ftc.teamcode.processors.AutoControl;
 import org.firstinspires.ftc.teamcode.utils.VecUtils;
 
 @TeleOp(name = "ConeTest", group = "Test")

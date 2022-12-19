@@ -1,7 +1,10 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.processors.AutoControl;
+import org.firstinspires.ftc.teamcode.processors.Control;
+import org.firstinspires.ftc.teamcode.processors.SignalOpticalSystem;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Auto Left", preselectTeleOp = "Drive")
 public abstract class Auto extends AutoControl {
@@ -47,15 +50,15 @@ public abstract class Auto extends AutoControl {
 
         while(getRuntime() < 25) {
             if(!robotInterrupt) {
-                moveToTile(posToPoleIdx(defaultPosition));
+                moveToTile(Control.posToPoleIdx(defaultPosition));
                 if(kai.frontDist.getDistance(DistanceUnit.INCH) < 24) {
                     robotInterrupt = true;
-                    moveToTile(posToPoleIdx(alternatePositon));
+                    moveToTile(Control.posToPoleIdx(alternatePositon));
                 }
             } else {
-                moveToTile(posToPoleIdx(alternatePositon));
+                moveToTile(Control.posToPoleIdx(alternatePositon));
             }
-            armControl.setLiftHeight(GoalHeight.HIGH);
+            armControl.setLiftHeight(Control.GoalHeight.HIGH);
 
             if(robotInterrupt) {
                 armControl.setTarget(alternateTarget);
@@ -68,7 +71,7 @@ public abstract class Auto extends AutoControl {
                     sleep(100);
                 }
             }
-            armControl.claw(ClawState.OPEN);
+            armControl.claw(Control.ClawState.OPEN);
             sleep(250);
 
             if(conesInStack < 0) break;
@@ -78,7 +81,7 @@ public abstract class Auto extends AutoControl {
             liftToStack(conesInStack);
             moveToTile(0, 2);
             armControl.setTarget(coneStackPosition);
-            armControl.claw(ClawState.CLOSE);
+            armControl.claw(Control.ClawState.CLOSE);
             conesInStack--;
         }
 

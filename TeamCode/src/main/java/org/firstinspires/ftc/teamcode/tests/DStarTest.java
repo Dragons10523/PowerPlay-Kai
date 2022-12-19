@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.AutoControl;
+import org.firstinspires.ftc.teamcode.processors.AutoControl;
 
 @Autonomous(name = "DStarTest", group = "Test")
 public class DStarTest extends AutoControl {
