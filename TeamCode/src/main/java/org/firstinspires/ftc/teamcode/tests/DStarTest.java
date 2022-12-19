@@ -2,10 +2,10 @@ package org.firstinspires.ftc.teamcode.tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.AbstractAuto;
+import org.firstinspires.ftc.teamcode.AutoControl;
 
 @Autonomous(name = "DStarTest", group = "Test")
-public class DStarTest extends AbstractAuto {
+public class DStarTest extends AutoControl {
     @Override
     public void loop() {
         if(isStopRequested) return;

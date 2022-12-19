@@ -2,11 +2,11 @@ package org.firstinspires.ftc.teamcode.tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.AbstractAuto;
+import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.utils.VecUtils;
 
 @TeleOp(name = "ConeTest", group = "Test")
-public class ConeStackTest extends AbstractAuto {
+public class ConeStackTest extends AutoControl {
     double assistTurnPower = 1;
     double assistDrivePower = 0.7;
 

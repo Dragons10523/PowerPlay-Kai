@@ -2,11 +2,11 @@ package org.firstinspires.ftc.teamcode.tests;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.AbstractAuto;
+import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.SignalOpticalSystem;
 
 @Autonomous(name = "SignalTest", group = "Test")
-public class SignalTest extends AbstractAuto {
+public class SignalTest extends AutoControl {
     @Override
     public void loop() {
         if(isStopRequested) return;

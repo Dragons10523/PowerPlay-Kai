@@ -4,7 +4,7 @@ import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Auto Left", preselectTeleOp = "Drive")
-public abstract class Auto extends AbstractAuto {
+public abstract class Auto extends AutoControl {
     public void auto(FieldSide side) {
         VectorF initialTransform;
         VectorF defaultPosition;

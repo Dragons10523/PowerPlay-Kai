@@ -13,7 +13,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractAuto extends Control {
+public abstract class AutoControl extends Control {
     DStar dStar;
 
     protected SignalOpticalSystem signalOpticalSystem;
