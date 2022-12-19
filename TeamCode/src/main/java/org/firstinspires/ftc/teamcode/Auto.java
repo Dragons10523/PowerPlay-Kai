@@ -1,12 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@Autonomous(name = "Auto Left", preselectTeleOp = "Drive")
-public abstract class AbstractAutoMain extends AbstractAuto {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Auto Left", preselectTeleOp = "Drive")
+public abstract class Auto extends AbstractAuto {
     public void auto(FieldSide side) {
         VectorF initialTransform;
         VectorF defaultPosition;

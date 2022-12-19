@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-public class MainAutoLeft extends AbstractAutoMain {
+public class AutoRightImpl extends Auto {
     @Override public void start() {
-        auto(FieldSide.LEFT);
+        auto(FieldSide.RIGHT);
     }
 }
