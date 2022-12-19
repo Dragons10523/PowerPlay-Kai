@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -55,6 +56,10 @@ public class Kai {
         WebcamName frontWebcamName = hwmap.get(WebcamName.class, "Webcam 1");
         //frontCamera = OpenCvCameraFactory.getInstance().createWebcam(frontWebcamName);
         frontCamera = null;
+
+        // Set motor directions
+        armLiftA.setDirection(DcMotorSimple.Direction.REVERSE);
+        armLiftB.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Set motor behavior
         drivetrain.setZeroBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

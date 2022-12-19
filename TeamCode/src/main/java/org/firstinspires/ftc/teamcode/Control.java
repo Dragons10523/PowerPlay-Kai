@@ -96,9 +96,6 @@ public abstract class Control extends OpMode {
 
     public void orientClaw(WristState wrist) {
         switch(wrist) {
-            /*case FLIPPED:
-                kai.clawTwist.setPosition(1);
-                break;*/
             case LEFT:
                 kai.clawTwist.setPosition(0);
                 break;
