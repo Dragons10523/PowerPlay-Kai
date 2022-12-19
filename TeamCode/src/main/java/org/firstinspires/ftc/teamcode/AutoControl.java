@@ -84,46 +84,7 @@ public abstract class AutoControl extends Control {
         this.dStar.updateEnd(nodeIndex);
         checkPathing();
 
-        List<Integer> compressedPath = new ArrayList<>();
-
-        {
-            int tileX;
-            int tileY;
-            int prevTileX = -1;
-            int prevTileY = -1;
-            int prevDirection = 0; // 1 for X, 2 for Y
-
-            List<Integer> fullPath = this.dStar.getFullPath();
-
-            // Add the first node
-            compressedPath.add(fullPath.get(0));
-
-            for (int i = 0; i < fullPath.size(); i++) {
-                int nodeCheck = fullPath.get(i);
-
-                tileX = nodeCheck % 6;
-                tileY = (int) Math.floor(nodeCheck / 6f);
-
-                // Check if the direction of the path changed, and if so add the corner node
-                if (tileX == prevTileX) {
-                    if (prevDirection == 2) {
-                        compressedPath.add(fullPath.get(i - 1));
-                    }
-                    prevDirection = 1;
-                } else if (tileY == prevTileY) {
-                    if (prevDirection == 1) {
-                        compressedPath.add(fullPath.get(i - 1));
-                    }
-                    prevDirection = 2;
-                }
-
-                prevTileX = tileX;
-                prevTileY = tileY;
-            }
-
-            // Add the last node
-            compressedPath.add(fullPath.get(fullPath.size() - 1));
-        }
+        List<Integer> compressedPath = dStar.getCompressedPath();
 
         for (Integer cornerNode : compressedPath) {
             int nodeX = cornerNode % 6;
@@ -182,77 +143,94 @@ public abstract class AutoControl extends Control {
         return false;
     }
 
+    public VectorF getSensorIntercept(DistanceSensor sensor, double[] sensorOffset) {
+        double distance = sensor.getDistance(DistanceUnit.INCH);
+        double robotAngle = kai.getHeading();
+
+        // Calculate the origin intercept
+        VectorF intercept = new VectorF(
+                (float)(Math.cos(robotAngle + sensorOffset[3]) * distance + kai.deadwheels.currentX),
+                (float)(Math.sin(robotAngle + sensorOffset[3]) * distance + kai.deadwheels.currentY));
+
+        // Offset the origin intercept by the sensor position
+        intercept.add(VecUtils.rotateVector(new VectorF((float)sensorOffset[0], (float)sensorOffset[1]), robotAngle));
+
+        return intercept;
+    }
+
     // Returns true on robot detected
     private boolean checkPathing() {
         kai.deadwheels.wheelLoop();
 
-        double robotAngle = kai.getHeading();
+        for(int sensorIndex = 0; sensorIndex < 4; sensorIndex++) {
+            VectorF intercept = getSensorIntercept(robotSensors[sensorIndex], sensorOffsets[sensorIndex]);
 
-        for(int i = 0; i < 4; i++) {
-            double distance = robotSensors[i].getDistance(DistanceUnit.INCH);
-            double[] sensorOffset = sensorOffsets[i];
+            double xTile = intercept.get(0) / 24;
+            double yTile = 6 - (intercept.get(1) / 24);
 
-            // Calculate the origin intercept
-            VectorF intercept = new VectorF(
-                    (float)(Math.cos(robotAngle + sensorOffset[3]) * distance + kai.deadwheels.currentX),
-                    (float)(Math.sin(robotAngle + sensorOffset[3]) * distance + kai.deadwheels.currentY));
+            if(robotSensors[sensorIndex].getDistance(DistanceUnit.INCH) < 60)
+                if(tryBlockPath(xTile, yTile)) return true;
 
-            // Offset the origin intercept by the sensor position
-            intercept.add(VecUtils.rotateVector(new VectorF((float)sensorOffset[0], (float)sensorOffset[1]), robotAngle));
-
-            double xIntercept = intercept.get(0);
-            double yIntercept = intercept.get(1);
-
-            double xTile = xIntercept / 24;
-            double yTile = 6 - (yIntercept / 24);
-
-            // If the intercept is in the field (with 6 inches of margin), mark that tile as blocked
-            // Also check if the distance is out of range and ignore it if it is
-            if(xIntercept < 132 && xIntercept > 12 && yIntercept < 132 && yIntercept > 12 && distance <= 60) {
-                int nodeIndex = ((int) Math.floor(yTile)) * 6 + ((int) Math.floor(xTile));
-
-                int robotStartIndex = (int)(kai.deadwheels.currentY / 24) * 6 + (int)(kai.deadwheels.currentX / 24);
-                dStar.updateStart(robotStartIndex);
-                dStar.markBlocked(nodeIndex);
-                return true;
-            } else {
-                for(Integer nodeIndex : dStar.obstacles) {
-                    double obstacleX = nodeIndex % 6;
-                    double obstacleY = Math.floor(nodeIndex / 6f);
-
-                    double robotXTile = kai.deadwheels.currentX / 24;
-                    double robotYTile = 6 - (kai.deadwheels.currentY / 24);
-
-                    // Get minimum distance between sensor line and tiles marked as obstacles
-                    double xOffset = xTile - robotXTile;
-                    double yOffset = yTile - robotYTile;
-
-                    double endObstacleXOffset = obstacleX - xTile;
-                    double endObstacleYOffset = obstacleY - yTile;
-
-                    double startObstacleXOffset = obstacleX - robotXTile;
-                    double startObstacleYOffset = obstacleY - robotYTile;
-
-                    double distanceB = (xOffset * endObstacleXOffset + yOffset * endObstacleYOffset);
-                    double distanceA = (xOffset * startObstacleXOffset + yOffset * startObstacleYOffset);
-
-                    double finalDistance = 0;
-
-                    if(distanceB < 0) {
-                        finalDistance = Math.hypot(obstacleY - yTile, obstacleX - xTile);
-                    } else if(distanceA < 0) {
-                        finalDistance = Math.hypot(obstacleY - robotYTile, obstacleX - robotXTile);
-                    } else {
-                        double mod = Math.hypot(xOffset, yOffset);
-                        finalDistance = Math.abs(xOffset * startObstacleYOffset - yOffset * startObstacleXOffset) / mod;
-                    }
-
-                    if(finalDistance < 6) {
-                        dStar.markOpen(nodeIndex);
-                    }
-                }
-            }
+            tryClearPath(xTile, yTile);
         }
         return false;
+    }
+
+    private boolean tryBlockPath(double xTile, double yTile) {
+        double xMargin = 1 - ((xTile - 0.5) % 1);
+        double yMargin = 1 - ((yTile - 0.5) % 1);
+
+        // Don't trust values where the intercept is within 1/8 of a tile edge
+        if(xMargin >= 0.125 && yMargin >= 0.125) {
+            int nodeIndex = ((int) Math.floor(yTile)) * 6 + ((int) Math.floor(xTile));
+
+            int robotStartIndex = (int)(kai.deadwheels.currentY / 24) * 6 + (int)(kai.deadwheels.currentX / 24);
+            dStar.updateStart(robotStartIndex);
+            dStar.markBlocked(nodeIndex);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void tryClearPath(double xTile, double yTile) {
+        for(Integer nodeIndex : dStar.obstacles) {
+            double obstacleX = nodeIndex % 6;
+            double obstacleY = Math.floor(nodeIndex / 6f);
+
+            double robotXTile = kai.deadwheels.currentX / 24;
+            double robotYTile = 6 - (kai.deadwheels.currentY / 24);
+
+            // Get minimum distance between sensor line and tiles marked as obstacles
+            double xOffset = xTile - robotXTile;
+            double yOffset = yTile - robotYTile;
+
+            // Calculate the beginning and end points of a the line between the robot and the obstacle location
+            double endObstacleXOffset = obstacleX - xTile;
+            double endObstacleYOffset = obstacleY - yTile;
+
+            double startObstacleXOffset = obstacleX - robotXTile;
+            double startObstacleYOffset = obstacleY - robotYTile;
+
+            // Begin calculating the distance from the detected point to the previously defined line
+            double distanceB = (xOffset * endObstacleXOffset + yOffset * endObstacleYOffset);
+            double distanceA = (xOffset * startObstacleXOffset + yOffset * startObstacleYOffset);
+
+            double finalDistance;
+
+            if(distanceB < 0) {
+                finalDistance = Math.hypot(obstacleY - yTile, obstacleX - xTile);
+            } else if(distanceA < 0) {
+                finalDistance = Math.hypot(obstacleY - robotYTile, obstacleX - robotXTile);
+            } else {
+                double mod = Math.hypot(xOffset, yOffset);
+                finalDistance = Math.abs(xOffset * startObstacleYOffset - yOffset * startObstacleXOffset) / mod;
+            }
+
+            // If we are within an 20 inch diameter circle of the center of the tile, that tile is marked free
+            if(finalDistance < 10) {
+                dStar.markOpen(nodeIndex);
+            }
+        }
     }
 }

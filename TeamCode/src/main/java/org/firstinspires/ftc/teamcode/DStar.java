@@ -48,6 +48,49 @@ public class DStar {
         }
     }
 
+    public List<Integer> getCompressedPath() {
+        List<Integer> compressedPath = new ArrayList<>();
+
+        int tileX;
+        int tileY;
+        int prevTileX = -1;
+        int prevTileY = -1;
+        int prevDirection = 0; // 1 for X, 2 for Y
+
+        List<Integer> fullPath = getFullPath();
+
+        // Add the first node
+        compressedPath.add(fullPath.get(0));
+
+        for (int i = 0; i < fullPath.size(); i++) {
+            int nodeCheck = fullPath.get(i);
+
+            tileX = nodeCheck % 6;
+            tileY = (int) Math.floor(nodeCheck / 6f);
+
+            // Check if the direction of the path changed, and if so add the corner node
+            if (tileX == prevTileX) {
+                if (prevDirection == 2) {
+                    compressedPath.add(fullPath.get(i - 1));
+                }
+                prevDirection = 1;
+            } else if (tileY == prevTileY) {
+                if (prevDirection == 1) {
+                    compressedPath.add(fullPath.get(i - 1));
+                }
+                prevDirection = 2;
+            }
+
+            prevTileX = tileX;
+            prevTileY = tileY;
+        }
+
+        // Add the last node
+        compressedPath.add(fullPath.get(fullPath.size() - 1));
+
+        return compressedPath;
+    }
+
     public List<Integer> getFullPath() {
         processOpenList();
 
