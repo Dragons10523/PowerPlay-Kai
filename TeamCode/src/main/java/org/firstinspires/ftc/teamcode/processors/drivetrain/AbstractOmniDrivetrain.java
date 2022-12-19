@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.processors.drivetrain;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.teamcode.utils.VecUtils;
+import org.firstinspires.ftc.teamcode.processors.VecUtils;
 
 public abstract class AbstractOmniDrivetrain extends AbstractDrivetrain {
     double impulseRotation;

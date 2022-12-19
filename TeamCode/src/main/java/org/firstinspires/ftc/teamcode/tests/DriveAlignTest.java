@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.tests;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.processors.Control;
-import org.firstinspires.ftc.teamcode.utils.VecUtils;
+import org.firstinspires.ftc.teamcode.processors.VecUtils;
 
 @TeleOp(name = "DriveAlign", group = "Test")
 public class DriveAlignTest extends Control {

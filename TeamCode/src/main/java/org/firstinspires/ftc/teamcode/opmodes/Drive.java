@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.processors.Control;
-import org.firstinspires.ftc.teamcode.utils.VecUtils;
+import org.firstinspires.ftc.teamcode.processors.VecUtils;
 
 @TeleOp(name = "Drive")
 public class Drive extends Control {

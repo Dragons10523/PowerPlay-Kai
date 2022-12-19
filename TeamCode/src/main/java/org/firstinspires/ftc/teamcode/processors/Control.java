@@ -5,8 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Kai;
-import org.firstinspires.ftc.teamcode.processors.ArmControl;
-import org.firstinspires.ftc.teamcode.utils.VecUtils;
 
 public abstract class Control extends OpMode {
     public Kai kai;

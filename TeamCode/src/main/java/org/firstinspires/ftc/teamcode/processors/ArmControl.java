@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.processors;
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.teamcode.utils.VecUtils;
 
 // This class is meant to handle "blocking" to prevent any possibly dangerous movements from happening
 public class ArmControl {

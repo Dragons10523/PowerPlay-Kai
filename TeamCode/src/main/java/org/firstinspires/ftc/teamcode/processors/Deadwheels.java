@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.processors;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.teamcode.utils.VecUtils;
 
 public class Deadwheels {
     private final DcMotor leftYEncoder;
