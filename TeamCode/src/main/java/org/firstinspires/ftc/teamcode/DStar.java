@@ -8,15 +8,15 @@ public class DStar {
     List<Integer> openList;
     List<Integer> obstacles;
 
-    private int gridX;
-    private int gridY;
+    public final int GRID_X;
+    public final int GRID_Y;
 
     private int start;
     private int end;
 
     public DStar(int gridX, int gridY, int start, int end) {
-        this.gridX = gridX;
-        this.gridY = gridY;
+        this.GRID_X = gridX;
+        this.GRID_Y = gridY;
         nodeArray = new Node[gridX * gridY];
         this.start = start;
         this.end = end;
