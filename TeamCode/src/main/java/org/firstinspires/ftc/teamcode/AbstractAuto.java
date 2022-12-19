@@ -69,11 +69,6 @@ public abstract class AbstractAuto extends Control {
     }
 
     @Override
-    public void start() {
-        armControl.shouldRun = true;
-    }
-
-    @Override
     public void loop() {
         requestOpModeStop();
     }
@@ -251,14 +246,5 @@ public abstract class AbstractAuto extends Control {
             }
         }
         return false;
-    }
-
-    public void aimAtStack() {
-        armControl.aimClaw(
-                Math.atan2(
-                        60 - kai.deadwheels.currentY,
-                        0 - kai.deadwheels.currentX
-                ) - kai.deadwheels.currentAngle
-        );
     }
 }

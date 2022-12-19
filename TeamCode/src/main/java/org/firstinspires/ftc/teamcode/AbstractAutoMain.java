@@ -13,6 +13,7 @@ public abstract class AbstractAutoMain extends AbstractAuto {
         VectorF alternatePositon;
         VectorF defaultTarget;
         VectorF alternateTarget;
+        VectorF coneStackPosition;
 
         switch(side) {
             case LEFT:
@@ -21,6 +22,7 @@ public abstract class AbstractAutoMain extends AbstractAuto {
                 alternatePositon = new VectorF(2, 2);
                 defaultTarget = new VectorF(1, 2);
                 alternateTarget = new VectorF(2, 1);
+                coneStackPosition = new VectorF(2, 60);
                 break;
             case RIGHT:
             default:
@@ -29,6 +31,7 @@ public abstract class AbstractAutoMain extends AbstractAuto {
                 alternatePositon = new VectorF(3, 2);
                 defaultTarget = new VectorF(4, 2);
                 alternateTarget = new VectorF(2, 1);
+                coneStackPosition = new VectorF(142, 60);
         }
 
         if(isStopRequested) return;
@@ -72,11 +75,11 @@ public abstract class AbstractAutoMain extends AbstractAuto {
 
             if(conesInStack < 0) break;
 
-            aimAtStack();
+            armControl.setTarget(coneStackPosition);
             sleep(250);
             liftToStack(conesInStack);
             moveToTile(0, 2);
-            aimAtStack();
+            armControl.setTarget(coneStackPosition);
             armControl.claw(ClawState.CLOSE);
             conesInStack--;
         }

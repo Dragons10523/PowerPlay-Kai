@@ -9,7 +9,6 @@ public class AutomatedGrabTest extends Control {
     @Override
     public void start() {
         super.start();
-        armControl.shouldRun = true;
     }
 
     @Override

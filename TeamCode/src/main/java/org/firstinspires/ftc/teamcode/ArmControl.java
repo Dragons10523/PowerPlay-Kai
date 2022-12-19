@@ -4,7 +4,7 @@ import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.teamcode.utils.VecUtils;
 
 // This class is meant to handle "blocking" to prevent any possibly dangerous movements from happening
-public class ArmControl extends Thread {
+public class ArmControl {
     // TODO: Calculate the proper angle to ticks value
     public static final double TURNTABLE_TICKS_PER_RAD = 100;
     // TODO: Replace 1000 with the proper conversion value
@@ -16,30 +16,21 @@ public class ArmControl extends Thread {
     public static final int HIGH_GOAL_HEIGHT = 1000;
 
     public Control control;
-    public boolean shouldRun = false;
     public int coneStack = -1;
 
-    protected VectorF target;
-    protected Control.GoalHeight liftHeight;
-    protected Control.GoalHeight prevLiftHeight;
-    protected int extensionDistance;
+    private VectorF target = null;
+    private Control.GoalHeight liftHeight = Control.GoalHeight.NONE;
+    private boolean liftHeightChanged = false;
+    private int extensionDistance = 0;
 
     public ArmControl(Control control) {
         this.control = control;
     }
 
-    public void run() {
-        try {
-            while(!Thread.interrupted()) {
-                if(shouldRun) {
-                    aimClaw();
-                    lift();
-                    moveExtensionWhenSafe();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void update() {
+        aimClaw();
+        lift();
+        moveExtensionWhenSafe();
     }
 
     public void setTarget(float x, float y) {
@@ -52,11 +43,12 @@ public class ArmControl extends Thread {
 
     public void setLiftHeight(Control.GoalHeight liftHeight) {
         this.liftHeight = liftHeight;
+        liftHeightChanged = true;
     }
 
-    protected void aimClaw() {
+    private void aimClaw() {
         // Blocked by the lift target
-        if(liftHeight == Control.GoalHeight.GROUND || liftHeight == Control.GoalHeight.NONE) {
+        if(liftHeight == Control.GoalHeight.GROUND || liftHeight == Control.GoalHeight.NONE || target == null) {
             aimClaw(0);
             return;
         }
@@ -118,14 +110,9 @@ public class ArmControl extends Thread {
     }
 
     // TODO: calibrate lift heights
-    protected void lift() {
+    private void lift() {
         // Blocked by the extension's current position
-        if(control.kai.liftExtension.getCurrentPosition() >= 10) {
-            return;
-        }
-
-        // Blocked by the turntable's current position
-        if(Math.abs(control.kai.turntable.getCurrentPosition()) >= 10 || control.kai.turntable.isBusy()) {
+        if(getExtensionCurrent() >= 2) {
             return;
         }
 
@@ -148,8 +135,6 @@ public class ArmControl extends Thread {
                 }
                 setLiftHeight(GROUND_GOAL_HEIGHT);
         }
-
-        prevLiftHeight = liftHeight;
     }
 
     public void claw(Control.ClawState clawState) {
@@ -174,16 +159,16 @@ public class ArmControl extends Thread {
         }
     }
 
-    public void aimClaw(double angle) {
+    private void aimClaw(double angle) {
         angle = control.mapAngle(angle, 0);
         control.kai.turntable.setTargetPosition((int) (angle * TURNTABLE_TICKS_PER_RAD));
     }
 
-    protected void moveExtensionWhenSafe() {
+    private void moveExtensionWhenSafe() {
         // Lift blocks all
         if(getLiftCurrentLiftHeight() > getGoalHeight(liftHeight) - 100) {
             control.kai.liftExtension.setTargetPosition(extensionDistance);
-        } else if(prevLiftHeight != liftHeight) {
+        } else if(liftHeightChanged) {
             control.kai.liftExtension.setTargetPosition(0);
         }
     }
@@ -200,9 +185,10 @@ public class ArmControl extends Thread {
         return control.kai.liftExtension.getCurrentPosition() / EXTENSION_TICKS_PER_INCH;
     }
 
-    public void setLiftHeight(int liftHeight) {
+    private void setLiftHeight(int liftHeight) {
         control.kai.armLiftA.setTargetPosition(liftHeight);
         control.kai.armLiftB.setTargetPosition(liftHeight);
+        liftHeightChanged = false;
     }
 
     public int getLiftCurrentLiftHeight() {

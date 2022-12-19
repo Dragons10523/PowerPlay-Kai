@@ -50,18 +50,14 @@ public abstract class Control extends OpMode {
         armControl = new ArmControl(this);
     }
 
-    public void start() {
-        armControl.start();
-    }
-
     public void loop() {
         kai.deadwheels.wheelLoop();
+        armControl.update();
     }
 
     public void stop() {
         if(isStopRequested) return;
 
-        if(armControl.isAlive()) armControl.interrupt();
         stopAllMovement();
         isStopRequested = true;
     }
