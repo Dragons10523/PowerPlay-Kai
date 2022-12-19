@@ -147,7 +147,7 @@ public class ArmControl {
     }
 
     public boolean isClawOpen() {
-        return control.kai.claw.getPosition() != 0;
+        return control.kai.claw.getPosition() == 1;
     }
 
     public void toggleClaw() {

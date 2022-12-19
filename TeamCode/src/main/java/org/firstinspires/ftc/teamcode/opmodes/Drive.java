@@ -45,7 +45,48 @@ public class Drive extends Control {
     public void loop() {
         super.loop();
 
-        // GAMEPAD1
+        processDriverControls();
+        processManipulatorControls();
+
+        checkIntensivePractice();
+
+        telemetry.update();
+    }
+
+    public void displayField() {
+        for(int i = 0; i < 5; i++) {
+            StringBuilder line = new StringBuilder();
+            for(int j = 0; j < 5; j++) {
+                int index = i * 5 + j;
+
+                if(index == selectedPole) {
+                    line.append("*");
+                    continue;
+                }
+
+                switch(FIELD_SETUP[index]) {
+                    case GROUND:
+                        line.append("G");
+                        break;
+                    case LOW:
+                        line.append("L");
+                        break;
+                    case MID:
+                        line.append("M");
+                        break;
+                    case HIGH:
+                        line.append("H");
+                        break;
+                    default:
+                        line.append(" ");
+                }
+            }
+
+            telemetry.addLine(line.toString());
+        }
+    }
+
+    private void processDriverControls() {
         // Assist Toggles
         if(gamepad1.a != assistTurnPrev && gamepad1.a) {
             assistDrive = !assistDrive;
@@ -54,6 +95,9 @@ public class Drive extends Control {
             assistDrive = !assistDrive;
         }
 
+        assistTurnPrev = gamepad1.a;
+        assistDrivePrev = gamepad1.b;
+
         // Calibration
         if(gamepad1.back) {
             kai.deadwheels.setTransform(0, 0, 0);
@@ -61,13 +105,10 @@ public class Drive extends Control {
 
         // Turning
         double turn = gamepad1.right_trigger - gamepad1.left_trigger;
-        if(assistTurns) {// && Math.abs(turn) <= .1) {
-            telemetry.addData("Angle", (int) Math.toDegrees(kai.getHeading()));
-            double addend = -mapAngle(kai.getHeading(), -VecUtils.HALF_PI/2, VecUtils.HALF_PI/2, 0);
-            turn += addend * addend * assistTurnPower;
+        if(assistTurns && Math.abs(turn) <= .1) {
+            double correctionValue = -mapAngle(kai.getHeading(), -VecUtils.HALF_PI/2, VecUtils.HALF_PI/2, 0);
+            turn += correctionValue * correctionValue * assistTurnPower;
         }
-
-        telemetry.addData("Turn", turn);
 
         // Driving
         float driveX = gamepad1.left_stick_x;
@@ -93,52 +134,18 @@ public class Drive extends Control {
         }
 
         mecanumDrive(driveX, driveY, turn, driveMode);
+    }
 
-        // GAMEPAD2
+    private void processManipulatorControls() {
+        // Assist Toggles
         if(gamepad2.left_bumper != assistManipPrev && gamepad2.left_bumper) {
             assistManipulator = !assistManipulator;
         }
 
-        boolean manualClaw = gamepad2.right_bumper;
-        if(assistManipulator) {
-            // Pole Selection
-            if(!directionPrev) {
-                if(gamepad2.dpad_up) {
-                    selectedPole -= 5;
-                } else if(gamepad2.dpad_down) {
-                    selectedPole += 5;
-                } else if(gamepad2.dpad_left) {
-                    selectedPole -= 1;
-                } else if(gamepad2.dpad_right) {
-                    selectedPole += 1;
-                }
+        assistManipPrev = gamepad2.left_bumper;
 
-                selectedPole %= 25;
-            }
-
-            armControl.setTarget(Control.poleIdxToPos(selectedPole));
-
-            boolean clawOpen = armControl.isClawOpen();
-            if(clawOpen && gamepad2.x && clawDistance() <= 1.5 && !clawSensorBroken) {
-                clawOpen = false;
-            }
-            if(!clawOpen && gamepad2.x && armControl.willConeHit(selectedPole)) {
-                clawOpen = true;
-            }
-
-            if(clawOpen != armControl.isClawOpen()) {
-                armControl.toggleClaw();
-            }
-
-            directionPrev = gamepad2.dpad_up || gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right;
-
-            orientClaw(WristState.NORMAL);
-
-            displayField();
-
-            // Raising the claw
-            GoalHeight poleHeight = FIELD_SETUP[selectedPole];
-        } else {
+        // Manual Control
+        if(!assistManipulator) {
             if(gamepad2.x) {
                 armControl.setLiftHeight(GoalHeight.NONE);
             } else if(gamepad2.y) {
@@ -149,18 +156,52 @@ public class Drive extends Control {
                 armControl.setLiftHeight(GoalHeight.LOW);
             }
 
-            if(manualClaw != clawPrev && manualClaw) {
+            boolean clawToggle = gamepad2.right_bumper;
+            if(clawToggle != clawPrev && clawToggle) {
                 armControl.toggleClaw();
             }
+            clawPrev = clawToggle;
 
             if(gamepad2.dpad_down) {
                 orientClaw(WristState.FLIPPED);
             } else if(gamepad2.dpad_up) {
                 orientClaw(WristState.NORMAL);
             }
+            return;
         }
 
-        // Intensive Practice Things
+        // Pole Selection
+        if(!directionPrev) {
+            if(gamepad2.dpad_up) {
+                selectedPole -= 5;
+            } else if(gamepad2.dpad_down) {
+                selectedPole += 5;
+            } else if(gamepad2.dpad_left) {
+                selectedPole -= 1;
+            } else if(gamepad2.dpad_right) {
+                selectedPole += 1;
+            }
+
+            selectedPole %= 25;
+        }
+        directionPrev = gamepad2.dpad_up || gamepad2.dpad_down || gamepad2.dpad_left || gamepad2.dpad_right;
+
+        // Target the selected pole
+        armControl.setTarget(Control.poleIdxToPos(selectedPole));
+
+        // Toggle the claw as needed
+        boolean clawOpen = armControl.isClawOpen();
+        if(clawOpen && gamepad2.x && clawDistance() <= 1.5 && !clawSensorBroken) {
+            armControl.toggleClaw();
+        }
+        if(!clawOpen && gamepad2.x && armControl.willConeHit(selectedPole)) {
+            armControl.toggleClaw();
+        }
+
+        displayField();
+    }
+
+    private void checkIntensivePractice() {
         if(INTENSIVE_PRACTICE && practiceTimer.seconds() >= timeUntilEvent) {
             practiceTimer.reset();
 
@@ -218,46 +259,6 @@ public class Drive extends Control {
 
             // Random value between 10 and 120
             timeUntilEvent = Math.random() * 130 + 10;
-        }
-
-        telemetry.update();
-
-        assistTurnPrev = gamepad1.a;
-        assistDrivePrev = gamepad1.b;
-        assistManipPrev = gamepad2.left_bumper;
-        clawPrev = manualClaw;
-    }
-
-    public void displayField() {
-        for(int i = 0; i < 5; i++) {
-            StringBuilder line = new StringBuilder();
-            for(int j = 0; j < 5; j++) {
-                int index = i * 5 + j;
-
-                if(index == selectedPole) {
-                    line.append("*");
-                    continue;
-                }
-
-                switch(FIELD_SETUP[index]) {
-                    case GROUND:
-                        line.append("G");
-                        break;
-                    case LOW:
-                        line.append("L");
-                        break;
-                    case MID:
-                        line.append("M");
-                        break;
-                    case HIGH:
-                        line.append("H");
-                        break;
-                    default:
-                        line.append(" ");
-                }
-            }
-
-            telemetry.addLine(line.toString());
         }
     }
 }
