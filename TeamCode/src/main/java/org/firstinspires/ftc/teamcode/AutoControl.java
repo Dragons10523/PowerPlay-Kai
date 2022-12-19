@@ -192,8 +192,16 @@ public abstract class AutoControl extends Control {
             double distance = robotSensors[i].getDistance(DistanceUnit.INCH);
             double[] sensorOffset = sensorOffsets[i];
 
-            double xIntercept = Math.cos(robotAngle + sensorOffset[3]) * distance + kai.deadwheels.currentX;
-            double yIntercept = Math.sin(robotAngle + sensorOffset[3]) * distance + kai.deadwheels.currentY;
+            // Calculate the origin intercept
+            VectorF intercept = new VectorF(
+                    (float)(Math.cos(robotAngle + sensorOffset[3]) * distance + kai.deadwheels.currentX),
+                    (float)(Math.sin(robotAngle + sensorOffset[3]) * distance + kai.deadwheels.currentY));
+
+            // Offset the origin intercept by the sensor position
+            intercept.add(VecUtils.rotateVector(new VectorF((float)sensorOffset[0], (float)sensorOffset[1]), robotAngle));
+
+            double xIntercept = intercept.get(0);
+            double yIntercept = intercept.get(1);
 
             double xTile = xIntercept / 24;
             double yTile = 6 - (yIntercept / 24);
