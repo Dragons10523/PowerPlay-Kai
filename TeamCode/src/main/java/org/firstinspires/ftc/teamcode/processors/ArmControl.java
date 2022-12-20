@@ -139,10 +139,10 @@ public class ArmControl {
     public void claw(Control.ClawState clawState) {
         switch(clawState) {
             case CLOSE:
-                control.kai.claw.setPosition(-1);
+                control.kai.claw.setPosition(1);
             case OPEN:
             default:
-                control.kai.claw.setPosition(1);
+                control.kai.claw.setPosition(-1);
         }
     }
 
