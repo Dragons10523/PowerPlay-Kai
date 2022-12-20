@@ -37,11 +37,6 @@ public class Drive extends Control {
     boolean clawSensorBroken = false;
 
     @Override
-    public void start() {
-        super.start();
-    }
-
-    @Override
     public void loop() {
         super.loop();
 
