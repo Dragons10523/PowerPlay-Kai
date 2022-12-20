@@ -6,7 +6,6 @@ import org.firstinspires.ftc.teamcode.processors.AutoControl;
 import org.firstinspires.ftc.teamcode.processors.Control;
 import org.firstinspires.ftc.teamcode.processors.SignalOpticalSystem;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Auto Left", preselectTeleOp = "Drive")
 public abstract class Auto extends AutoControl {
     public void auto(FieldSide side) {
         VectorF initialTransform;
