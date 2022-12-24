@@ -5,14 +5,14 @@ import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 // This class is meant to handle "blocking" to prevent any possibly dangerous movements from happening
 public class ArmControl {
     // TODO: Calculate the proper angle to ticks value
-    public static final double TURNTABLE_TICKS_PER_RAD = 100;
+    public static final double TURNTABLE_TICKS_PER_RAD = 3024/Math.PI;
     // TODO: Replace 1000 with the proper conversion value
-    public static final double EXTENSION_TICKS_PER_INCH = 1000;
+    public static final double EXTENSION_TICKS_PER_INCH = 88.9;
 
     public static final int GROUND_GOAL_HEIGHT = 0;
-    public static final int LOW_GOAL_HEIGHT = 333;
-    public static final int MID_GOAL_HEIGHT = 667;
-    public static final int HIGH_GOAL_HEIGHT = 1000;
+    public static final int LOW_GOAL_HEIGHT = 3000;
+    public static final int MID_GOAL_HEIGHT = 5000;
+    public static final int HIGH_GOAL_HEIGHT = 6000;
 
     public Control control;
     public int coneStack = -1;
@@ -22,6 +22,7 @@ public class ArmControl {
     private Double angleOverride = null;
     private boolean liftHeightChanged = false;
     private int extensionDistance = 0;
+    private boolean clawLastOpened = true;
 
     public ArmControl(Control control) {
         this.control = control;
@@ -149,19 +150,22 @@ public class ArmControl {
     public void claw(Control.ClawState clawState) {
         switch(clawState) {
             case CLOSE:
-                control.kai.claw.setPosition(1);
+                control.kai.claw.setPosition(0);
+                clawLastOpened = false;
+                break;
             case OPEN:
             default:
-                control.kai.claw.setPosition(-1);
+                control.kai.claw.setPosition(1);
+                clawLastOpened = true;
         }
     }
 
     public boolean isClawOpen() {
-        return control.kai.claw.getPosition() == 1;
+        return clawLastOpened;
     }
 
     public void toggleClaw() {
-        if(!isClawOpen()) {
+        if(isClawOpen()) {
             claw(Control.ClawState.CLOSE);
         } else {
             claw(Control.ClawState.OPEN);

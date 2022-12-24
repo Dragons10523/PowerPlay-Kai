@@ -136,7 +136,6 @@ public class Drive extends Control {
         if(gamepad2.left_bumper != assistManipPrev && gamepad2.left_bumper) {
             assistManipulator = !assistManipulator;
         }
-
         assistManipPrev = gamepad2.left_bumper;
 
         // Manual Control
@@ -145,21 +144,30 @@ public class Drive extends Control {
                 armControl.setLiftHeight(GoalHeight.NONE);
             } else if(gamepad2.y) {
                 armControl.setLiftHeight(GoalHeight.HIGH);
-            } else if(gamepad2.a) {
-                armControl.setLiftHeight(GoalHeight.MID);
             } else if(gamepad2.b) {
+                armControl.setLiftHeight(GoalHeight.MID);
+            } else if(gamepad2.a) {
                 armControl.setLiftHeight(GoalHeight.LOW);
             }
 
-            armControl.setAngleOverride(Math.atan2(
-                    gamepad2.left_stick_y,
-                    gamepad2.left_stick_x
-            ));
+            if(Math.hypot(gamepad2.left_stick_y, gamepad2.left_stick_x) > 0.1) {
+                double angle = Math.atan2(
+                        gamepad2.left_stick_y,
+                        gamepad2.left_stick_x);
+
+                telemetry.addData("Requested Angle", angle);
+                armControl.setAngleOverride(angle);
+            }
+
+            armControl.setExtensionDistance(gamepad2.right_trigger * 3);
+            telemetry.addData("Set Distance", armControl.getExtensionTarget());
+            telemetry.addData("Actual Distance", armControl.getExtensionCurrent());
 
             boolean clawToggle = gamepad2.right_bumper;
             if(clawToggle != clawPrev && clawToggle) {
                 armControl.toggleClaw();
             }
+
             clawPrev = clawToggle;
 
             if(gamepad2.dpad_down) {
@@ -237,7 +245,7 @@ public class Drive extends Control {
                             int willBreak = (int) Math.floor(Math.random() * 3);
                             if(willBreak == 0) {
                                 motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-                                motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                                motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                             }
                         }
                         break;

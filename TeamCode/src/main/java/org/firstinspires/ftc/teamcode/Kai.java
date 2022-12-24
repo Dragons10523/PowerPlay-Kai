@@ -82,8 +82,7 @@ public class Kai {
         armLiftA.setTargetPosition(0);
         armLiftB.setTargetPosition(0);
 
-        turntable.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(1.31, 0.131, 0.03, 13.1));
-        turntable.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, new PIDFCoefficients(2, 0, 0, 0));
+        //turntable.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, new PIDFCoefficients(2, 0, 0, 0));
 
         liftExtension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turntable.setMode(DcMotor.RunMode.RUN_TO_POSITION);
