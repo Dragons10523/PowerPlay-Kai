@@ -152,16 +152,19 @@ public class Drive extends Control {
 
             if(Math.hypot(gamepad2.left_stick_y, gamepad2.left_stick_x) > 0.1) {
                 double angle = Math.atan2(
-                        gamepad2.left_stick_y,
+                        -gamepad2.left_stick_y,
                         gamepad2.left_stick_x);
 
+                angle -= VecUtils.HALF_PI;
+                angle = collapseAngle(angle);
+
                 telemetry.addData("Requested Angle", angle);
+                telemetry.addData("Actual Angle", armControl.tableAngle());
+
                 armControl.setAngleOverride(angle);
             }
 
             armControl.setExtensionDistance(gamepad2.right_trigger * 3);
-            telemetry.addData("Set Distance", armControl.getExtensionTarget());
-            telemetry.addData("Actual Distance", armControl.getExtensionCurrent());
 
             boolean clawToggle = gamepad2.right_bumper;
             if(clawToggle != clawPrev && clawToggle) {
