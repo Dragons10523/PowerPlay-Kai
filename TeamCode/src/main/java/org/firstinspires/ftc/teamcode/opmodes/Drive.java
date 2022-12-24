@@ -198,6 +198,8 @@ public class Drive extends Control {
 
     private void checkIntensivePractice() {
         if(INTENSIVE_PRACTICE && practiceTimer.seconds() >= timeUntilEvent) {
+            telemetry.addLine("INTENSIVE PRACTICE IS ENABLED");
+
             practiceTimer.reset();
 
             if(timeUntilEvent != -1) {
