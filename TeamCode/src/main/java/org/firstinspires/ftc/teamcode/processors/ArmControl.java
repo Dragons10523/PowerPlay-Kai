@@ -19,6 +19,7 @@ public class ArmControl {
 
     private VectorF target = null;
     private Control.GoalHeight liftHeight = Control.GoalHeight.NONE;
+    private Double angleOverride = null;
     private boolean liftHeightChanged = false;
     private int extensionDistance = 0;
 
@@ -40,6 +41,10 @@ public class ArmControl {
         this.target = target;
     }
 
+    public void setAngleOverride(Double angle) {
+        angleOverride = angle;
+    }
+
     public void setLiftHeight(Control.GoalHeight liftHeight) {
         this.liftHeight = liftHeight;
         liftHeightChanged = true;
@@ -47,8 +52,13 @@ public class ArmControl {
 
     private void aimClaw() {
         // Blocked by the lift target
-        if(liftHeight == Control.GoalHeight.GROUND || liftHeight == Control.GoalHeight.NONE || target == null) {
+        if(liftHeight == Control.GoalHeight.GROUND || liftHeight == Control.GoalHeight.NONE || (target == null && angleOverride == null)) {
             aimClaw(0);
+            return;
+        }
+
+        if(angleOverride != null) {
+            aimClaw(angleOverride);
             return;
         }
 

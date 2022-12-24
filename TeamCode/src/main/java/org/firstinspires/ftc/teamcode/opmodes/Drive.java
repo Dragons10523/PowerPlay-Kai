@@ -151,6 +151,11 @@ public class Drive extends Control {
                 armControl.setLiftHeight(GoalHeight.LOW);
             }
 
+            armControl.setAngleOverride(Math.atan2(
+                    gamepad2.left_stick_y,
+                    gamepad2.left_stick_x
+            ));
+
             boolean clawToggle = gamepad2.right_bumper;
             if(clawToggle != clawPrev && clawToggle) {
                 armControl.toggleClaw();
