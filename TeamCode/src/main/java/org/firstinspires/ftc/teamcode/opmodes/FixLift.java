@@ -14,7 +14,7 @@ public class FixLift extends Control {
     }
 
     public void loop() {
-        kai.armLiftA.setPower(gamepad2.left_stick_y);
-        kai.armLiftB.setPower(gamepad2.left_stick_y);
+        kai.armLiftA.setPower(-gamepad2.left_stick_y / 4);
+        kai.armLiftB.setPower(-gamepad2.left_stick_y / 4);
     }
 }
