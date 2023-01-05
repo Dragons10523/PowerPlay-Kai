@@ -74,6 +74,9 @@ public abstract class Control extends OpMode {
                 angle = 0;
         }
 
+        x = Math.min(1, Math.max(-1, x));
+        y = Math.min(1, Math.max(-1, y));
+
         VectorF vec = VecUtils.rotateVector(new VectorF(x, y), angle);
 
         kai.drivetrain.drive(vec.get(0), vec.get(1), turn);
@@ -87,7 +90,9 @@ public abstract class Control extends OpMode {
     }
 
     public static int posToPoleIdx(VectorF pos) {
-        return (int) ((pos.get(0) - 12)/24 + 5 * (pos.get(1) - 12)/24);
+        int x = (int) pos.get(0);
+        int y = (int) pos.get(1);
+        return (int) ((x - 12)/24 + 5 * (y - 12)/24);
     }
 
     public double clawDistance() {
