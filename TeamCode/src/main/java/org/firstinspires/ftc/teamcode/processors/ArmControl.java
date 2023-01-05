@@ -5,14 +5,14 @@ import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 // This class is meant to handle "blocking" to prevent any possibly dangerous movements from happening
 public class ArmControl {
     // TODO: Calculate the proper angle to ticks value
-    public static final double TURNTABLE_TICKS_PER_RAD = 3024/Math.PI;
+    public static final double TURNTABLE_TICKS_PER_RAD = 3024/VecUtils.TAU;
     // TODO: Replace 1000 with the proper conversion value
     public static final double EXTENSION_TICKS_PER_INCH = 88.9;
 
     public static final int GROUND_GOAL_HEIGHT = 0;
-    public static final int LOW_GOAL_HEIGHT = 3000;
-    public static final int MID_GOAL_HEIGHT = 5000;
-    public static final int HIGH_GOAL_HEIGHT = 6000;
+    public static final int LOW_GOAL_HEIGHT = 2800;
+    public static final int MID_GOAL_HEIGHT = 4500;
+    public static final int HIGH_GOAL_HEIGHT = 7000;
 
     public Control control;
     public int coneStack = -1;
@@ -139,7 +139,7 @@ public class ArmControl {
             case GROUND:
             case NONE:
             default:
-                if(Math.abs(tableAngle()) > 0.08) {
+                if(Math.abs(tableAngle()) > 0.4) {
                     setLiftHeight(LOW_GOAL_HEIGHT);
                     break;
                 }
@@ -179,7 +179,7 @@ public class ArmControl {
 
     private void moveExtensionWhenSafe() {
         // Lift blocks all
-        if(getLiftCurrentLiftHeight() > getGoalHeight(liftHeight) - 100) {
+        if(getLiftCurrentLiftHeight() > getGoalHeight(liftHeight) - 600) {
             control.kai.liftExtension.setTargetPosition(extensionDistance);
         } else if(liftHeightChanged) {
             control.kai.liftExtension.setTargetPosition(0);
@@ -209,7 +209,7 @@ public class ArmControl {
     }
 
     public double tableAngle() {
-        return control.collapseAngle(control.kai.turntable.getCurrentPosition() / TURNTABLE_TICKS_PER_RAD);
+        return control.mapAngle(control.kai.turntable.getCurrentPosition() / TURNTABLE_TICKS_PER_RAD, -Math.PI, Math.PI, 0);
     }
 
     public double tableVel() {
