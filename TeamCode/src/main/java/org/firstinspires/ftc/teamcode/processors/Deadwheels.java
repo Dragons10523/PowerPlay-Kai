@@ -32,6 +32,11 @@ public class Deadwheels {
         this.leftYEncoder = leftYEncoder;
         this.rightYEncoder = rightYEncoder;
         this.XEncoder = XEncoder;
+
+        leftYPosPrev = leftYEncoder.getCurrentPosition();
+        rightYPosPrev = rightYEncoder.getCurrentPosition();
+        XPosPrev = XEncoder.getCurrentPosition();
+
         this.symmetricCircumference = VecUtils.TAU * lateralOffset;
         this.asymmetricCircumference = VecUtils.TAU * forwardOffset;
         this.inchesPerTick = inchesPerTick;
@@ -62,9 +67,9 @@ public class Deadwheels {
         // Positive turning right, negative for left
         double turnDelta = ((((rightYDelta - leftYDelta) / 2d) * inchesPerTick) / symmetricCircumference) * VecUtils.TAU;
 
-        double robotTurnXDelta = (turnDelta / VecUtils.TAU) * asymmetricCircumference;
+        double robotTurnXDelta = (-turnDelta / VecUtils.TAU) * asymmetricCircumference;
         double robotXDelta = ((XDelta) * inchesPerTick) - robotTurnXDelta;
-        double robotYDelta = (leftYDelta + rightYDelta) * Math.PI;
+        double robotYDelta = (leftYDelta + rightYDelta) * inchesPerTick / 2;
 
         double updateAngle = currentAngle + (turnDelta / 2);
         double xGlobalDelta = Math.cos(updateAngle) * robotXDelta + Math.sin(updateAngle) * robotYDelta;
