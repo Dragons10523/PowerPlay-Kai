@@ -5,8 +5,8 @@ import java.util.List;
 
 public class DStar {
     public Node[] nodeArray;
-    private List<Integer> openList;
-    public List<Integer> obstacles;
+    private List<Integer> openList = new ArrayList<>();
+    public List<Integer> obstacles = new ArrayList<>();
 
     public final int GRID_X;
     public final int GRID_Y;
@@ -23,6 +23,7 @@ public class DStar {
 
         // Find and cache all neighbors
         for(int i = 0; i < gridX * gridY; i++) {
+            nodeArray[i] = new Node();
             Node node = nodeArray[i];
             List<Integer> neighbors = new ArrayList<>();
 
@@ -44,7 +45,7 @@ public class DStar {
                 neighbors.add(i+gridX);
             }
 
-            node.neighbors = (Integer[]) neighbors.toArray();
+            node.neighbors = neighbors;
         }
     }
 
@@ -231,7 +232,7 @@ class Node {
     int nextNode = -1;
     boolean obstacle = false;
 
-    Integer[] neighbors;
+    List<Integer> neighbors = new ArrayList<>();
 
     NodeState state = NodeState.NEW;
 }
