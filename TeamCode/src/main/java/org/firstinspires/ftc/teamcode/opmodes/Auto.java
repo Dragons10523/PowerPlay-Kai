@@ -9,29 +9,44 @@ import org.firstinspires.ftc.teamcode.processors.SignalOpticalSystem;
 public abstract class Auto extends AutoControl {
     public void auto(FieldSide side) {
         VectorF initialTransform;
+        VectorF targetTile;
         VectorF defaultPosition;
         VectorF alternatePositon;
         VectorF defaultTarget;
         VectorF alternateTarget;
         VectorF coneStackPosition;
 
+        VectorF leftPark;
+        VectorF middlePark;
+        VectorF rightPark;
+
         switch(side) {
             case LEFT:
                 initialTransform = new VectorF(1, 0);
-                defaultPosition = new VectorF(1, 2);
-                alternatePositon = new VectorF(2, 2);
-                defaultTarget = new VectorF(1, 2);
-                alternateTarget = new VectorF(2, 1);
+                targetTile = new VectorF(1, 2);
+                defaultPosition = new VectorF(0.5f, 2);
+                alternatePositon = new VectorF(1.5f, 2);
+                defaultTarget = new VectorF(48, 72);
+                alternateTarget = new VectorF(72, 48);
                 coneStackPosition = new VectorF(2, 60);
+
+                leftPark = new VectorF(0, 1);
+                middlePark = new VectorF(1, 1);
+                rightPark = new VectorF(2, 1);
                 break;
             case RIGHT:
             default:
                 initialTransform = new VectorF(4, 0);
-                defaultPosition = new VectorF(4, 2);
-                alternatePositon = new VectorF(3, 2);
-                defaultTarget = new VectorF(4, 2);
-                alternateTarget = new VectorF(2, 1);
+                targetTile = new VectorF(4, 2);
+                defaultPosition = new VectorF(4.5f, 2);
+                alternatePositon = new VectorF(3.5f, 2);
+                defaultTarget = new VectorF(96, 72);
+                alternateTarget = new VectorF(72, 48);
                 coneStackPosition = new VectorF(142, 60);
+
+                leftPark = new VectorF(3, 1);
+                middlePark = new VectorF(4, 1);
+                rightPark = new VectorF(5, 1);
         }
 
         if(isStopRequested) return;
@@ -47,15 +62,17 @@ public abstract class Auto extends AutoControl {
         SignalOpticalSystem.SignalOrientation signalOrientation = signalOpticalSystem.getSignalOrientation();
         kai.frontCamera.closeCameraDevice();
 
+        moveToTile(Control.posToPoleIdx(targetTile));
+
         while(getRuntime() < 25) {
             if(!robotInterrupt) {
-                moveToTile(Control.posToPoleIdx(defaultPosition));
+                moveToTile(defaultPosition);
                 if(kai.frontDist.getDistance(DistanceUnit.INCH) < 24) {
                     robotInterrupt = true;
-                    moveToTile(Control.posToPoleIdx(alternatePositon));
+                    moveToTile(alternatePositon);
                 }
             } else {
-                moveToTile(Control.posToPoleIdx(alternatePositon));
+                moveToTile(alternatePositon);
             }
             armControl.setLiftHeight(Control.GoalHeight.HIGH);
 
@@ -86,14 +103,14 @@ public abstract class Auto extends AutoControl {
 
         switch (signalOrientation) {
             case MIDDLE:
-                moveToTile(1, 1);
+                moveToTile(Control.posToPoleIdx(middlePark));
                 break;
             case RIGHT:
-                moveToTile(2, 1);
+                moveToTile(Control.posToPoleIdx(rightPark));
                 break;
             case LEFT:
             default:
-                moveToTile(0, 1);
+                moveToTile(Control.posToPoleIdx(leftPark));
         }
 
         requestOpModeStop();
