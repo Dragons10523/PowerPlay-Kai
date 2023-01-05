@@ -7,6 +7,7 @@ import org.firstinspires.ftc.teamcode.processors.VecUtils;
 
 public abstract class AbstractOmniDrivetrain extends AbstractDrivetrain {
     double impulseRotation;
+    final static double ROOT2OVER2 = Math.sqrt(2) / 2;
 
     public AbstractOmniDrivetrain(DcMotor frontLeft, DcMotor frontRight, DcMotor backLeft, DcMotor backRight, double impulseRotation) {
         super(frontLeft, frontRight, backLeft, backRight);
@@ -17,8 +18,8 @@ public abstract class AbstractOmniDrivetrain extends AbstractDrivetrain {
         VectorF powerVector = new VectorF(forward, sideway);
         VecUtils.rotateVector(powerVector, impulseRotation);
 
-        float negativeGroup = powerVector.get(0);
-        float positiveGroup = powerVector.get(1);
+        float negativeGroup = (float) (powerVector.get(0) / ROOT2OVER2);
+        float positiveGroup = (float) (powerVector.get(1) / ROOT2OVER2);
 
         driveMotors[0].setPower(negativeGroup + turn);
         driveMotors[1].setPower(positiveGroup - turn);
