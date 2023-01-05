@@ -62,6 +62,7 @@ public class Kai {
         // Set motor directions
         armLiftA.setDirection(DcMotorSimple.Direction.REVERSE);
         armLiftB.setDirection(DcMotorSimple.Direction.REVERSE);
+        turntable.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Set motor behavior
         drivetrain.setZeroBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -90,11 +91,11 @@ public class Kai {
         armLiftB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         liftExtension.setPower(1);
-        turntable.setPower(1);
+        turntable.setPower(0.35);
         armLiftA.setPower(1);
         armLiftB.setPower(1);
 
-        deadwheels = new Deadwheels(drivetrain.driveMotors[2], drivetrain.driveMotors[3], drivetrain.driveMotors[0], 7, 0, Math.PI/4096);
+        deadwheels = new Deadwheels(drivetrain.driveMotors[2], drivetrain.driveMotors[1], drivetrain.driveMotors[0], 2.82, .43, Math.PI/2048);
     }
 
     public double getHeading(){
