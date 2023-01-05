@@ -28,11 +28,11 @@ public abstract class AutoControl extends Control {
         telemetry.addLine("Robot is Starting...");
         telemetry.update();
 
-        signalOpticalSystem = new SignalOpticalSystem();
+        //signalOpticalSystem = new SignalOpticalSystem();
 
         telemetry.addLine("Opening camera...");
         telemetry.update();
-        kai.frontCamera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+        /*kai.frontCamera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
                 kai.frontCamera.startStreaming(SignalOpticalSystem.CAMERA_WIDTH, SignalOpticalSystem.CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
@@ -44,11 +44,11 @@ public abstract class AutoControl extends Control {
                 telemetry.addLine(String.format("Robot startup failed with error code %d", errorCode));
                 telemetry.update();
             }
-        });
+        });*/
 
         telemetry.addLine("Setting up systems...");
         telemetry.update();
-        kai.frontCamera.setPipeline(signalOpticalSystem);
+        //kai.frontCamera.setPipeline(signalOpticalSystem);
         super.init();
         this.dStar = new DStar(6, 6, 0, 0);
 
@@ -61,7 +61,7 @@ public abstract class AutoControl extends Control {
                 {0, 0, VecUtils.HALF_PI}
         };
 
-        while(!signalOpticalSystem.isReady()) sleep(100);
+        //while(!signalOpticalSystem.isReady()) sleep(100);
         telemetry.addLine("Robot is Ready!");
         telemetry.update();
     }
@@ -96,49 +96,73 @@ public abstract class AutoControl extends Control {
     }
 
     // Returns true on robot detected
-    public boolean moveToTile(int X, int Y) {
+    public boolean moveToTile(float X, float Y) {
         if(isStopRequested) return false; // Returning false so we don't get Stack Overflows from recursion
 
-        int xInch = X * 24 + 12;
-        int yInch = Y * 24 + 12;
+        float xInch = 12 + X * 24;
+        float yInch = 12 + Y * 24;
 
         // Align Y to the nearest column
         if(checkPathing()) return true;
         double yAdjust = 12 - (kai.deadwheels.currentY % 24);
-        while(Math.abs(yAdjust) > 4) {
+        while(Math.abs(yAdjust) > .5) {
             if(isStopRequested) return false;
 
-            mecanumDrive(0, (float) (yAdjust * .4), 0, DriveMode.GLOBAL);
+            mecanumDrive(0, (float) (yAdjust/4), kai.deadwheels.currentAngle * 10, DriveMode.GLOBAL);
 
             if(checkPathing()) return true;
             yAdjust = 12 - (kai.deadwheels.currentY % 24);
+
+            telemetry.addLine("Y Align");
+            telemetry.update();
         }
 
         // Go to the right row
         double xAdjust = xInch - kai.deadwheels.currentX;
-        while(Math.abs(xAdjust) > 4) {
+        while(Math.abs(xAdjust) > .5) {
             if(isStopRequested) return false;
 
-            mecanumDrive((float) xAdjust, (float) yAdjust, 0, DriveMode.GLOBAL) ;
+            mecanumDrive(
+                    (float) (Math.atan(xAdjust/3)/VecUtils.HALF_PI),
+                    (float) (Math.atan(yAdjust/3)/VecUtils.HALF_PI),
+                    kai.deadwheels.currentAngle * 10, DriveMode.GLOBAL);
 
             if(checkPathing()) return true;
             xAdjust = xInch - kai.deadwheels.currentX;
             yAdjust = 12 - (kai.deadwheels.currentY % 24);
+
+            telemetry.addLine("X Move");
+            telemetry.addData("X", kai.deadwheels.currentX);
+            telemetry.addData("Y", kai.deadwheels.currentY);
+            telemetry.addData("R", kai.deadwheels.currentAngle);
+            telemetry.update();
         }
 
         // Go to the right column
         yAdjust = yInch - kai.deadwheels.currentY;
-        while(Math.abs(yAdjust) > 4) {
+        while(Math.abs(yAdjust) > .5) {
             if(isStopRequested) return false;
 
-            mecanumDrive((float) xAdjust, (float) yAdjust, 0, DriveMode.GLOBAL) ;
+            mecanumDrive(
+                    (float) (Math.atan(xAdjust/3)/VecUtils.HALF_PI),
+                    (float) (Math.atan(yAdjust/3)/VecUtils.HALF_PI),
+                    kai.deadwheels.currentAngle * 10, DriveMode.GLOBAL);
 
             if(checkPathing()) return true;
             xAdjust = xInch - kai.deadwheels.currentX;
             yAdjust = yInch - kai.deadwheels.currentY;
+
+            telemetry.addLine("Y Move");
+            telemetry.update();
         }
 
+        mecanumDrive(0, 0, 0, DriveMode.LOCAL);
+
         return false;
+    }
+
+    public boolean moveToTile(VectorF target) {
+        return moveToTile(target.get(0), target.get(1));
     }
 
     public VectorF getSensorIntercept(DistanceSensor sensor, double[] sensorOffset) {
@@ -147,8 +171,8 @@ public abstract class AutoControl extends Control {
 
         // Calculate the origin intercept
         VectorF intercept = new VectorF(
-                (float)(Math.cos(robotAngle + sensorOffset[3]) * distance + kai.deadwheels.currentX),
-                (float)(Math.sin(robotAngle + sensorOffset[3]) * distance + kai.deadwheels.currentY));
+                (float)(Math.cos(robotAngle + sensorOffset[2]) * distance + kai.deadwheels.currentX),
+                (float)(Math.sin(robotAngle + sensorOffset[2]) * distance + kai.deadwheels.currentY));
 
         // Offset the origin intercept by the sensor position
         intercept.add(VecUtils.rotateVector(new VectorF((float)sensorOffset[0], (float)sensorOffset[1]), robotAngle));
@@ -159,7 +183,8 @@ public abstract class AutoControl extends Control {
     // Returns true on robot detected
     private boolean checkPathing() {
         kai.deadwheels.wheelLoop();
-
+        // TODO: UNCOMMENT CHECK PATHING WHEN SENSORS ARE IN
+/*
         for(int sensorIndex = 0; sensorIndex < 4; sensorIndex++) {
             VectorF intercept = getSensorIntercept(robotSensors[sensorIndex], sensorOffsets[sensorIndex]);
 
@@ -170,7 +195,7 @@ public abstract class AutoControl extends Control {
                 if(tryBlockPath(xTile, yTile)) return true;
 
             tryClearPath(xTile, yTile);
-        }
+        }*/
         return false;
     }
 
