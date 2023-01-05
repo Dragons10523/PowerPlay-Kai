@@ -13,7 +13,7 @@ public class Drive extends Control {
 
     // Assist values
     boolean assistDrive = false;
-    boolean assistTurns = true;
+    boolean assistTurns = false;
     boolean assistManipulator = false;
 
     // Numerical values
@@ -108,7 +108,7 @@ public class Drive extends Control {
         // Driving
         float driveX = gamepad1.left_stick_x;
         float driveY = -gamepad1.left_stick_y;
-        DriveMode driveMode = DriveMode.LOCAL;
+        DriveMode driveMode = DriveMode.GLOBAL;
 
         if(assistDrive) {
             driveMode = DriveMode.GLOBAL;
@@ -164,7 +164,7 @@ public class Drive extends Control {
                 armControl.setAngleOverride(angle);
             }
 
-            armControl.setExtensionDistance(gamepad2.right_trigger * 3);
+            armControl.setExtensionDistance(gamepad2.right_trigger * 15);
 
             boolean clawToggle = gamepad2.right_bumper;
             if(clawToggle != clawPrev && clawToggle) {
