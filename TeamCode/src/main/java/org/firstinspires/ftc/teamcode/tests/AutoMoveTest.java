@@ -29,9 +29,16 @@ public class AutoMoveTest extends AutoControl {
         moveToTile(-1, 0);
         moveToTile(-1, 2);*/
 
-        moveToTile(3, 0);
-        moveToTile(0, 0);
+        armControl.setExtensionDistance(15);
 
-        sleep(1000);
+        while(clawDistance() > 2.5) {
+            armControl.update();
+        }
+        armControl.claw(ClawState.CLOSE);
+        sleep(700);
+        armControl.setExtensionDistance(0);
+        armControl.update();
+
+        sleep(3000);
     }
 }
