@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -18,13 +20,15 @@ public class Kai {
     // Also used for deadwheels. Use back motors for both y axis, front left for the x axis
     public final MecanumDrivetrain drivetrain;
 
-    public final DcMotor liftExtension;
+    public final DcMotorEx liftExtension;
     public final DcMotorEx turntable;
     public final DcMotor armLiftA, armLiftB;
     public final Servo claw, clawTwist;
 
-    public final DistanceSensor frontDist, rightDist, leftDist, backDist;
-    public final DistanceSensor clawSensor;
+    public final Rev2mDistanceSensor rightDist, leftDist, backDist;
+    public final Rev2mDistanceSensor clawSensor;
+
+    public final IMU imu;
 
     public OpenCvWebcam frontCamera;
 
@@ -40,7 +44,7 @@ public class Kai {
                 hwmap.get(DcMotor.class, "backLeft"), hwmap.get(DcMotor.class, "backRight")
         );
 
-        liftExtension = hwmap.get(DcMotor.class, "horizontalLift");
+        liftExtension = hwmap.get(DcMotorEx.class, "horizontalLift");
         turntable = hwmap.get(DcMotorEx.class, "turntable");
         armLiftA = hwmap.get(DcMotor.class, "armLiftA");
         armLiftB = hwmap.get(DcMotor.class, "armLiftB");
@@ -48,12 +52,13 @@ public class Kai {
         claw = hwmap.get(Servo.class, "claw");
         clawTwist = hwmap.get(Servo.class, "clawTwist");
 
-        frontDist = hwmap.get(DistanceSensor.class, "frontDist");
-        rightDist = hwmap.get(DistanceSensor.class, "rightDist");
-        leftDist = hwmap.get(DistanceSensor.class, "leftDist");
-        backDist = hwmap.get(DistanceSensor.class, "backDist");
+        rightDist = hwmap.get(Rev2mDistanceSensor.class, "rightDist");
+        leftDist = hwmap.get(Rev2mDistanceSensor.class, "leftDist");
+        backDist = hwmap.get(Rev2mDistanceSensor.class, "backDist");
 
-        clawSensor = hwmap.get(DistanceSensor.class, "clawSensor");
+        clawSensor = hwmap.get(Rev2mDistanceSensor.class, "clawSensor");
+
+        imu = hwmap.get(IMU.class, "imu");
 
         WebcamName frontWebcamName = hwmap.get(WebcamName.class, "Webcam 1");
         //frontCamera = OpenCvCameraFactory.getInstance().createWebcam(frontWebcamName);
@@ -78,12 +83,18 @@ public class Kai {
         armLiftA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armLiftB.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        try {
+            Thread.sleep(50);
+        } catch(InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        liftExtension.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, new PIDFCoefficients(15, 0, 0, 0));
+
         liftExtension.setTargetPosition(0);
         turntable.setTargetPosition(0);
         armLiftA.setTargetPosition(0);
         armLiftB.setTargetPosition(0);
-
-        //turntable.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, new PIDFCoefficients(2, 0, 0, 0));
 
         liftExtension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turntable.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -94,6 +105,12 @@ public class Kai {
         turntable.setPower(0.35);
         armLiftA.setPower(1);
         armLiftB.setPower(1);
+
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP);
+
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
 
         deadwheels = new Deadwheels(drivetrain.driveMotors[2], drivetrain.driveMotors[1], drivetrain.driveMotors[0], 2.82, .43, Math.PI/2048);
     }
