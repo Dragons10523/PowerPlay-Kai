@@ -18,8 +18,6 @@ public class DStar {
         this.GRID_X = gridX;
         this.GRID_Y = gridY;
         nodeArray = new Node[gridX * gridY];
-        this.start = start;
-        this.end = end;
 
         // Find and cache all neighbors
         for(int i = 0; i < gridX * gridY; i++) {
@@ -28,6 +26,7 @@ public class DStar {
             List<Integer> neighbors = new ArrayList<>();
 
             node.ownIndex = i;
+            node.cost = nodeArray.length;
 
             int nodeX = i % gridX;
             int nodeY = i / gridX;
@@ -47,6 +46,9 @@ public class DStar {
 
             node.neighbors = neighbors;
         }
+
+        updateStart(start);
+        updateEnd(end);
     }
 
     public List<Integer> getCompressedPath() {
@@ -99,6 +101,8 @@ public class DStar {
         int currentNode = start;
 
         while(true) {
+            if(currentNode == -1) break;
+            if(path.contains(currentNode)) throw new UnknownError();
             path.add(currentNode);
 
             if(getNodeCost(nodeArray[currentNode]) == 0) {
@@ -112,21 +116,23 @@ public class DStar {
     }
 
     public void updateStart(int start) {
-        nodeArray[this.start].cost = -1;
-        nodeArray[this.start].state = Node.NodeState.OPEN;
+        nodeArray[this.start].cost = nodeArray.length + 1;
+        nodeArray[this.start].state = Node.NodeState.RAISE;
         openList.add(this.start);
         this.start = start;
-        nodeArray[start].cost = 0;
+        openList.add(start);
         processOpenList();
     }
 
     public void updateEnd(int end) {
-        nodeArray[this.end].cost = -1;
-        nodeArray[this.end].state = Node.NodeState.OPEN;
+        nodeArray[this.end].cost = nodeArray.length + 1;
+        nodeArray[this.end].state = Node.NodeState.RAISE;
         openList.add(this.end);
         this.end = end;
+        openList.add(end);
         nodeArray[end].cost = 0;
         processOpenList();
+        System.out.println("Update Ended");
     }
 
     public void markBlocked(int node) {
@@ -134,11 +140,14 @@ public class DStar {
         nodeArray[node].state = Node.NodeState.OPEN;
         openList.add(node);
         obstacles.add(node);
+
+        openList.add(nodeArray[node].nextNode);
+
         processOpenList();
     }
 
     public void markOpen(int node) {
-        nodeArray[node].cost = -1;
+        nodeArray[node].cost = nodeArray.length;
         nodeArray[node].obstacle = false;
         nodeArray[node].state = Node.NodeState.OPEN;
         openList.add(node);
@@ -150,6 +159,7 @@ public class DStar {
         while(openList.size() > 0) {
             List<Integer> processList = new ArrayList<>(openList);
             for(Integer nodeIndex : processList) {
+                System.out.println(processList.size());
                 Node node = nodeArray[nodeIndex];
                 expand(node);
                 openList.remove(nodeIndex);
@@ -161,12 +171,25 @@ public class DStar {
     private void expand(Node node) {
         boolean raise = checkRaise(node);
         int costThroughCurrent = getNodeCost(node) + 1;
+
+        StringBuilder builder = new StringBuilder();
+        for (Node printNode : nodeArray) {
+            if(printNode.ownIndex % 6 == 0) {
+                System.out.println(builder);
+                builder = new StringBuilder();
+            }
+            builder.append(printNode.nextNode);
+            builder.append(" ");
+        }
+
         for(Integer neighborIdx : node.neighbors) {
             Node neighbor = nodeArray[neighborIdx];
+            if(neighbor.obstacle) continue;
             if(raise) {
                 if(neighbor.nextNode == node.ownIndex) {
-                    neighbor.state = Node.NodeState.OPEN;
-                    neighbor.cost = costThroughCurrent;
+                    neighbor.state = Node.NodeState.RAISE;
+                    if(neighbor.cost != 0)
+                        neighbor.cost = costThroughCurrent;
                     openList.add(neighborIdx);
                 } else if(costThroughCurrent < getNodeCost(neighbor)) {
                     neighbor.nextNode = node.ownIndex;
@@ -185,15 +208,16 @@ public class DStar {
         }
     }
 
-    private int getNodeCost(Node node) {
+    public int getNodeCost(Node node) {
         if(node.obstacle) return node.cost = nodeArray.length;
 
         if(node.state == Node.NodeState.CLOSED) return node.cost;
 
         if(node.cost != 0) {
+            if(node.nextNode == -1) return node.cost;
             return node.cost = getNodeCost(nodeArray[node.nextNode]) + 1;
         } else {
-            return 0;
+            return node.cost = 0;
         }
     }
 
@@ -201,9 +225,13 @@ public class DStar {
         int cost = getNodeCost(node);
         boolean costChanged = false;
 
+        if(cost == nodeArray.length || cost == 0) return false;
+
+        if(node.state == Node.NodeState.RAISE) return true;
+
         for(Integer neighborIdx : node.neighbors) {
             Node neighbor = nodeArray[neighborIdx];
-            int neighborCost = getNodeCost(neighbor);
+            int neighborCost = getNodeCost(neighbor) + 1;
             if(neighborCost < cost) {
                 cost = neighborCost;
                 node.cost = cost;

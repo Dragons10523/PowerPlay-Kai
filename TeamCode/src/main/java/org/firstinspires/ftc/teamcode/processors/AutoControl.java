@@ -1,18 +1,16 @@
 package org.firstinspires.ftc.teamcode.processors;
 
-import android.annotation.SuppressLint;
-
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.List;
 
 public abstract class AutoControl extends Control {
-    DStar dStar;
+    protected DStar dStar;
 
     protected SignalOpticalSystem signalOpticalSystem;
     private DistanceSensor[] robotSensors;
@@ -52,10 +50,9 @@ public abstract class AutoControl extends Control {
         super.init();
         this.dStar = new DStar(6, 6, 0, 0);
 
-        robotSensors = new DistanceSensor[]{kai.frontDist, kai.rightDist, kai.leftDist, kai.backDist};
+        robotSensors = new DistanceSensor[]{kai.rightDist, kai.leftDist, kai.backDist};
         // X, Y, Angle
         sensorOffsets = new double[][]{
-                {0, 0, -VecUtils.HALF_PI},
                 {0, 0, 0},
                 {0, 0, Math.PI},
                 {0, 0, VecUtils.HALF_PI}
@@ -71,16 +68,11 @@ public abstract class AutoControl extends Control {
         requestOpModeStop();
     }
 
-    public void liftToStack(int stackHeight) {
-        // TODO: Calibrate real values
-        armControl.coneStack = 1000 + (10 * stackHeight);
-    }
-
     public void moveToTile(int nodeIndex) {
-        if(isStopRequested) return;
+        if(checkInvalid()) return;
 
         this.dStar.updateEnd(nodeIndex);
-        checkPathing();
+        //checkPathing();
 
         List<Integer> compressedPath = dStar.getCompressedPath();
 
@@ -88,7 +80,7 @@ public abstract class AutoControl extends Control {
             int nodeX = cornerNode % 6;
             int nodeY = (int) Math.floor(cornerNode / 6f);
 
-            if(moveToTile(nodeX, nodeY)) {
+            if(moveToTile((float) Math.floor(nodeX), (float) Math.floor(nodeY))) {
                 moveToTile(nodeIndex);
                 return;
             }
@@ -97,63 +89,67 @@ public abstract class AutoControl extends Control {
 
     // Returns true on robot detected
     public boolean moveToTile(float X, float Y) {
-        if(isStopRequested) return false; // Returning false so we don't get Stack Overflows from recursion
+        if(checkInvalid()) return false; // Returning false so we don't get Stack Overflows from recursion
 
-        float xInch = 12 + X * 24;
-        float yInch = 12 + Y * 24;
+        float xInch = 12 + (X * 24);
+        float yInch = 12 + (Y * 24);
+
+        double targetAngle = ((int)Math.round(kai.deadwheels.currentAngle/VecUtils.HALF_PI)) * VecUtils.HALF_PI;
 
         // Align Y to the nearest column
         if(checkPathing()) return true;
-        double yAdjust = 12 - (kai.deadwheels.currentY % 24);
-        while(Math.abs(yAdjust) > .5) {
-            if(isStopRequested) return false;
-
-            mecanumDrive(0, (float) (yAdjust/4), kai.deadwheels.currentAngle * 10, DriveMode.GLOBAL);
-
-            if(checkPathing()) return true;
-            yAdjust = 12 - (kai.deadwheels.currentY % 24);
-
-            telemetry.addLine("Y Align");
-            telemetry.update();
-        }
-
-        // Go to the right row
         double xAdjust = xInch - kai.deadwheels.currentX;
-        while(Math.abs(xAdjust) > .5) {
-            if(isStopRequested) return false;
+        double yAdjust = 12 - (kai.deadwheels.currentY % 24);
+        while(Math.abs(yAdjust) > 1) {
+            if(checkInvalid()) return false;
 
             mecanumDrive(
-                    (float) (Math.atan(xAdjust/3)/VecUtils.HALF_PI),
-                    (float) (Math.atan(yAdjust/3)/VecUtils.HALF_PI),
-                    kai.deadwheels.currentAngle * 10, DriveMode.GLOBAL);
+                    (float) (Math.atan(xAdjust*1.5)/2.5),
+                    (float) (Math.atan(yAdjust*1.5)/2.5),
+                    (kai.deadwheels.currentAngle - targetAngle) * 10, DriveMode.GLOBAL);
+
+            if(checkPathing()) return true;
+            xAdjust = 12 - (kai.deadwheels.currentX % 24);
+            yAdjust = 12 - (kai.deadwheels.currentY % 24);
+        }
+
+        ElapsedTime stopTimer = new ElapsedTime();
+
+        // Go to the right row
+        while(stopTimer.seconds() < 0.1) {
+            if(checkInvalid()) return false;
+
+            if(Math.abs(xAdjust) > 1)
+                stopTimer.reset();
+
+            mecanumDrive(
+                    (float) (Math.atan(xAdjust*1.5)/2.5),
+                    (float) (Math.atan(yAdjust*1.5)/Math.PI),
+                    (kai.deadwheels.currentAngle - targetAngle) * 10, DriveMode.GLOBAL);
 
             if(checkPathing()) return true;
             xAdjust = xInch - kai.deadwheels.currentX;
             yAdjust = 12 - (kai.deadwheels.currentY % 24);
-
-            telemetry.addLine("X Move");
-            telemetry.addData("X", kai.deadwheels.currentX);
-            telemetry.addData("Y", kai.deadwheels.currentY);
-            telemetry.addData("R", kai.deadwheels.currentAngle);
-            telemetry.update();
         }
+
+        stopTimer.reset();
 
         // Go to the right column
         yAdjust = yInch - kai.deadwheels.currentY;
-        while(Math.abs(yAdjust) > .5) {
-            if(isStopRequested) return false;
+        while(stopTimer.seconds() < 0.1) {
+            if(checkInvalid()) return false;
+
+            if(Math.abs(yAdjust) > .5)
+                stopTimer.reset();
 
             mecanumDrive(
-                    (float) (Math.atan(xAdjust/3)/VecUtils.HALF_PI),
-                    (float) (Math.atan(yAdjust/3)/VecUtils.HALF_PI),
-                    kai.deadwheels.currentAngle * 10, DriveMode.GLOBAL);
+                    (float) (Math.atan(xAdjust*1.5)/Math.PI),
+                    (float) (Math.atan(yAdjust*1.5)/2.5),
+                    (kai.deadwheels.currentAngle - targetAngle) * 10, DriveMode.GLOBAL);
 
             if(checkPathing()) return true;
             xAdjust = xInch - kai.deadwheels.currentX;
             yAdjust = yInch - kai.deadwheels.currentY;
-
-            telemetry.addLine("Y Move");
-            telemetry.update();
         }
 
         mecanumDrive(0, 0, 0, DriveMode.LOCAL);
@@ -255,5 +251,16 @@ public abstract class AutoControl extends Control {
                 dStar.markOpen(nodeIndex);
             }
         }
+    }
+
+    public boolean checkInvalid() {
+        return isStopRequested;// || !(Math.abs(mapAngle(kai.deadwheels.currentAngle - kai.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS), -Math.PI, Math.PI, 0)) > 0.3);
+    }
+
+    public void turnTo(double angle) {
+        do {
+            kai.deadwheels.wheelLoop();
+            mecanumDrive(0, 0, (kai.deadwheels.currentAngle + angle) * 5, DriveMode.LOCAL);
+        } while(Math.abs(kai.deadwheels.currentAngle + angle) > 0.1);
     }
 }

@@ -67,13 +67,15 @@ public class Deadwheels {
         // Positive turning right, negative for left
         double turnDelta = ((((rightYDelta - leftYDelta) / 2d) * inchesPerTick) / symmetricCircumference) * VecUtils.TAU;
 
+        double robotYDelta = (leftYDelta + rightYDelta) * inchesPerTick / 2;
+        turnDelta -= robotYDelta * 0.0018;
+
         double robotTurnXDelta = (-turnDelta / VecUtils.TAU) * asymmetricCircumference;
         double robotXDelta = ((XDelta) * inchesPerTick) - robotTurnXDelta;
-        double robotYDelta = (leftYDelta + rightYDelta) * inchesPerTick / 2;
 
         double updateAngle = currentAngle + (turnDelta / 2);
-        double xGlobalDelta = Math.cos(updateAngle) * robotXDelta + Math.sin(updateAngle) * robotYDelta;
-        double yGlobalDelta = -Math.sin(updateAngle) * robotXDelta + Math.cos(updateAngle) * robotYDelta;
+        double xGlobalDelta = Math.cos(-updateAngle) * robotXDelta + Math.sin(-updateAngle) * robotYDelta;
+        double yGlobalDelta = -Math.sin(-updateAngle) * robotXDelta + Math.cos(-updateAngle) * robotYDelta;
 
         // Calculate velocities
         long currentUpdateTime = System.currentTimeMillis();

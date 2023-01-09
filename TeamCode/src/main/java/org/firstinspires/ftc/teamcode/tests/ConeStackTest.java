@@ -54,6 +54,6 @@ public class ConeStackTest extends AutoControl {
 
         coneStackHeight %= 5;
 
-        liftToStack(coneStackHeight);
+        armControl.coneStack = coneStackHeight;
     }
 }

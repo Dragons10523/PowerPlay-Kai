@@ -10,12 +10,12 @@ public class ArmControl {
     public static final double EXTENSION_TICKS_PER_INCH = 88.9;
 
     public static final int GROUND_GOAL_HEIGHT = 0;
-    public static final int LOW_GOAL_HEIGHT = 2800;
+    public static final int LOW_GOAL_HEIGHT = 3100;
     public static final int MID_GOAL_HEIGHT = 4500;
-    public static final int HIGH_GOAL_HEIGHT = 7000;
+    public static final int HIGH_GOAL_HEIGHT = 6300;
 
     public Control control;
-    public int coneStack = -1;
+    public int coneStack = 0;
 
     private VectorF target = null;
     private Control.GoalHeight liftHeight = Control.GoalHeight.NONE;
@@ -53,33 +53,45 @@ public class ArmControl {
 
     private void aimClaw() {
         // Blocked by the lift target
-        if(liftHeight == Control.GoalHeight.GROUND || liftHeight == Control.GoalHeight.NONE || (target == null && angleOverride == null)) {
-            aimClaw(0);
-            return;
+        boolean limitAngle = liftHeight == Control.GoalHeight.GROUND || liftHeight == Control.GoalHeight.NONE || getLiftCurrentLiftHeight() < 1800;
+
+        double targetAngle;
+
+        System.out.println("Aiming");
+        if(angleOverride == null) {
+            System.out.println("No Override");
+            if(target == null) {
+                return;
+            }
+            System.out.println("Target Acquired");
+
+            VectorF poleVec = this.target.subtracted(new VectorF((float) control.kai.deadwheels.currentX, (float) control.kai.deadwheels.currentY));
+            VectorF velVec = new VectorF((float) control.kai.deadwheels.xVelocity, (float) control.kai.deadwheels.yVelocity);
+
+            // Calculate the position to target in field space
+            VectorF targetVec = poleVec.subtracted(velVec);
+
+            System.out.println("Pole Vector: " + poleVec);
+            System.out.println("Velocity Vector: " + velVec);
+            System.out.println("Target Vector: " + targetVec);
+
+            double currentAngle = control.kai.getHeading();
+
+            // Convert the target position from field space to robot space
+            VectorF robotVec = VecUtils.rotateVector(targetVec, currentAngle);
+
+            targetAngle = VecUtils.getVectorAngle(robotVec);
+
+            extensionDistance = (int) ((Math.hypot(robotVec.get(0), robotVec.get(1)) - 9.75) * EXTENSION_TICKS_PER_INCH);
+        } else {
+            targetAngle = angleOverride;
         }
 
-        if(angleOverride != null) {
-            aimClaw(angleOverride);
-            return;
-        }
-
-        VectorF poleVec = this.target.subtracted(new VectorF((float) control.kai.deadwheels.currentX, (float) control.kai.deadwheels.currentY));
-        VectorF velVec = new VectorF((float) control.kai.deadwheels.xVelocity, (float) control.kai.deadwheels.yVelocity);
-
-        // Calculate the position to target in field space
-        VectorF targetVec = poleVec.subtracted(velVec);
-
-        double currentAngle = control.kai.getHeading();
-
-        // Convert the target position from field space to robot space
-        VectorF robotVec = VecUtils.rotateVector(targetVec, currentAngle);
-
-        double targetAngle = VecUtils.getVectorAngle(robotVec);
+        targetAngle = (limitAngle ? Math.min(-.3, Math.max(.3, targetAngle)) : targetAngle);
 
         // Set the extension distance
-        extensionDistance = robotVec.length();
         // Aim
-        aimClaw(targetAngle);
+        //aimClaw(targetAngle);
     }
 
     public boolean willConeHit(VectorF target) {
@@ -143,7 +155,9 @@ public class ArmControl {
                     setLiftHeight(LOW_GOAL_HEIGHT);
                     break;
                 }
-                setLiftHeight(GROUND_GOAL_HEIGHT);
+
+                coneStack = Math.min(5, Math.max(1, coneStack));
+                setLiftHeight((250 * coneStack) - 250);
         }
     }
 
@@ -179,9 +193,13 @@ public class ArmControl {
 
     private void moveExtensionWhenSafe() {
         // Lift blocks all
-        if(getLiftCurrentLiftHeight() > getGoalHeight(liftHeight) - 600) {
+        extensionDistance = Math.min(1333, Math.max(0, extensionDistance));
+        System.out.println("Checking Extension");
+        if(getLiftCurrentLiftHeight() > getGoalHeight(liftHeight) - 800) {
+            System.out.println("Extendo Patronum at " + extensionDistance);
             control.kai.liftExtension.setTargetPosition(extensionDistance);
         } else if(liftHeightChanged) {
+            System.out.println("No Extendo");
             control.kai.liftExtension.setTargetPosition(0);
         }
     }

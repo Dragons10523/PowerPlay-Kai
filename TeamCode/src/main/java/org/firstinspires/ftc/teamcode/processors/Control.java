@@ -95,6 +95,12 @@ public abstract class Control extends OpMode {
         return (int) ((x - 12)/24 + 5 * (y - 12)/24);
     }
 
+    public static int tileToNodeIndex(VectorF pos) {
+        int x = (int) pos.get(0);
+        int y = (int) pos.get(1);
+        return (x + (6 * y));
+    }
+
     public double clawDistance() {
         return kai.clawSensor.getDistance(DistanceUnit.INCH);
     }
