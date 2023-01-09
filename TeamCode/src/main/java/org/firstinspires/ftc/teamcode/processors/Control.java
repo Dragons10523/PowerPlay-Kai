@@ -58,8 +58,8 @@ public abstract class Control extends OpMode {
     public void stop() {
         if(isStopRequested) return;
 
-        stopAllMovement();
         isStopRequested = true;
+        stopAllMovement();
     }
 
     public void mecanumDrive(float x, float y, double turn, DriveMode mode) {

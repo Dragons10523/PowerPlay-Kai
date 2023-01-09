@@ -17,6 +17,10 @@ public class FixLift extends Control {
         kai.armLiftB.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         kai.liftExtension.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        kai.armLiftA.setPower(0);
+        kai.armLiftB.setPower(0);
+        kai.liftExtension.setPower(0);
+
         deltaTime = new ElapsedTime();
     }
 
@@ -30,14 +34,16 @@ public class FixLift extends Control {
         kai.liftExtension.setPower(-gamepad2.right_stick_y);
 
         if(gamepad2.right_bumper) {
-            position += deltaTime.seconds()*300;
-        } else if(gamepad2.left_bumper) {
             position -= deltaTime.seconds()*300;
+        } else if(gamepad2.left_bumper) {
+            position += deltaTime.seconds()*300;
         }
         deltaTime.reset();
 
         kai.turntable.setTargetPosition((int)position);
 
-        telemetry.addData("Recorded Angle", kai.turntable.getCurrentPosition());
+        telemetry.addData("Lift A", kai.armLiftA.getCurrentPosition());
+        telemetry.addData("Lift B", kai.armLiftB.getCurrentPosition());
+        telemetry.update();
     }
 }
