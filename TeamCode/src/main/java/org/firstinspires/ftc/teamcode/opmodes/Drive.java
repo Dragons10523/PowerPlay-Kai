@@ -13,7 +13,7 @@ public class Drive extends Control {
 
     // Assist values
     boolean assistDrive = false;
-    boolean assistTurns = false;
+    boolean assistTurns = false; 
     boolean assistManipulator = false;
 
     // Numerical values
@@ -108,7 +108,7 @@ public class Drive extends Control {
         // Driving
         float driveX = gamepad1.left_stick_x;
         float driveY = -gamepad1.left_stick_y;
-        DriveMode driveMode = DriveMode.GLOBAL;
+        DriveMode driveMode = DriveMode.LOCAL;
 
         if(assistDrive) {
             driveMode = DriveMode.GLOBAL;
