@@ -50,12 +50,11 @@ public abstract class AutoControl extends Control {
         super.init();
         this.dStar = new DStar(6, 6, 0, 0);
 
-        robotSensors = new DistanceSensor[]{kai.rightDist, kai.leftDist, kai.backDist};
+        robotSensors = new DistanceSensor[]{kai.rightDist, kai.leftDist};
         // X, Y, Angle
         sensorOffsets = new double[][]{
                 {0, 0, 0},
-                {0, 0, Math.PI},
-                {0, 0, VecUtils.HALF_PI}
+                {0, 0, Math.PI}
         };
 
         //while(!signalOpticalSystem.isReady()) sleep(100);

@@ -25,7 +25,7 @@ public class Kai {
     public final DcMotor armLiftA, armLiftB;
     public final Servo claw, clawTwist;
 
-    public final Rev2mDistanceSensor rightDist, leftDist, backDist;
+    public final Rev2mDistanceSensor rightDist, leftDist;
     public final Rev2mDistanceSensor clawSensor;
 
     public final IMU imu;
@@ -54,7 +54,6 @@ public class Kai {
 
         rightDist = hwmap.get(Rev2mDistanceSensor.class, "rightDist");
         leftDist = hwmap.get(Rev2mDistanceSensor.class, "leftDist");
-        backDist = hwmap.get(Rev2mDistanceSensor.class, "backDist");
 
         clawSensor = hwmap.get(Rev2mDistanceSensor.class, "clawSensor");
 
@@ -88,8 +87,6 @@ public class Kai {
         } catch(InterruptedException e) {
             e.printStackTrace();
         }
-
-        liftExtension.setPIDFCoefficients(DcMotor.RunMode.RUN_TO_POSITION, new PIDFCoefficients(15, 0, 0, 0));
 
         liftExtension.setTargetPosition(0);
         turntable.setTargetPosition(0);
