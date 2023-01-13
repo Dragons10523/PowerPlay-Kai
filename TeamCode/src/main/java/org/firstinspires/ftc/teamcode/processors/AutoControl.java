@@ -1,11 +1,14 @@
 package org.firstinspires.ftc.teamcode.processors;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.List;
 
@@ -26,14 +29,15 @@ public abstract class AutoControl extends Control {
         telemetry.addLine("Robot is Starting...");
         telemetry.update();
 
-        //signalOpticalSystem = new SignalOpticalSystem();
+        super.init();
+        signalOpticalSystem = new SignalOpticalSystem();
 
         telemetry.addLine("Opening camera...");
         telemetry.update();
-        /*kai.frontCamera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+        kai.frontCamera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                kai.frontCamera.startStreaming(SignalOpticalSystem.CAMERA_WIDTH, SignalOpticalSystem.CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
+                kai.frontCamera.startStreaming(SignalOpticalSystem.CAMERA_WIDTH, SignalOpticalSystem.CAMERA_HEIGHT, OpenCvCameraRotation.SIDEWAYS_LEFT);
             }
 
             @SuppressLint("DefaultLocale")
@@ -42,12 +46,11 @@ public abstract class AutoControl extends Control {
                 telemetry.addLine(String.format("Robot startup failed with error code %d", errorCode));
                 telemetry.update();
             }
-        });*/
+        });
 
         telemetry.addLine("Setting up systems...");
         telemetry.update();
-        //kai.frontCamera.setPipeline(signalOpticalSystem);
-        super.init();
+        kai.frontCamera.setPipeline(signalOpticalSystem);
         this.dStar = new DStar(6, 6, 0, 0);
 
         robotSensors = new DistanceSensor[]{kai.rightDist, kai.leftDist};
@@ -57,7 +60,7 @@ public abstract class AutoControl extends Control {
                 {0, 0, Math.PI}
         };
 
-        //while(!signalOpticalSystem.isReady()) sleep(100);
+        while(!signalOpticalSystem.isReady()) sleep(100);
         telemetry.addLine("Robot is Ready!");
         telemetry.update();
     }
@@ -71,7 +74,7 @@ public abstract class AutoControl extends Control {
         if(checkInvalid()) return;
 
         this.dStar.updateEnd(nodeIndex);
-        //checkPathing();
+        checkPathing();
 
         List<Integer> compressedPath = dStar.getCompressedPath();
 
@@ -178,9 +181,8 @@ public abstract class AutoControl extends Control {
     // Returns true on robot detected
     private boolean checkPathing() {
         kai.deadwheels.wheelLoop();
-        // TODO: UNCOMMENT CHECK PATHING WHEN SENSORS ARE IN
-/*
-        for(int sensorIndex = 0; sensorIndex < 4; sensorIndex++) {
+
+        /*for(int sensorIndex = 0; sensorIndex < 4; sensorIndex++) {
             VectorF intercept = getSensorIntercept(robotSensors[sensorIndex], sensorOffsets[sensorIndex]);
 
             double xTile = intercept.get(0) / 24;

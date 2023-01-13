@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.processors.drivetrain.MecanumDrivetrain;
+import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 import org.firstinspires.ftc.teamcode.processors.Deadwheels;
@@ -60,8 +61,7 @@ public class Kai {
         imu = hwmap.get(IMU.class, "imu");
 
         WebcamName frontWebcamName = hwmap.get(WebcamName.class, "Webcam 1");
-        //frontCamera = OpenCvCameraFactory.getInstance().createWebcam(frontWebcamName);
-        frontCamera = null;
+        frontCamera = OpenCvCameraFactory.getInstance().createWebcam(frontWebcamName);
 
         // Set motor directions
         armLiftA.setDirection(DcMotorSimple.Direction.REVERSE);
