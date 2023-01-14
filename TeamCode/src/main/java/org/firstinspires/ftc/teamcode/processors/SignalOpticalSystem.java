@@ -165,11 +165,12 @@ public class SignalOpticalSystem extends OpenCvPipeline {
         Core.reduce(squared.reshape(1, image.rows() * image.cols()), reduced, 1, Core.REDUCE_SUM);
         squared.release();
 
-        Mat rangeCheck = new Mat();
-        Core.subtract(reduced, new Scalar(900), rangeCheck);
+        Mat inRange = new Mat();
+        Core.inRange(reduced, new Scalar(-195075), new Scalar(195075), inRange);
+        //reduced.release();
 
-        rangeCheck.convertTo(rangeCheck, CvType.CV_8U);
+        inRange.convertTo(inRange, CvType.CV_8UC3);
 
-        return rangeCheck;
+        return inRange;
     }
 }
