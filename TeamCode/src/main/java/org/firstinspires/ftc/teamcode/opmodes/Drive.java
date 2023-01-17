@@ -36,6 +36,8 @@ public class Drive extends Control {
     double timeUntilEvent = -1;
     boolean clawSensorBroken = false;
 
+    boolean resetLift = false;
+
     @Override
     public void loop() {
         super.loop();
@@ -140,17 +142,17 @@ public class Drive extends Control {
 
         // Manual Control
         if(!assistManipulator) {
-            if(gamepad2.x) {
+            if (gamepad2.x) {
                 armControl.setLiftHeight(GoalHeight.NONE);
-            } else if(gamepad2.y) {
+            } else if (gamepad2.y) {
                 armControl.setLiftHeight(GoalHeight.HIGH);
-            } else if(gamepad2.b) {
+            } else if (gamepad2.b) {
                 armControl.setLiftHeight(GoalHeight.MID);
-            } else if(gamepad2.a) {
+            } else if (gamepad2.a) {
                 armControl.setLiftHeight(GoalHeight.LOW);
             }
 
-            if(Math.hypot(gamepad2.left_stick_y, gamepad2.left_stick_x) > 0.1) {
+            if (Math.hypot(gamepad2.left_stick_y, gamepad2.left_stick_x) > 0.1) {
                 double angle = Math.atan2(
                         -gamepad2.left_stick_y,
                         gamepad2.left_stick_x);
@@ -164,7 +166,32 @@ public class Drive extends Control {
                 armControl.setAngleOverride(angle);
             }
 
-            armControl.setExtensionDistance(gamepad2.right_trigger * 15);
+            if (gamepad2.dpad_up) {
+                armControl.setExtensionDistance(8);
+                telemetry.addLine("Extend");
+           }
+            if(gamepad2.dpad_down) {
+                armControl.setExtensionDistance(0);
+                telemetry.addLine("Retract");
+            }
+
+            if(Math.abs(gamepad2.right_stick_y) > 0.5) {
+                kai.armLiftA.setPower(-gamepad2.right_stick_y * .8);
+                kai.armLiftB.setPower(-gamepad2.right_stick_y * .8);
+                kai.armLiftA.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                kai.armLiftA.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                resetLift = true;
+            } else if(resetLift) {
+                kai.armLiftA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                kai.armLiftA.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                kai.armLiftA.setPower(1);
+                kai.armLiftB.setPower(1);
+                kai.armLiftA.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                kai.armLiftA.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                resetLift = false;
+            }
+
+            //armControl.setExtensionDistance(gamepad2.right_trigger * 13.5);
 
             boolean clawToggle = gamepad2.right_bumper;
             if(clawToggle != clawPrev && clawToggle) {

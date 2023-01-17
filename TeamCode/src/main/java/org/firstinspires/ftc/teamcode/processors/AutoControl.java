@@ -34,7 +34,7 @@ public abstract class AutoControl extends Control {
 
         telemetry.addLine("Opening camera...");
         telemetry.update();
-        kai.frontCamera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+        /*kai.frontCamera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
                 kai.frontCamera.startStreaming(SignalOpticalSystem.CAMERA_WIDTH, SignalOpticalSystem.CAMERA_HEIGHT, OpenCvCameraRotation.SIDEWAYS_LEFT);
@@ -46,11 +46,11 @@ public abstract class AutoControl extends Control {
                 telemetry.addLine(String.format("Robot startup failed with error code %d", errorCode));
                 telemetry.update();
             }
-        });
+        });*/
 
         telemetry.addLine("Setting up systems...");
         telemetry.update();
-        kai.frontCamera.setPipeline(signalOpticalSystem);
+        //kai.frontCamera.setPipeline(signalOpticalSystem);
         this.dStar = new DStar(6, 6, 0, 0);
 
         robotSensors = new DistanceSensor[]{kai.rightDist, kai.leftDist};
@@ -60,7 +60,7 @@ public abstract class AutoControl extends Control {
                 {0, 0, Math.PI}
         };
 
-        while(!signalOpticalSystem.isReady()) sleep(100);
+        //while(!signalOpticalSystem.isReady()) sleep(100);
         telemetry.addLine("Robot is Ready!");
         telemetry.update();
     }
@@ -106,8 +106,8 @@ public abstract class AutoControl extends Control {
             if(checkInvalid()) return false;
 
             mecanumDrive(
-                    (float) (Math.atan(xAdjust*1.5)/2.5),
-                    (float) (Math.atan(yAdjust*1.5)/2.5),
+                    (float) (Math.atan(xAdjust*2)/2.5),
+                    (float) (Math.atan(yAdjust*2)/2.5),
                     (kai.deadwheels.currentAngle - targetAngle) * 10, DriveMode.GLOBAL);
 
             if(checkPathing()) return true;
@@ -125,8 +125,8 @@ public abstract class AutoControl extends Control {
                 stopTimer.reset();
 
             mecanumDrive(
-                    (float) (Math.atan(xAdjust*1.5)/2.5),
-                    (float) (Math.atan(yAdjust*1.5)/Math.PI),
+                    (float) (Math.atan(xAdjust*2)/2.5),
+                    (float) (Math.atan(yAdjust*2)/Math.PI),
                     (kai.deadwheels.currentAngle - targetAngle) * 10, DriveMode.GLOBAL);
 
             if(checkPathing()) return true;
@@ -145,8 +145,8 @@ public abstract class AutoControl extends Control {
                 stopTimer.reset();
 
             mecanumDrive(
-                    (float) (Math.atan(xAdjust*1.5)/Math.PI),
-                    (float) (Math.atan(yAdjust*1.5)/2.5),
+                    (float) (Math.atan(xAdjust*2)/Math.PI),
+                    (float) (Math.atan(yAdjust*2)/2.5),
                     (kai.deadwheels.currentAngle - targetAngle) * 10, DriveMode.GLOBAL);
 
             if(checkPathing()) return true;

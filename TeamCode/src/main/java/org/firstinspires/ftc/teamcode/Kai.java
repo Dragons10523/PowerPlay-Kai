@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -61,7 +60,8 @@ public class Kai {
         imu = hwmap.get(IMU.class, "imu");
 
         WebcamName frontWebcamName = hwmap.get(WebcamName.class, "Webcam 1");
-        frontCamera = OpenCvCameraFactory.getInstance().createWebcam(frontWebcamName);
+        frontCamera = null;
+        //frontCamera = OpenCvCameraFactory.getInstance().createWebcam(frontWebcamName);
 
         // Set motor directions
         armLiftA.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -102,6 +102,8 @@ public class Kai {
         turntable.setPower(0.35);
         armLiftA.setPower(1);
         armLiftB.setPower(1);
+
+        liftExtension.setTargetPositionTolerance(23);
 
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,

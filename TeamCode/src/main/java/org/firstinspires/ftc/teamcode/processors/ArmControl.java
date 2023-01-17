@@ -7,7 +7,7 @@ public class ArmControl {
     // TODO: Calculate the proper angle to ticks value
     public static final double TURNTABLE_TICKS_PER_RAD = 3024/VecUtils.TAU;
     // TODO: Replace 1000 with the proper conversion value
-    public static final double EXTENSION_TICKS_PER_INCH = 88.9;
+    public static final double EXTENSION_TICKS_PER_INCH = 266.7;
 
     public static final int GROUND_GOAL_HEIGHT = 0;
     public static final int LOW_GOAL_HEIGHT = 3100;
@@ -134,7 +134,7 @@ public class ArmControl {
     // TODO: calibrate lift heights
     private void lift() {
         // Blocked by the extension's current position
-        if(getExtensionCurrent() >= 2) {
+        if(getExtensionCurrent() >= 2 && (liftHeight == Control.GoalHeight.GROUND || liftHeight == Control.GoalHeight.NONE)) {
             return;
         }
 
@@ -193,7 +193,7 @@ public class ArmControl {
 
     private void moveExtensionWhenSafe() {
         // Lift blocks all
-        extensionDistance = Math.min(1333, Math.max(0, extensionDistance));
+        extensionDistance = Math.min(3734, Math.max(0, extensionDistance));
         System.out.println("Checking Extension");
         if(getLiftCurrentLiftHeight() > getGoalHeight(liftHeight) - 800) {
             System.out.println("Extendo Patronum at " + extensionDistance);

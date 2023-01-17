@@ -33,7 +33,7 @@ public abstract class Auto extends AutoControl {
                 targetTile = new VectorF(1, 2);
                 grabAngle = -VecUtils.HALF_PI;
                 depotPosition = new VectorF(0.45f, 2);
-                defaultPosition = new VectorF(1, 2);
+                defaultPosition = new VectorF(1.5f, 2);
                 alternatePositon = new VectorF(2, 2);
                 defaultTarget = new VectorF(48, 72);
                 alternateTarget = new VectorF(72, 48);
@@ -49,7 +49,7 @@ public abstract class Auto extends AutoControl {
                 targetTile = new VectorF(4, 2);
                 grabAngle = VecUtils.HALF_PI;
                 depotPosition = new VectorF(4.55f, 2);
-                defaultPosition = new VectorF(4, 2);
+                defaultPosition = new VectorF(3.5f, 2);
                 alternatePositon = new VectorF(3, 2);
                 defaultTarget = new VectorF(96, 72);
                 alternateTarget = new VectorF(72, 48);
@@ -66,20 +66,25 @@ public abstract class Auto extends AutoControl {
 
         boolean robotInterrupt = false;
 
-        int conesInStack = 5;
+        int conesInStack = 0;
 
         kai.deadwheels.setTransform(initialTransform, 0); // Set initial location to (1, 0)
         dStar.updateStart(tileToNodeIndex(initialTransform));
 
         //while(signalOpticalSystem.passes < 5) sleep(10);
-        SignalOpticalSystem.SignalOrientation signalOrientation = SignalOpticalSystem.SignalOrientation.RIGHT;//signalOpticalSystem.getSignalOrientation();
+        SignalOpticalSystem.SignalOrientation signalOrientation = SignalOpticalSystem.SignalOrientation.MIDDLE;
+        //SignalOpticalSystem.SignalOrientation signalOrientation = SignalOpticalSystem.SignalOrientation.RIGHT;//signalOpticalSystem.getSignalOrientation();
         //kai.frontCamera.closeCameraDevice();
 
         armControl.claw(ClawState.CLOSE);
+        armControl.update();
+        sleep(1250);
+        armControl.setLiftHeight(GoalHeight.HIGH);
+        armControl.update();
 
         moveToTile(Control.tileToNodeIndex(targetTile));
 
-        turnTo(grabAngle);
+        //turnTo(Math.PI);
 
         while(getRuntime() < PARK_TIME && !checkInvalid()) {
             armControl.coneStack = conesInStack;
@@ -88,10 +93,10 @@ public abstract class Auto extends AutoControl {
 
             if(!robotInterrupt) {
                 moveToTile(defaultPosition);
-                if(kai.leftDist.getDistance(DistanceUnit.INCH) < 24) {
+                /*if(kai.leftDist.getDistance(DistanceUnit.INCH) < 24) {
                     robotInterrupt = true;
                     moveToTile(alternatePositon);
-                }
+                }*/
             } else {
                 moveToTile(alternatePositon);
             }
@@ -109,10 +114,12 @@ public abstract class Auto extends AutoControl {
                     armControl.update();
                 }
             }*/
+            while(kai.liftExtension.isBusy()) armControl.update();
+            armControl.setLiftHeight(GoalHeight.MID);
+            armControl.update();
+            sleep(400);
             armControl.claw(Control.ClawState.OPEN);
             sleep(750);
-
-            while(kai.armLiftA.isBusy()) sleep(10);
 
             if(conesInStack <= 0) break;
 
@@ -138,6 +145,26 @@ public abstract class Auto extends AutoControl {
         armControl.setLiftHeight(GoalHeight.GROUND);
         armControl.setAngleOverride(0.0);
         armControl.update();
+
+        if(side == FieldSide.LEFT) {
+            double distance = kai.rightDist.getDistance(DistanceUnit.INCH);
+            if(distance <= 28) {
+                signalOrientation = SignalOpticalSystem.SignalOrientation.LEFT;
+            } else if(distance <= 52) {
+                signalOrientation = SignalOpticalSystem.SignalOrientation.MIDDLE;
+            } else {
+                signalOrientation = SignalOpticalSystem.SignalOrientation.RIGHT;
+            }
+        } else {
+            double distance = kai.leftDist.getDistance(DistanceUnit.INCH);
+            if(distance <= 28) {
+                signalOrientation = SignalOpticalSystem.SignalOrientation.RIGHT;
+            } else if(distance <= 52) {
+                signalOrientation = SignalOpticalSystem.SignalOrientation.MIDDLE;
+            } else {
+                signalOrientation = SignalOpticalSystem.SignalOrientation.LEFT;
+            }
+        }
 
         dStar.updateStart(tileToNodeIndex(defaultPosition));
 

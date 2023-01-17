@@ -154,22 +154,25 @@ public class SignalOpticalSystem extends OpenCvPipeline {
     private Mat getColorFilter(Mat image, Scalar color) {
         image.convertTo(image, CvType.CV_32F); // Floatify for upcoming calculations
 
+        int rows = image.rows();
+
         Mat subtracted = new Mat();
-        Core.subtract(image, new Scalar(0), subtracted);
+        Core.subtract(image, color, subtracted);
 
         Mat squared = new Mat();
         Core.multiply(subtracted, subtracted, squared);
         subtracted.release();
 
         Mat reduced = new Mat();
-        Core.reduce(squared.reshape(1, image.rows() * image.cols()), reduced, 1, Core.REDUCE_SUM);
+        Core.reduce(squared.reshape(1, rows * image.cols()), reduced, 1, Core.REDUCE_SUM);
         squared.release();
 
-        Mat inRange = new Mat();
-        Core.inRange(reduced, new Scalar(-195075), new Scalar(195075), inRange);
-        //reduced.release();
+        Mat reshaped = reduced.reshape(1, rows);
+        reduced.release();
 
-        inRange.convertTo(inRange, CvType.CV_8UC3);
+        Mat inRange = new Mat();
+        Core.inRange(reshaped, new Scalar(-195075), new Scalar(195075), inRange);
+        reshaped.release();
 
         return inRange;
     }
