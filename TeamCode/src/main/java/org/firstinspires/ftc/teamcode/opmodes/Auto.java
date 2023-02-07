@@ -71,24 +71,19 @@ public abstract class Auto extends AutoControl {
         kai.deadwheels.setTransform(initialTransform, 0); // Set initial location to (1, 0)
         dStar.updateStart(tileToNodeIndex(initialTransform));
 
-        //while(signalOpticalSystem.passes < 5) sleep(10);
-        SignalOpticalSystem.SignalOrientation signalOrientation = SignalOpticalSystem.SignalOrientation.MIDDLE;
-        //SignalOpticalSystem.SignalOrientation signalOrientation = SignalOpticalSystem.SignalOrientation.RIGHT;//signalOpticalSystem.getSignalOrientation();
-        //kai.frontCamera.closeCameraDevice();
+        while(signalOpticalSystem.passes < 5) sleep(10);
+        SignalOpticalSystem.SignalOrientation signalOrientation = signalOpticalSystem.getSignalOrientation();
+        kai.frontCamera.closeCameraDevice();
 
         armControl.claw(ClawState.CLOSE);
         armControl.update();
         sleep(1250);
-        armControl.setLiftHeight(GoalHeight.HIGH);
-        armControl.update();
 
         moveToTile(Control.tileToNodeIndex(targetTile));
 
-        //turnTo(Math.PI);
-
         while(getRuntime() < PARK_TIME && !checkInvalid()) {
             armControl.coneStack = conesInStack;
-            //armControl.setLiftHeight(Control.GoalHeight.HIGH);
+            armControl.setLiftHeight(Control.GoalHeight.HIGH);
             armControl.update();
 
             if(!robotInterrupt) {
@@ -100,6 +95,11 @@ public abstract class Auto extends AutoControl {
             } else {
                 moveToTile(alternatePositon);
             }
+
+            turnTo(Math.atan2(
+                    kai.deadwheels.currentX-defaultTarget.get(0),
+                    kai.deadwheels.currentY-defaultTarget.get(1)
+            ));
 
             /*if(robotInterrupt) {
                 armControl.setTarget(alternateTarget);
@@ -114,10 +114,10 @@ public abstract class Auto extends AutoControl {
                     armControl.update();
                 }
             }*/
-            while(kai.liftExtension.isBusy()) armControl.update();
+            //while(kai.liftExtension.isBusy()) armControl.update();
             armControl.setLiftHeight(GoalHeight.MID);
             armControl.update();
-            sleep(400);
+            sleep(800);
             armControl.claw(Control.ClawState.OPEN);
             sleep(750);
 
@@ -145,26 +145,6 @@ public abstract class Auto extends AutoControl {
         armControl.setLiftHeight(GoalHeight.GROUND);
         armControl.setAngleOverride(0.0);
         armControl.update();
-
-        if(side == FieldSide.LEFT) {
-            double distance = kai.rightDist.getDistance(DistanceUnit.INCH);
-            if(distance <= 28) {
-                signalOrientation = SignalOpticalSystem.SignalOrientation.LEFT;
-            } else if(distance <= 52) {
-                signalOrientation = SignalOpticalSystem.SignalOrientation.MIDDLE;
-            } else {
-                signalOrientation = SignalOpticalSystem.SignalOrientation.RIGHT;
-            }
-        } else {
-            double distance = kai.leftDist.getDistance(DistanceUnit.INCH);
-            if(distance <= 28) {
-                signalOrientation = SignalOpticalSystem.SignalOrientation.RIGHT;
-            } else if(distance <= 52) {
-                signalOrientation = SignalOpticalSystem.SignalOrientation.MIDDLE;
-            } else {
-                signalOrientation = SignalOpticalSystem.SignalOrientation.LEFT;
-            }
-        }
 
         dStar.updateStart(tileToNodeIndex(defaultPosition));
 

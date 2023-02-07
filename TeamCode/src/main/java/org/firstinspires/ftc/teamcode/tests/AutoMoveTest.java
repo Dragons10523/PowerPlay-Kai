@@ -31,9 +31,6 @@ public class AutoMoveTest extends AutoControl {
 
         armControl.setExtensionDistance(15);
 
-        while(clawDistance() > 2.5) {
-            armControl.update();
-        }
         armControl.claw(ClawState.CLOSE);
         sleep(700);
         armControl.setExtensionDistance(0);

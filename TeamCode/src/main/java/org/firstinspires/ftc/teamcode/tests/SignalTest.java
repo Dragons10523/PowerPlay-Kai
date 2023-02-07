@@ -15,7 +15,7 @@ public class SignalTest extends AutoControl {
 
         SignalOpticalSystem.SignalOrientation signalOrientation = signalOpticalSystem.getSignalOrientation();
         telemetry.addLine(signalOrientation.name());
-        telemetry.addData("Center", Arrays.toString(signalOpticalSystem.centerHSV));
+        telemetry.addData("Center", Arrays.toString(signalOpticalSystem.centerLab));
         telemetry.update();
     }
 }

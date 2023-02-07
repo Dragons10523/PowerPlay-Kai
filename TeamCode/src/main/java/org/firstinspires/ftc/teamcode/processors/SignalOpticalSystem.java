@@ -15,8 +15,6 @@ import org.opencv.objdetect.CascadeClassifier;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SignalOpticalSystem extends OpenCvPipeline {
     public static final int CAMERA_WIDTH = 320;
@@ -29,9 +27,15 @@ public class SignalOpticalSystem extends OpenCvPipeline {
     }
 
     private final Scalar[] COLOR_CHECKS = {
-            new Scalar(232, 80, 114),  // CYAN
-            new Scalar(248, 106, 222), // YELLOW
-            new Scalar(154, 226, 67),  // MAGENTA
+            new Scalar(150, 100, 95),  // CYAN
+            new Scalar(160, 90, 150),  // GREEN
+            new Scalar(140, 170, 128), // MAGENTA
+    };
+
+    private final Scalar[] COLOR_OUTLINES = {
+            new Scalar(0, 255, 255), // CYAN
+            new Scalar(0, 255, 0),   // GREEN
+            new Scalar(255, 0, 255), // MAGENTA
     };
 
     public int passes = 0;
@@ -39,8 +43,10 @@ public class SignalOpticalSystem extends OpenCvPipeline {
     private String picturePath = "";
     private final CascadeClassifier cascadeClassifier;
     private SignalOrientation signalOrientation = SignalOrientation.RIGHT;
+
+    private Rect previousRectangle = null;
     
-    public double[] centerHSV = new double[3];
+    public double[] centerLab = new double[3];
 
     public SignalOpticalSystem() {
         cascadeClassifier = new CascadeClassifier("/storage/emulated/0/FIRST/signalClassifiers/wings.xml");
@@ -75,7 +81,7 @@ public class SignalOpticalSystem extends OpenCvPipeline {
         int maxScoreIndex = 1;
 
         MatOfRect detectedInstances = new MatOfRect();
-        cascadeClassifier.detectMultiScale(input, detectedInstances);
+        cascadeClassifier.detectMultiScale(input, detectedInstances, 1.1, 2);
 
         // Get the largest most centered rectangle
         Rect centeredRectangle = new Rect(0, 0, 0, 0);
@@ -98,24 +104,33 @@ public class SignalOpticalSystem extends OpenCvPipeline {
             centeredRectangle = instance;
         }
 
-        if(centeredRectangle.area() == 0) {
-            if(!isReady()) return input; // Return early if nothing was detected from last time
+        centeredRectangle.height -= 40;
+        centeredRectangle.width -= 40;
+        centeredRectangle.y += 15;
+        centeredRectangle.x += 20;
 
-            centeredRectangle = new Rect(135, 75, 90, 90); // Default value if noting is detected
+        if(centeredRectangle.width <= 0 || centeredRectangle.height <= 0) {
+            //if(!isReady()) return input; // Return early if nothing was detected from last time
+
+            if(previousRectangle == null)
+                centeredRectangle = new Rect(135, 75, 90, 90); // Default value if noting is detected
+            else
+                centeredRectangle = previousRectangle;
         }
 
-        Mat subMat = input.submat(centeredRectangle); // Image cropping
-        Imgproc.rectangle(input, centeredRectangle, new Scalar(64, 255, 64));
+        previousRectangle = centeredRectangle;
 
-        Mat hsv = new Mat();
-        Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2Lab);
+        Mat lab = new Mat();
+        Imgproc.cvtColor(input, lab, Imgproc.COLOR_RGB2Lab);
 
-        centerHSV = hsv.get(CAMERA_HEIGHT/2, CAMERA_WIDTH/2);
+        Mat subMat = lab.submat(centeredRectangle); // Image cropping
+
+        centerLab = lab.get(CAMERA_HEIGHT/2, CAMERA_WIDTH/2);
         
-        /*for(int i = 0; i < COLOR_CHECKS.length; i++) {
+        for(int i = 0; i < COLOR_CHECKS.length; i++) {
             Scalar colorCheck = COLOR_CHECKS[i];
 
-            Mat filteredMat = getColorFilter(hsv, colorCheck);
+            Mat filteredMat = getColorFilter(subMat, colorCheck);
             int score = Core.countNonZero(filteredMat); // Count the number of matched pixels in the image
             filteredMat.release();
 
@@ -123,8 +138,10 @@ public class SignalOpticalSystem extends OpenCvPipeline {
                 maxScore = score;
                 maxScoreIndex = i;
             }
-        }*/
-        //hsv.release();
+        }
+        lab.release();
+
+        Imgproc.rectangle(input, centeredRectangle, COLOR_OUTLINES[maxScoreIndex]);
 
         switch (maxScoreIndex) {
             case 0:
@@ -146,34 +163,43 @@ public class SignalOpticalSystem extends OpenCvPipeline {
 
         passes++;
 
-        Imgproc.circle(input, new Point(CAMERA_HEIGHT/2, CAMERA_WIDTH/2), 3, new Scalar(0, 255, 0));
-
-        return getColorFilter(hsv, COLOR_CHECKS[0]);
+        return input;
     }
 
-    private Mat getColorFilter(Mat image, Scalar color) {
-        image.convertTo(image, CvType.CV_32F); // Floatify for upcoming calculations
+    private Mat getColorFilter(Mat LabImage, Scalar color) {
+        LabImage.convertTo(LabImage, CvType.CV_32F); // Floatify for upcoming calculations
 
-        int rows = image.rows();
+        int rows = LabImage.rows();
 
         Mat subtracted = new Mat();
-        Core.subtract(image, color, subtracted);
+        Core.subtract(LabImage, color, subtracted);
 
         Mat squared = new Mat();
         Core.multiply(subtracted, subtracted, squared);
         subtracted.release();
 
-        Mat reduced = new Mat();
-        Core.reduce(squared.reshape(1, rows * image.cols()), reduced, 1, Core.REDUCE_SUM);
+        Mat reducedLightness = new Mat();
+        Core.multiply(squared, new Scalar(0.6, 1, 1), reducedLightness);
         squared.release();
+
+        Mat reduced = new Mat();
+        Core.reduce(reducedLightness.reshape(1, LabImage.cols() * rows), reduced, 1, Core.REDUCE_SUM);
+        reducedLightness.release();
 
         Mat reshaped = reduced.reshape(1, rows);
         reduced.release();
 
         Mat inRange = new Mat();
-        Core.inRange(reshaped, new Scalar(-195075), new Scalar(195075), inRange);
+        Core.inRange(reshaped, new Scalar(0), new Scalar(1500), inRange);
         reshaped.release();
 
-        return inRange;
+        Mat denoise1 = new Mat(); // Basic deniosing
+        Imgproc.morphologyEx(inRange, denoise1, Imgproc.MORPH_CLOSE, new Mat());
+        inRange.release();
+        Mat denoise2 = new Mat();
+        Imgproc.morphologyEx(denoise1, denoise2, Imgproc.MORPH_OPEN, new Mat());
+        denoise1.release();
+
+        return denoise2;
     }
 }

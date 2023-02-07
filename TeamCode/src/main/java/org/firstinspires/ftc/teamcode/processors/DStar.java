@@ -132,7 +132,6 @@ public class DStar {
         openList.add(end);
         nodeArray[end].cost = 0;
         processOpenList();
-        System.out.println("Update Ended");
     }
 
     public void markBlocked(int node) {
@@ -159,7 +158,6 @@ public class DStar {
         while(openList.size() > 0) {
             List<Integer> processList = new ArrayList<>(openList);
             for(Integer nodeIndex : processList) {
-                System.out.println(processList.size());
                 Node node = nodeArray[nodeIndex];
                 expand(node);
                 openList.remove(nodeIndex);
@@ -175,7 +173,6 @@ public class DStar {
         StringBuilder builder = new StringBuilder();
         for (Node printNode : nodeArray) {
             if(printNode.ownIndex % 6 == 0) {
-                System.out.println(builder);
                 builder = new StringBuilder();
             }
             builder.append(printNode.nextNode);

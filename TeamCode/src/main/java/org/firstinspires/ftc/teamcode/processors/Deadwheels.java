@@ -68,7 +68,7 @@ public class Deadwheels {
         double turnDelta = ((((rightYDelta - leftYDelta) / 2d) * inchesPerTick) / symmetricCircumference) * VecUtils.TAU;
 
         double robotYDelta = (leftYDelta + rightYDelta) * inchesPerTick / 2;
-        turnDelta -= robotYDelta * 0.0012;
+        turnDelta -= robotYDelta * 0.001;
 
         double robotTurnXDelta = (-turnDelta / VecUtils.TAU) * asymmetricCircumference;
         double robotXDelta = ((XDelta) * inchesPerTick) - robotTurnXDelta;

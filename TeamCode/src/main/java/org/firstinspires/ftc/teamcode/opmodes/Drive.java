@@ -34,7 +34,6 @@ public class Drive extends Control {
     // Intensive driver practice variables
     ElapsedTime practiceTimer = new ElapsedTime();
     double timeUntilEvent = -1;
-    boolean clawSensorBroken = false;
 
     boolean resetLift = false;
 
@@ -176,8 +175,8 @@ public class Drive extends Control {
             }
 
             if(Math.abs(gamepad2.right_stick_y) > 0.5) {
-                kai.armLiftA.setPower(-gamepad2.right_stick_y * .8);
-                kai.armLiftB.setPower(-gamepad2.right_stick_y * .8);
+                kai.armLiftA.setPower(-gamepad2.right_stick_y);
+                kai.armLiftB.setPower(-gamepad2.right_stick_y);
                 kai.armLiftA.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 kai.armLiftA.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 resetLift = true;
@@ -229,7 +228,7 @@ public class Drive extends Control {
 
         // Toggle the claw as needed
         boolean clawOpen = armControl.isClawOpen();
-        if(clawOpen && gamepad2.x && clawDistance() <= 1.5 && !clawSensorBroken) {
+        if(clawOpen && gamepad2.x) {
             armControl.toggleClaw();
         }
         if(!clawOpen && gamepad2.x && armControl.willConeHit(selectedPole)) {
@@ -246,8 +245,8 @@ public class Drive extends Control {
             practiceTimer.reset();
 
             if(timeUntilEvent != -1) {
-                // random value 0-5 inclusive
-                int eventValue = (int) Math.floor(Math.random() * 5);
+                // random value 0-3 inclusive
+                int eventValue = (int) Math.floor(Math.random() * 4);
 
                 DcMotor[] liftMotors = {kai.armLiftA, kai.armLiftB};
                 switch(eventValue) {
@@ -289,10 +288,6 @@ public class Drive extends Control {
 
                         kai.deadwheels.currentX += 2*(Math.random()-.5);
                         kai.deadwheels.currentY += 2*(Math.random()-.5);
-                        break;
-                    // Break the claw sensor
-                    case 4:
-                        clawSensorBroken = true;
                         break;
                 }
             }

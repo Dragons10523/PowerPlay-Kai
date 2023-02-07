@@ -101,10 +101,6 @@ public abstract class Control extends OpMode {
         return (x + (6 * y));
     }
 
-    public double clawDistance() {
-        return kai.clawSensor.getDistance(DistanceUnit.INCH);
-    }
-
     public void orientClaw(WristState wrist) {
         switch(wrist) {
             case LEFT:

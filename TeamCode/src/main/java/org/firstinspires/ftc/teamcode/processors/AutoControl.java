@@ -34,7 +34,7 @@ public abstract class AutoControl extends Control {
 
         telemetry.addLine("Opening camera...");
         telemetry.update();
-        /*kai.frontCamera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+        kai.frontCamera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
                 kai.frontCamera.startStreaming(SignalOpticalSystem.CAMERA_WIDTH, SignalOpticalSystem.CAMERA_HEIGHT, OpenCvCameraRotation.SIDEWAYS_LEFT);
@@ -46,11 +46,11 @@ public abstract class AutoControl extends Control {
                 telemetry.addLine(String.format("Robot startup failed with error code %d", errorCode));
                 telemetry.update();
             }
-        });*/
+        });
 
         telemetry.addLine("Setting up systems...");
         telemetry.update();
-        //kai.frontCamera.setPipeline(signalOpticalSystem);
+        kai.frontCamera.setPipeline(signalOpticalSystem);
         this.dStar = new DStar(6, 6, 0, 0);
 
         robotSensors = new DistanceSensor[]{kai.rightDist, kai.leftDist};
@@ -96,8 +96,6 @@ public abstract class AutoControl extends Control {
         float xInch = 12 + (X * 24);
         float yInch = 12 + (Y * 24);
 
-        double targetAngle = ((int)Math.round(kai.deadwheels.currentAngle/VecUtils.HALF_PI)) * VecUtils.HALF_PI;
-
         // Align Y to the nearest column
         if(checkPathing()) return true;
         double xAdjust = xInch - kai.deadwheels.currentX;
@@ -108,7 +106,7 @@ public abstract class AutoControl extends Control {
             mecanumDrive(
                     (float) (Math.atan(xAdjust*2)/2.5),
                     (float) (Math.atan(yAdjust*2)/2.5),
-                    (kai.deadwheels.currentAngle - targetAngle) * 10, DriveMode.GLOBAL);
+                    (kai.deadwheels.currentAngle) * 3, DriveMode.GLOBAL);
 
             if(checkPathing()) return true;
             xAdjust = 12 - (kai.deadwheels.currentX % 24);
@@ -118,36 +116,37 @@ public abstract class AutoControl extends Control {
         ElapsedTime stopTimer = new ElapsedTime();
 
         // Go to the right row
-        while(stopTimer.seconds() < 0.1) {
+        while(stopTimer.seconds() < 0.2) {
             if(checkInvalid()) return false;
 
             if(Math.abs(xAdjust) > 1)
                 stopTimer.reset();
 
             mecanumDrive(
-                    (float) (Math.atan(xAdjust*2)/2.5),
-                    (float) (Math.atan(yAdjust*2)/Math.PI),
-                    (kai.deadwheels.currentAngle - targetAngle) * 10, DriveMode.GLOBAL);
+                    (float) (Math.atan(xAdjust*.3)/2.5),
+                    (float) (Math.atan(yAdjust)/4),
+                    (kai.deadwheels.currentAngle - VecUtils.HALF_PI) * 3, DriveMode.GLOBAL);
 
             if(checkPathing()) return true;
             xAdjust = xInch - kai.deadwheels.currentX;
             yAdjust = 12 - (kai.deadwheels.currentY % 24);
         }
 
+        sleep(150);
         stopTimer.reset();
 
         // Go to the right column
         yAdjust = yInch - kai.deadwheels.currentY;
-        while(stopTimer.seconds() < 0.1) {
+        while(stopTimer.seconds() < 0.2) {
             if(checkInvalid()) return false;
 
             if(Math.abs(yAdjust) > .5)
                 stopTimer.reset();
 
             mecanumDrive(
-                    (float) (Math.atan(xAdjust*2)/Math.PI),
-                    (float) (Math.atan(yAdjust*2)/2.5),
-                    (kai.deadwheels.currentAngle - targetAngle) * 10, DriveMode.GLOBAL);
+                    (float) (Math.atan(xAdjust)/4),
+                    (float) (Math.atan(yAdjust*.3)/2.5),
+                    (kai.deadwheels.currentAngle) * 3, DriveMode.GLOBAL);
 
             if(checkPathing()) return true;
             xAdjust = xInch - kai.deadwheels.currentX;

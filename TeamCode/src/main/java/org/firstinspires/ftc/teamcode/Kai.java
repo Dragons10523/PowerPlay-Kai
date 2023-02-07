@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -26,7 +27,7 @@ public class Kai {
     public final Servo claw, clawTwist;
 
     public final Rev2mDistanceSensor rightDist, leftDist;
-    public final Rev2mDistanceSensor clawSensor;
+    public final RevTouchSensor extensionLimit;
 
     public final IMU imu;
 
@@ -55,13 +56,12 @@ public class Kai {
         rightDist = hwmap.get(Rev2mDistanceSensor.class, "rightDist");
         leftDist = hwmap.get(Rev2mDistanceSensor.class, "leftDist");
 
-        clawSensor = hwmap.get(Rev2mDistanceSensor.class, "clawSensor");
+        extensionLimit = hwmap.get(RevTouchSensor.class, "extensionLimit");
 
         imu = hwmap.get(IMU.class, "imu");
 
         WebcamName frontWebcamName = hwmap.get(WebcamName.class, "Webcam 1");
-        frontCamera = null;
-        //frontCamera = OpenCvCameraFactory.getInstance().createWebcam(frontWebcamName);
+        frontCamera = OpenCvCameraFactory.getInstance().createWebcam(frontWebcamName);
 
         // Set motor directions
         armLiftA.setDirection(DcMotorSimple.Direction.REVERSE);
