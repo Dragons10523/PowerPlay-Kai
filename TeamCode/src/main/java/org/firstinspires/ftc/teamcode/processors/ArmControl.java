@@ -193,14 +193,15 @@ public class ArmControl {
             limitPressedTimer.reset();
         }
 
-        extensionDistance = Math.min(3734, Math.max(0, extensionDistance));
+        extensionDistance = (int) Math.min(EXTENSION_TICKS_PER_INCH * 14, Math.max(0, extensionDistance));
 
         // Lift blocks all
-        if(getLiftCurrentLiftHeight() > getGoalHeight(liftHeight) - 800) {
+        control.kai.liftExtension.setTargetPosition(extensionDistance);
+        /*if(getLiftCurrentLiftHeight() > getGoalHeight(liftHeight) - 800) {
             control.kai.liftExtension.setTargetPosition(extensionDistance);
         } else if(liftHeightChanged) {
             control.kai.liftExtension.setTargetPosition(0);
-        }
+        }*/
     }
 
     public void setExtensionDistance(double distance) {
@@ -245,6 +246,18 @@ public class ArmControl {
             case GROUND:
             default:
                 return GROUND_GOAL_HEIGHT;
+        }
+    }
+
+    public void sleep(long millis) {
+        try {
+            while(millis > 0) {
+                update();
+                Thread.sleep(Math.min(10, millis));
+                millis -= 10;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

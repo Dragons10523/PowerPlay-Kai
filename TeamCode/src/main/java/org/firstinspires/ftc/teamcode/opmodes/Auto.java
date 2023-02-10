@@ -76,29 +76,30 @@ public abstract class Auto extends AutoControl {
         kai.frontCamera.closeCameraDevice();
 
         armControl.claw(ClawState.CLOSE);
-        armControl.update();
-        sleep(1250);
+        armControl.sleep(1250);
 
         moveToTile(Control.tileToNodeIndex(targetTile));
 
         while(getRuntime() < PARK_TIME && !checkInvalid()) {
             armControl.coneStack = conesInStack;
-            armControl.setLiftHeight(Control.GoalHeight.HIGH);
-            armControl.update();
 
-            if(!robotInterrupt) {
+            /*if(!robotInterrupt) {
                 moveToTile(defaultPosition);
                 /*if(kai.leftDist.getDistance(DistanceUnit.INCH) < 24) {
                     robotInterrupt = true;
                     moveToTile(alternatePositon);
                 }*/
-            } else {
+            /*} else {
                 moveToTile(alternatePositon);
-            }
+            }*/
 
+            armControl.setLiftHeight(Control.GoalHeight.HIGH);
+            armControl.setAngleOverride(null);
+            armControl.setTarget(defaultTarget);
+            armControl.sleep(100);
             turnTo(Math.atan2(
-                    kai.deadwheels.currentX-defaultTarget.get(0),
-                    kai.deadwheels.currentY-defaultTarget.get(1)
+                    defaultTarget.get(0)-kai.deadwheels.currentX,
+                    defaultTarget.get(1)-kai.deadwheels.currentY
             ));
 
             /*if(robotInterrupt) {
@@ -116,10 +117,12 @@ public abstract class Auto extends AutoControl {
             }*/
             //while(kai.liftExtension.isBusy()) armControl.update();
             armControl.setLiftHeight(GoalHeight.MID);
-            armControl.update();
-            sleep(800);
+            armControl.sleep(800);
             armControl.claw(Control.ClawState.OPEN);
-            sleep(750);
+            armControl.sleep(750);
+            armControl.setTarget(null);
+            armControl.setExtensionDistance(0);
+            armControl.sleep(150);
 
             if(conesInStack <= 0) break;
 
@@ -136,7 +139,7 @@ public abstract class Auto extends AutoControl {
                 armControl.update();
             }
             armControl.claw(Control.ClawState.CLOSE);
-            sleep(1200);
+            armControl.sleep(1200);
             conesInStack--;
             break;
         }

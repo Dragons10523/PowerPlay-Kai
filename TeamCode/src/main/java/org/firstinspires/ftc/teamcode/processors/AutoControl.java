@@ -98,61 +98,13 @@ public abstract class AutoControl extends Control {
 
         // Align Y to the nearest column
         if(checkPathing()) return true;
-        double xAdjust = xInch - kai.deadwheels.currentX;
-        double yAdjust = 12 - (kai.deadwheels.currentY % 24);
-        while(Math.abs(yAdjust) > 1) {
-            if(checkInvalid()) return false;
 
-            mecanumDrive(
-                    (float) (Math.atan(xAdjust*2)/2.5),
-                    (float) (Math.atan(yAdjust*2)/2.5),
-                    (kai.deadwheels.currentAngle) * 3, DriveMode.GLOBAL);
-
-            if(checkPathing()) return true;
-            xAdjust = 12 - (kai.deadwheels.currentX % 24);
-            yAdjust = 12 - (kai.deadwheels.currentY % 24);
-        }
-
-        ElapsedTime stopTimer = new ElapsedTime();
-
-        // Go to the right row
-        while(stopTimer.seconds() < 0.2) {
-            if(checkInvalid()) return false;
-
-            if(Math.abs(xAdjust) > 1)
-                stopTimer.reset();
-
-            mecanumDrive(
-                    (float) (Math.atan(xAdjust*.3)/2.5),
-                    (float) (Math.atan(yAdjust)/4),
-                    (kai.deadwheels.currentAngle - VecUtils.HALF_PI) * 3, DriveMode.GLOBAL);
-
-            if(checkPathing()) return true;
-            xAdjust = xInch - kai.deadwheels.currentX;
-            yAdjust = 12 - (kai.deadwheels.currentY % 24);
-        }
+        if(driveToPID(xInch, 12 + (24 * Math.floor(kai.deadwheels.currentY/24)))) return true;
+        mecanumDrive(0, 0, 0, DriveMode.LOCAL);
 
         sleep(150);
-        stopTimer.reset();
 
-        // Go to the right column
-        yAdjust = yInch - kai.deadwheels.currentY;
-        while(stopTimer.seconds() < 0.2) {
-            if(checkInvalid()) return false;
-
-            if(Math.abs(yAdjust) > .5)
-                stopTimer.reset();
-
-            mecanumDrive(
-                    (float) (Math.atan(xAdjust)/4),
-                    (float) (Math.atan(yAdjust*.3)/2.5),
-                    (kai.deadwheels.currentAngle) * 3, DriveMode.GLOBAL);
-
-            if(checkPathing()) return true;
-            xAdjust = xInch - kai.deadwheels.currentX;
-            yAdjust = yInch - kai.deadwheels.currentY;
-        }
-
+        driveToPID(xInch, yInch);
         mecanumDrive(0, 0, 0, DriveMode.LOCAL);
 
         return false;
@@ -160,6 +112,47 @@ public abstract class AutoControl extends Control {
 
     public boolean moveToTile(VectorF target) {
         return moveToTile(target.get(0), target.get(1));
+    }
+
+    public boolean driveToPID(double x, double y) {
+        final double P = 0.5;
+        final double I = -0.01;
+        final double D = 0.08;
+
+        double xSum = 0;
+        double ySum = 0;
+
+        ElapsedTime stopTimer = new ElapsedTime();
+        ElapsedTime deltaTimer = new ElapsedTime();
+
+        while(stopTimer.seconds() < 0.2) {
+            if(checkInvalid()) return false;
+
+            double xError = x - kai.deadwheels.currentX;
+            double yError = y - kai.deadwheels.currentY;
+
+            double deltaX = kai.deadwheels.xVelocity;
+            double deltaY = kai.deadwheels.yVelocity;
+
+            if((xError * xError) + (yError * yError) > 1)
+                stopTimer.reset();
+
+            float xPower = (float) ((xError * P) + (xSum * I) + (deltaX * D));
+            float yPower = (float) ((yError * P) + (ySum * I) + (deltaY * D));
+
+            mecanumDrive(
+                    xPower,
+                    yPower,
+                    (kai.deadwheels.currentAngle) * 5 , DriveMode.GLOBAL);
+
+            xSum += xError * deltaTimer.seconds();
+            ySum += yError * deltaTimer.seconds();
+
+            if(checkPathing()) return true;
+            deltaTimer.reset();
+        }
+
+        return false;
     }
 
     public VectorF getSensorIntercept(DistanceSensor sensor, double[] sensorOffset) {
@@ -260,7 +253,8 @@ public abstract class AutoControl extends Control {
     public void turnTo(double angle) {
         do {
             kai.deadwheels.wheelLoop();
-            mecanumDrive(0, 0, (kai.deadwheels.currentAngle + angle) * 5, DriveMode.LOCAL);
+            mecanumDrive(0, 0, (kai.deadwheels.currentAngle + angle) * 10, DriveMode.LOCAL);
         } while(Math.abs(kai.deadwheels.currentAngle + angle) > 0.1);
+        mecanumDrive(0, 0, 0, DriveMode.LOCAL);
     }
 }

@@ -142,7 +142,10 @@ public abstract class Control extends OpMode {
 
     public void sleep(long millis) {
         try {
-            Thread.sleep(millis);
+            while(millis > 0) {
+                Thread.sleep(Math.min(10, millis));
+                millis -= 10;
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
