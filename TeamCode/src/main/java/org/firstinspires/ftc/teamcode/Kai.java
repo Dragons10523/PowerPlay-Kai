@@ -72,9 +72,9 @@ public class Kai {
         drivetrain.setZeroBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         liftExtension.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        turntable.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        armLiftA.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        armLiftB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        turntable.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        armLiftA.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        armLiftB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // Set up encoders
         liftExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -99,7 +99,7 @@ public class Kai {
         armLiftB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         liftExtension.setPower(1);
-        turntable.setPower(0.35);
+        turntable.setPower(0);
         armLiftA.setPower(1);
         armLiftB.setPower(1);
 

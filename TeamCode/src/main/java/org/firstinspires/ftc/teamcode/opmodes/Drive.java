@@ -20,6 +20,8 @@ public class Drive extends Control {
     double assistTurnPower = 1.6;
     double assistDrivePower = 0.7;
     int selectedPole = 12;
+    float xSum = 0;
+    float ySum = 0;
 
     // Prev values
     boolean assistDrivePrev = false;
@@ -37,8 +39,12 @@ public class Drive extends Control {
 
     boolean resetLift = false;
 
+    ElapsedTime deltaTimer = new ElapsedTime();
+    double deltaTime = 1;
+
     @Override
     public void loop() {
+        deltaTime = deltaTimer.seconds();
         super.loop();
 
         processDriverControls();
@@ -47,6 +53,7 @@ public class Drive extends Control {
         checkIntensivePractice();
 
         telemetry.update();
+        deltaTimer.reset();
     }
 
     public void displayField() {
@@ -107,8 +114,29 @@ public class Drive extends Control {
         }
 
         // Driving
-        float driveX = gamepad1.left_stick_x;
-        float driveY = -gamepad1.left_stick_y;
+        float driveX = 0;
+        float driveY = 0;
+
+        if(gamepad1.right_bumper) {
+            double offsetX = 40 * deltaTime * ((gamepad1.left_stick_x*0.7) - xSum);
+            double offsetY = 40 * deltaTime * ((-gamepad1.left_stick_y*0.7) - ySum);
+
+            telemetry.addData("OffX", offsetX);
+            telemetry.addData("OffY", offsetY);
+
+            xSum += offsetX;
+            ySum += offsetY;
+
+            telemetry.addData("xSum", xSum);
+            telemetry.addData("ySum", ySum);
+
+            driveX = xSum;
+            driveY = ySum;
+        } else {
+            driveX = gamepad1.left_stick_x;
+            driveY = -gamepad1.left_stick_y;
+        }
+
         DriveMode driveMode = DriveMode.LOCAL;
 
         if(assistDrive) {
