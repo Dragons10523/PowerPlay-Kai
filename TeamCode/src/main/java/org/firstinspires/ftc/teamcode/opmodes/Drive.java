@@ -118,8 +118,8 @@ public class Drive extends Control {
         float driveY;
 
         if(gamepad1.right_bumper) {
-            double offsetX = 40 * deltaTime * ((gamepad1.left_stick_x*0.7) - xSum);
-            double offsetY = 40 * deltaTime * ((-gamepad1.left_stick_y*0.7) - ySum);
+            double offsetX = 10 * deltaTime * ((gamepad1.left_stick_x*0.7) - xSum);
+            double offsetY = 10 * deltaTime * ((-gamepad1.left_stick_y*0.7) - ySum);
 
             xSum += offsetX;
             ySum += offsetY;
