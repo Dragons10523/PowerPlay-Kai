@@ -93,7 +93,6 @@ public class Kai {
         armLiftA.setTargetPosition(0);
         armLiftB.setTargetPosition(0);
 
-        liftExtension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         turntable.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armLiftA.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armLiftB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
