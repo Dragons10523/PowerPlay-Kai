@@ -188,7 +188,7 @@ public class Drive extends Control {
             }
 
             if (gamepad2.dpad_up) {
-                armControl.setExtensionDistance(8);
+                armControl.setExtensionDistance(2);
                 telemetry.addLine("Extend");
            }
             if(gamepad2.dpad_down) {
