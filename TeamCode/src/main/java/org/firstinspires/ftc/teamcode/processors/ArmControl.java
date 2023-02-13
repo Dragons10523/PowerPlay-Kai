@@ -24,7 +24,7 @@ public class ArmControl {
     private boolean liftHeightChanged = false;
     private int extensionDistance = 0;
     private boolean clawLastOpened = true;
-    private boolean wasExtensionMoving = false;
+    private ElapsedTime extensionMovingTime = new ElapsedTime();
 
     public ArmControl(Control control) {
         this.control = control;
@@ -186,14 +186,11 @@ public class ArmControl {
     }
 
     private void moveExtensionWhenSafe() {
-        if(extensionDistance != 0)
+        if(extensionDistance != 0) {
             control.kai.liftExtension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        else if(control.kai.liftExtension.getVelocity() == 0) {
-            if (wasExtensionMoving)
-                control.kai.liftExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            wasExtensionMoving = false;
-        } else
-            wasExtensionMoving = true;
+            extensionMovingTime.reset();
+        } else if(control.kai.liftExtension.getVelocity() == 0 && extensionMovingTime.seconds() > 0.1)
+            control.kai.liftExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         extensionDistance = (int) Math.min(EXTENSION_TICKS_PER_INCH * 14, Math.max(0, extensionDistance));
 
