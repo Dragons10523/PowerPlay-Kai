@@ -190,7 +190,7 @@ public class Drive extends Control {
             if (gamepad2.dpad_up) {
                 armControl.setExtensionDistance(4);
             }
-            
+
             if(gamepad2.dpad_down) {
                 armControl.setExtensionDistance(0);
             }
