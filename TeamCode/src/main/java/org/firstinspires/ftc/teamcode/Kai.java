@@ -72,7 +72,7 @@ public class Kai {
         drivetrain.setZeroBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         liftExtension.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        turntable.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        turntable.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         armLiftA.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armLiftB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -99,11 +99,11 @@ public class Kai {
         armLiftB.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         liftExtension.setPower(1);
-        turntable.setPower(0.35);
+        turntable.setPower(0);
         armLiftA.setPower(1);
         armLiftB.setPower(1);
 
-        liftExtension.setTargetPositionTolerance(23);
+        liftExtension.setTargetPositionTolerance(69);
 
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
