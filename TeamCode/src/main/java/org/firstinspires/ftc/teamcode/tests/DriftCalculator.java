@@ -7,9 +7,6 @@ import org.firstinspires.ftc.teamcode.processors.Control;
 
 @TeleOp(name = "DriftCalculator", group = "Test")
 public class DriftCalculator extends Control {
-    int selectedPole = 12;
-    boolean directionPrev = false;
-
     @Override
     public void start() {
         super.start();
