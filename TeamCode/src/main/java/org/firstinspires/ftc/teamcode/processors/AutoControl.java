@@ -99,11 +99,6 @@ public abstract class AutoControl extends Control {
         // Align Y to the nearest column
         if(checkPathing()) return true;
 
-        if(driveToPID(xInch, 12 + (24 * Math.floor(kai.deadwheels.currentY/24)))) return true;
-        mecanumDrive(0, 0, 0, DriveMode.LOCAL);
-
-        sleep(150);
-
         driveToPID(xInch, yInch);
         mecanumDrive(0, 0, 0, DriveMode.LOCAL);
 
@@ -115,9 +110,9 @@ public abstract class AutoControl extends Control {
     }
 
     public boolean driveToPID(double x, double y) {
-        final double P = 0.5;
-        final double I = -0.01;
-        final double D = 0.08;
+        final double P = 0.4;
+        final double I = 0.3;
+        final double D = 0.02;
 
         double xSum = 0;
         double ySum = 0;
@@ -131,10 +126,13 @@ public abstract class AutoControl extends Control {
             double xError = x - kai.deadwheels.currentX;
             double yError = y - kai.deadwheels.currentY;
 
+            telemetry.addData("X Error", xError);
+            telemetry.addData("Y Error", yError);
+
             double deltaX = kai.deadwheels.xVelocity;
             double deltaY = kai.deadwheels.yVelocity;
 
-            if((xError * xError) + (yError * yError) > 1)
+            if((xError * xError) + (yError * yError) > 2)
                 stopTimer.reset();
 
             float xPower = (float) ((xError * P) + (xSum * I) + (deltaX * D));
@@ -145,8 +143,16 @@ public abstract class AutoControl extends Control {
                     yPower,
                     (kai.deadwheels.currentAngle) * 5 , DriveMode.GLOBAL);
 
-            xSum += xError * deltaTimer.seconds();
-            ySum += yError * deltaTimer.seconds();
+            xSum += Math.sqrt(xError) * deltaTimer.seconds();
+            ySum += Math.sqrt(yError) * deltaTimer.seconds();
+
+            telemetry.addData("X Sum", xSum);
+            telemetry.addData("Y Sum", xSum);
+
+            telemetry.addData("X Delta", deltaX);
+            telemetry.addData("Y Delta", deltaY);
+
+            telemetry.update();
 
             if(checkPathing()) return true;
             deltaTimer.reset();

@@ -163,7 +163,7 @@ public class ArmControl {
                 break;
             case OPEN:
             default:
-                control.kai.claw.setPosition(0);
+                control.kai.claw.setPosition(0.4);
                 clawLastOpened = true;
         }
     }
