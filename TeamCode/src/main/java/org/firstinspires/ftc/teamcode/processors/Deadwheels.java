@@ -27,6 +27,14 @@ public class Deadwheels {
     public double yVelocity;
     public double angularVelocity;
 
+    public boolean calibrationMode;
+
+    public final double[][] calibration = {
+            {1, 0, 0},
+            {0, 1, 0},
+            {0, 0, 1}
+    };
+
     // All measurements in inches
     public Deadwheels(DcMotor leftYEncoder, DcMotor rightYEncoder, DcMotor XEncoder, double lateralOffset, double forwardOffset, double inchesPerTick) {
         this.leftYEncoder = leftYEncoder;
@@ -73,9 +81,20 @@ public class Deadwheels {
         double robotTurnXDelta = (-turnDelta / VecUtils.TAU) * asymmetricCircumference;
         double robotXDelta = ((XDelta) * inchesPerTick) - robotTurnXDelta;
 
-        double updateAngle = currentAngle + (turnDelta / 2);
-        double xGlobalDelta = Math.cos(-updateAngle) * robotXDelta + Math.sin(-updateAngle) * robotYDelta;
-        double yGlobalDelta = -Math.sin(-updateAngle) * robotXDelta + Math.cos(-updateAngle) * robotYDelta;
+        if(calibrationMode) {
+            currentX += robotXDelta;
+            currentY += robotYDelta;
+            currentAngle += turnDelta;
+            return;
+        }
+
+        double correctedXDelta = robotXDelta * calibration[0][0] + robotYDelta * calibration[0][1] + turnDelta * calibration[0][2];
+        double correctedYDelta = robotXDelta * calibration[1][0] + robotYDelta * calibration[1][1] + turnDelta * calibration[1][2];
+        double correctedTurnDelta = robotXDelta * calibration[2][0] + robotYDelta * calibration[2][1] + turnDelta * calibration[2][2];
+
+        double updateAngle = currentAngle + (correctedTurnDelta / 2);
+        double xGlobalDelta = Math.cos(-updateAngle) * correctedXDelta + Math.sin(-updateAngle) * correctedYDelta;
+        double yGlobalDelta = -Math.sin(-updateAngle) * correctedXDelta + Math.cos(-updateAngle) * correctedYDelta;
 
         // Calculate velocities
         long currentUpdateTime = System.currentTimeMillis();
@@ -83,13 +102,13 @@ public class Deadwheels {
             double deltaTime = (lastUpdateTime - currentUpdateTime) / 1000f;
             xVelocity = xGlobalDelta / deltaTime;
             yVelocity = yGlobalDelta / deltaTime;
-            angularVelocity = turnDelta / deltaTime;
+            angularVelocity = correctedTurnDelta / deltaTime;
         }
         lastUpdateTime = currentUpdateTime;
 
         currentX += xGlobalDelta;
         currentY += yGlobalDelta;
-        currentAngle += turnDelta;
+        currentAngle += correctedTurnDelta;
 
         leftYPosPrev = leftYPos;
         rightYPosPrev = rightYPos;
