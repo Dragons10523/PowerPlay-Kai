@@ -27,13 +27,19 @@ public class Deadwheels {
     public double yVelocity;
     public double angularVelocity;
 
-    public boolean calibrationMode;
+    public boolean calibrationMode = false;
 
     public final double[][] calibration = {
-            {1, 0, 0},
-            {0, 1, 0},
+            {0.995397, -0.008677, 0.002195},
+            {0.008976, 0.992383, 0.000904},
             {0, 0, 1}
     };
+
+    /*
+            {1.003473, 0.009575, -0.002154},
+            {-0.009476, 1.007915, -0.000867},
+            {0.438919, -0.358398, 0.973666}
+     */
 
     // All measurements in inches
     public Deadwheels(DcMotor leftYEncoder, DcMotor rightYEncoder, DcMotor XEncoder, double lateralOffset, double forwardOffset, double inchesPerTick) {
@@ -85,6 +91,10 @@ public class Deadwheels {
             currentX += robotXDelta;
             currentY += robotYDelta;
             currentAngle += turnDelta;
+
+            leftYPosPrev = leftYPos;
+            rightYPosPrev = rightYPos;
+            XPosPrev = XPos;
             return;
         }
 

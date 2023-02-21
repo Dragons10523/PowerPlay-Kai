@@ -110,7 +110,7 @@ public class Kai {
 
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
-        deadwheels = new Deadwheels(drivetrain.driveMotors[2], drivetrain.driveMotors[1], drivetrain.driveMotors[0], 2.82, .43, Math.PI/2048);
+        deadwheels = new Deadwheels(drivetrain.driveMotors[2], drivetrain.driveMotors[1], drivetrain.driveMotors[0], 2.82, 1.46314322832412201, Math.PI/2048);
     }
 
     public double getHeading(){

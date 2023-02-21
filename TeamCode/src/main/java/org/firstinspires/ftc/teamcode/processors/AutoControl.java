@@ -60,6 +60,8 @@ public abstract class AutoControl extends Control {
                 {0, 0, Math.PI}
         };
 
+        while(signalOpticalSystem.passes < 5) sleep(10);
+
         //while(!signalOpticalSystem.isReady()) sleep(100);
         telemetry.addLine("Robot is Ready!");
         telemetry.update();
@@ -99,8 +101,23 @@ public abstract class AutoControl extends Control {
         // Align Y to the nearest column
         if(checkPathing()) return true;
 
-        driveToPID(xInch, yInch);
+        double angle;
+
+        double xDist = Math.abs(xInch - kai.deadwheels.currentX);
+        double yDist = Math.abs(yInch - kai.deadwheels.currentY);
+        if(xDist - 6 > yDist) {
+            angle = VecUtils.HALF_PI;
+        } else if(yDist - 6 > xDist) {
+            angle = 0;
+        } else {
+            angle = Math.round(mapAngle(kai.deadwheels.currentAngle, -Math.PI, Math.PI, 0)/Math.PI)*Math.PI;
+        }
+
+        turnTo(-angle);
+        sleep(300);
+        driveToPID(xInch, yInch, angle);
         mecanumDrive(0, 0, 0, DriveMode.LOCAL);
+        sleep(300);
 
         return false;
     }
@@ -109,19 +126,26 @@ public abstract class AutoControl extends Control {
         return moveToTile(target.get(0), target.get(1));
     }
 
-    public boolean driveToPID(double x, double y) {
-        final double P = 0.4;
-        final double I = 0.3;
-        final double D = 0.02;
+    public void driveToPID(double x, double y, double angle) {
+        final double P = 0.55;
+        final double I = 0.05;
+        final double D = 1.2;
+
+        final double smoothing = 3.5;
 
         double xSum = 0;
         double ySum = 0;
+
+        double smoothedXDelta = 0;
+        double smoothedYDelta = 0;
 
         ElapsedTime stopTimer = new ElapsedTime();
         ElapsedTime deltaTimer = new ElapsedTime();
 
         while(stopTimer.seconds() < 0.2) {
-            if(checkInvalid()) return false;
+            if(checkInvalid()) return;
+
+            kai.deadwheels.wheelLoop();
 
             double xError = x - kai.deadwheels.currentX;
             double yError = y - kai.deadwheels.currentY;
@@ -132,33 +156,34 @@ public abstract class AutoControl extends Control {
             double deltaX = kai.deadwheels.xVelocity;
             double deltaY = kai.deadwheels.yVelocity;
 
+            smoothedXDelta += deltaTimer.seconds() * (deltaX - smoothedXDelta) / smoothing;
+            smoothedYDelta += deltaTimer.seconds() * (deltaY - smoothedYDelta) / smoothing;
+
             if((xError * xError) + (yError * yError) > 2)
                 stopTimer.reset();
 
-            float xPower = (float) ((xError * P) + (xSum * I) + (deltaX * D));
-            float yPower = (float) ((yError * P) + (ySum * I) + (deltaY * D));
+            float xPower = (float) ((xError * P) + (xSum * I) + (smoothedXDelta * D));
+            float yPower = (float) ((yError * P) + (ySum * I) + (smoothedYDelta * D));
 
             mecanumDrive(
                     xPower,
                     yPower,
-                    (kai.deadwheels.currentAngle) * 5 , DriveMode.GLOBAL);
+                    (kai.deadwheels.currentAngle - angle) * 5, DriveMode.GLOBAL);
 
-            xSum += Math.sqrt(xError) * deltaTimer.seconds();
-            ySum += Math.sqrt(yError) * deltaTimer.seconds();
+            xSum += xError * deltaTimer.seconds();
+            ySum += yError * deltaTimer.seconds();
 
             telemetry.addData("X Sum", xSum);
             telemetry.addData("Y Sum", xSum);
 
-            telemetry.addData("X Delta", deltaX);
-            telemetry.addData("Y Delta", deltaY);
+            telemetry.addData("X Delta", smoothedXDelta);
+            telemetry.addData("Y Delta", smoothedYDelta);
+
+            telemetry.addData("Current Angle", kai.deadwheels.currentAngle);
 
             telemetry.update();
-
-            if(checkPathing()) return true;
             deltaTimer.reset();
         }
-
-        return false;
     }
 
     public VectorF getSensorIntercept(DistanceSensor sensor, double[] sensorOffset) {
@@ -259,8 +284,8 @@ public abstract class AutoControl extends Control {
     public void turnTo(double angle) {
         do {
             kai.deadwheels.wheelLoop();
-            mecanumDrive(0, 0, (kai.deadwheels.currentAngle + angle) * 10, DriveMode.LOCAL);
-        } while(Math.abs(kai.deadwheels.currentAngle + angle) > 0.1);
+            mecanumDrive(0, 0, (kai.deadwheels.currentAngle + angle) * 3, DriveMode.LOCAL);
+        } while(Math.abs(kai.deadwheels.currentAngle + angle) > 0.25);
         mecanumDrive(0, 0, 0, DriveMode.LOCAL);
     }
 }

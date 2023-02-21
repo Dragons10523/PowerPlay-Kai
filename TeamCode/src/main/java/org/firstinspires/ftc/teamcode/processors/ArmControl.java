@@ -77,7 +77,7 @@ public class ArmControl {
 
             targetAngle = VecUtils.getVectorAngle(robotVec);
 
-            extensionDistance = (int) ((Math.hypot(robotVec.get(0), robotVec.get(1)) - 9.75) * EXTENSION_TICKS_PER_INCH);
+            extensionDistance = (int) ((Math.hypot(robotVec.get(0), robotVec.get(1)) - 10.5) * EXTENSION_TICKS_PER_INCH);
         } else {
             targetAngle = angleOverride;
         }
