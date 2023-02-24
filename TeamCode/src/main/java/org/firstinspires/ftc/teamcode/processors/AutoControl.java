@@ -128,10 +128,12 @@ public abstract class AutoControl extends Control {
 
     public void driveToPID(double x, double y, double angle) {
         final double P = 0.55;
-        final double I = 0.05;
-        final double D = 1.2;
+        final double I = 0.12;
+        final double D = 1.5;
 
-        final double smoothing = 3.5;
+        final double SMOOTHING = 3.7;
+
+        final float POWER_LIMIT = 0.7f;
 
         double xSum = 0;
         double ySum = 0;
@@ -139,11 +141,13 @@ public abstract class AutoControl extends Control {
         double smoothedXDelta = 0;
         double smoothedYDelta = 0;
 
+        ElapsedTime stuckDetector = new ElapsedTime();
         ElapsedTime stopTimer = new ElapsedTime();
         ElapsedTime deltaTimer = new ElapsedTime();
 
         while(stopTimer.seconds() < 0.2) {
             if(checkInvalid()) return;
+            if(stuckDetector.seconds() > 3.5) break;
 
             kai.deadwheels.wheelLoop();
 
@@ -156,14 +160,21 @@ public abstract class AutoControl extends Control {
             double deltaX = kai.deadwheels.xVelocity;
             double deltaY = kai.deadwheels.yVelocity;
 
-            smoothedXDelta += deltaTimer.seconds() * (deltaX - smoothedXDelta) / smoothing;
-            smoothedYDelta += deltaTimer.seconds() * (deltaY - smoothedYDelta) / smoothing;
+            smoothedXDelta += deltaTimer.seconds() * (deltaX - smoothedXDelta) / SMOOTHING;
+            smoothedYDelta += deltaTimer.seconds() * (deltaY - smoothedYDelta) / SMOOTHING;
 
-            if((xError * xError) + (yError * yError) > 2)
+            if((xError * xError) + (yError * yError) > 2.5)
                 stopTimer.reset();
 
             float xPower = (float) ((xError * P) + (xSum * I) + (smoothedXDelta * D));
             float yPower = (float) ((yError * P) + (ySum * I) + (smoothedYDelta * D));
+
+            xPower = Math.min(POWER_LIMIT, Math.max(-POWER_LIMIT, xPower));
+            yPower = Math.min(POWER_LIMIT, Math.max(-POWER_LIMIT, yPower));
+
+            // Soften power curve
+            xPower *= Math.min(1, 3 * stuckDetector.seconds());
+            yPower *= Math.min(1, 3 * stuckDetector.seconds());
 
             mecanumDrive(
                     xPower,

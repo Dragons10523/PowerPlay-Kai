@@ -30,6 +30,11 @@ public class Drive extends Control {
         processDriverControls();
         processManipulatorControls();
 
+        telemetry.addData("Target Level", kai.armLiftA.getTargetPosition());
+        telemetry.addData("Current Level A", kai.armLiftA.getCurrentPosition());
+        telemetry.addData("Current Level B", kai.armLiftA.getCurrentPosition());
+        telemetry.addData("PIDF Coefficients", kai.armLiftA.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER));
+
         telemetry.update();
     }
 
@@ -91,7 +96,7 @@ public class Drive extends Control {
         }
 
         if (gamepad2.dpad_up) {
-            armControl.setExtensionDistance(4);
+            armControl.setExtensionDistance(5);
         }
 
         if(gamepad2.dpad_down) {

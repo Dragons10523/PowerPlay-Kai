@@ -21,18 +21,18 @@ public class ParkAuto extends AutoControl {
         armControl.setLiftHeight(GoalHeight.LOW);
         armControl.sleep(100);
 
-        moveToTile(new VectorF(1, 0));
-
         switch(signalOrientation) {
             case LEFT:
-                moveToTile(new VectorF(0, 0-(1.5f/24)));
+                moveToTile(new VectorF(1.13f, 0));
+                moveToTile(new VectorF(0, 0));
                 moveToTile(new VectorF(0, 1));
                 break;
             case MIDDLE:
                 moveToTile(new VectorF(1, 1));
                 break;
             case RIGHT:
-                moveToTile(new VectorF(2, 0-(1.5f/24)));
+                moveToTile(new VectorF(1.13f, 0));
+                moveToTile(new VectorF(2, 0));
                 moveToTile(new VectorF(2, 1));
                 break;
         }

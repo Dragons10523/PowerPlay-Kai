@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -23,7 +24,7 @@ public class Kai {
 
     public final DcMotorEx liftExtension;
     public final DcMotorEx turntable;
-    public final DcMotor armLiftA, armLiftB;
+    public final DcMotorEx armLiftA, armLiftB;
     public final Servo claw, clawTwist;
 
     public final Rev2mDistanceSensor rightDist, leftDist;
@@ -47,8 +48,8 @@ public class Kai {
 
         liftExtension = hwmap.get(DcMotorEx.class, "horizontalLift");
         turntable = hwmap.get(DcMotorEx.class, "turntable");
-        armLiftA = hwmap.get(DcMotor.class, "armLiftA");
-        armLiftB = hwmap.get(DcMotor.class, "armLiftB");
+        armLiftA = hwmap.get(DcMotorEx.class, "armLiftA");
+        armLiftB = hwmap.get(DcMotorEx.class, "armLiftB");
 
         claw = hwmap.get(Servo.class, "claw");
         clawTwist = hwmap.get(Servo.class, "clawTwist");
@@ -103,6 +104,8 @@ public class Kai {
         armLiftB.setPower(1);
 
         liftExtension.setTargetPositionTolerance(69);
+        armLiftA.setTargetPositionTolerance(80);
+        armLiftB.setTargetPositionTolerance(80);
 
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,

@@ -50,6 +50,10 @@ public abstract class Control extends OpMode {
         armControl = new ArmControl(this);
     }
 
+    public void start() {
+        armControl.claw(ClawState.OPEN);
+    }
+
     public void loop() {
         kai.deadwheels.wheelLoop();
         armControl.update();
@@ -79,7 +83,7 @@ public abstract class Control extends OpMode {
 
         VectorF vec = VecUtils.rotateVector(new VectorF(x, y), angle);
 
-        kai.drivetrain.drive(vec.get(0), vec.get(1), turn);
+        kai.drivetrain.drive(vec.get(0), vec.get(1)*0.35f, turn);
     }
 
     public static VectorF poleIdxToPos(int poleIndex) {

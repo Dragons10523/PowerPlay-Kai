@@ -11,9 +11,9 @@ public class ArmControl {
     public static final double EXTENSION_TICKS_PER_INCH = 266.7;
 
     public static final int GROUND_GOAL_HEIGHT = 0;
-    public static final int LOW_GOAL_HEIGHT = 3100/2;
-    public static final int MID_GOAL_HEIGHT = 4500/2;
-    public static final int HIGH_GOAL_HEIGHT = 6300/2;
+    public static final int LOW_GOAL_HEIGHT = 1550;
+    public static final int MID_GOAL_HEIGHT = 2500;
+    public static final int HIGH_GOAL_HEIGHT = 3400;
 
     public Control control;
     public int coneStack = 0;

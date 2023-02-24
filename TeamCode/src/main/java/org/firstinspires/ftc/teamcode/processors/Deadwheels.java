@@ -30,8 +30,8 @@ public class Deadwheels {
     public boolean calibrationMode = false;
 
     public final double[][] calibration = {
-            {0.995397, -0.008677, 0.002195},
-            {0.008976, 0.992383, 0.000904},
+            {1, 0, 0},
+            {0, 1, 0},
             {0, 0, 1}
     };
 
