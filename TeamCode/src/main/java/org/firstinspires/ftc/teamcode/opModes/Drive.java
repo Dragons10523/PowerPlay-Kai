@@ -12,14 +12,18 @@ public class Drive extends CommandOpMode {
     Mushu mushu;
     Tool m_tool;
     ToolSubsystem m_toolSub;
-    MecanumDriveSubsystems driveSub;
+    MecanumDriveSubsystems m_driveSub;
 
     @Override
     public void initialize() {
         mushu = Mushu.GetInstance(this);
-        schedule(new MecanumDriveWithSticks(mushu.mecanum, mushu.driverGamepad, driveSub));
-
+        schedule(new MecanumDriveWithSticks(mushu.mecanum, mushu.driverGamepad, m_driveSub));
+        m_driveSub = new MecanumDriveSubsystems(mushu.mecanum, mushu.driverGamepad);
+        m_toolSub = new ToolSubsystem(hardwareMap, "intakeServo", "arm", "omniServo");
+        
+        
         register(m_toolSub);
+        register(m_driveSub);
 
     }
 }

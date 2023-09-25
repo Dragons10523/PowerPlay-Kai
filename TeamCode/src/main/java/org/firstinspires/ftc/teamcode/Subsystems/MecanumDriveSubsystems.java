@@ -1,12 +1,16 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.drivebase.MecanumDrive;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.geometry.Vector2d;
 
 public class MecanumDriveSubsystems extends SubsystemBase {
-
-    public MecanumDriveSubsystems(){
-
+    MecanumDrive mecanum;
+    GamepadEx driverGamepad;
+    public MecanumDriveSubsystems(MecanumDrive mecanumDrive, GamepadEx driverGamepad){
+        this.mecanum = mecanumDrive;
+        this.driverGamepad = driverGamepad;
     }
     public void driveWithVector(Vector2d vector) {
         double[] speeds = normalize(new double[]{vector.getX(), vector.getY()});
@@ -28,5 +32,8 @@ public class MecanumDriveSubsystems extends SubsystemBase {
         }
 
         return wheelSpeeds;
+    }
+    public void resetEncoders(){
+
     }
 }
