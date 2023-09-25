@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
+import org.firstinspires.ftc.teamcode.Subsystems.ToolSubsystem;
+
 public class Tool extends CommandBase {
     private final ToolSubsystem m_toolSubsystem;
 
@@ -11,6 +13,12 @@ public class Tool extends CommandBase {
     }
     @Override
     public void initialize(){
-        m_toolSubsystem.
+        m_toolSubsystem.extendArm(0, true);
+        m_toolSubsystem.retractArm();
     }
+    @Override
+    public boolean isFinished(){
+        return(true);
+    }
+
 }
