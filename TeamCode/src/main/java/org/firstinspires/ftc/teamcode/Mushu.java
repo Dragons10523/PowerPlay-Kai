@@ -5,9 +5,12 @@ import com.arcrobotics.ftclib.command.Robot;
 import com.arcrobotics.ftclib.drivebase.DifferentialDrive;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.hardware.motors.CRServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorGroup;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class Mushu extends Robot {
     private static Mushu instance;
@@ -35,7 +38,12 @@ public class Mushu extends Robot {
         Motor backLeft = new Motor(hardwareMap, "BackLeft");
         Motor backRight = new Motor(hardwareMap, "BackRight");
         Motor extake = new Motor(hardwareMap, "extake");
-        Motor intake = new Motor(hardwareMap, "intake");
+        Motor intake = new Motor(hardwareMap, "arm");
+        CRServo intakeServo = new CRServo(hardwareMap, "intakeServo");
+        CRServo omniServo = new CRServo(hardwareMap, "omniServo");
+
+
+
 
 //        MotorGroup leftMotors = new MotorGroup(frontLeft, backLeft);
 //        MotorGroup rightMotors = new MotorGroup(frontRight, backRight);

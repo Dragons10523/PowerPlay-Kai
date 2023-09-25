@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.commands;
+package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.SubsystemBase;
@@ -19,7 +19,7 @@ public class ToolSubsystem extends SubsystemBase{
         intakeServo = hMap.get(Servo.class, servoName);
         omniIntake = hMap.get(Servo.class, omniName);
     }
-    public void extendArm(int targetPosition, boolean defaultExtension){
+    public void extendArm(int targetPosition, boolean defaultExtension){ // defaultExtension extends to max position
         arm.setTargetPosition(targetPosition);
         if(defaultExtension){
             arm.setTargetPosition(1000);
