@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveSubsystems;
 import org.firstinspires.ftc.teamcode.commands.MecanumDriveWithSticks;
+import org.firstinspires.ftc.teamcode.commands.ScoringMode;
 import org.firstinspires.ftc.teamcode.commands.Tool;
 import org.firstinspires.ftc.teamcode.Subsystems.ToolSubsystem;
 
@@ -13,17 +14,21 @@ public class Drive extends CommandOpMode {
     Tool m_tool;
     ToolSubsystem m_toolSub;
     MecanumDriveSubsystems m_driveSub;
+    ScoringMode m_scoringMode;
+
 
     @Override
     public void initialize() {
         mushu = Mushu.GetInstance(this);
         schedule(new MecanumDriveWithSticks(mushu.mecanum, mushu.driverGamepad, m_driveSub));
+        schedule(new ScoringMode(m_toolSub));
         m_driveSub = new MecanumDriveSubsystems(mushu.mecanum, mushu.driverGamepad);
         m_toolSub = new ToolSubsystem(hardwareMap, "intakeServo", "arm", "omniServo");
         
-        
+        m_scoringMode.gridinator(mushu.driverGamepad);
+
         register(m_toolSub);
         register(m_driveSub);
-
     }
+
 }

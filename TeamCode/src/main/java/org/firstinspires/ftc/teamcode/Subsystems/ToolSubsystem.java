@@ -25,10 +25,7 @@ public class ToolSubsystem extends SubsystemBase{
         }
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
-    public void retractArm(){
-        arm.setTargetPosition(0);
-        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
+
     public void spinIntake(boolean SPIN){
         if(SPIN){intakeServo.setPower(1);}
 

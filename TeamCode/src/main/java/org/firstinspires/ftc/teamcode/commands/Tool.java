@@ -14,10 +14,6 @@ public class Tool extends CommandBase {
     }
     @Override
     public void initialize(){
-        m_toolSubsystem.extendArm(0, false);
-        m_toolSubsystem.retractArm();
-        m_toolSubsystem.spinIntake(false);
-        m_toolSubsystem.intake2Extake(false);
 
     }
     @Override
