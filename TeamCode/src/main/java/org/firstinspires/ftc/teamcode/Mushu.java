@@ -38,17 +38,11 @@ public class Mushu extends Robot {
         Motor backLeft = new Motor(hardwareMap, "BackLeft");
         Motor backRight = new Motor(hardwareMap, "BackRight");
         Motor extake = new Motor(hardwareMap, "extake");
-        Motor intake = new Motor(hardwareMap, "arm");
+        Motor arm = new Motor(hardwareMap, "arm");
         CRServo intakeServo = new CRServo(hardwareMap, "intakeServo");
         CRServo omniServo = new CRServo(hardwareMap, "omniServo");
 
 
-
-
-//        MotorGroup leftMotors = new MotorGroup(frontLeft, backLeft);
-//        MotorGroup rightMotors = new MotorGroup(frontRight, backRight);
-
-        //drivetrain = new DifferentialDrive(leftMotors, rightMotors);
 
         mecanum  = new MecanumDrive(frontLeft, frontRight, backLeft, backRight);
 
