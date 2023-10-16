@@ -18,23 +18,22 @@ public class ToolSubsystem extends SubsystemBase{
         intakeServo = hMap.get(CRServo.class, CRServoName);
         omniIntake = hMap.get(CRServo.class, omniName);
     }
-    public void extendArm(int targetPosition, boolean defaultExtension){ // defaultExtension extends to max position
+
+
+     // @param targetPosition target position. -1 for default
+
+    public void setArmPosition(int targetPosition){
+        if(targetPosition < 0) { targetPosition = 1000; }
         arm.setTargetPosition(targetPosition);
-        if(defaultExtension){
-            arm.setTargetPosition(1000);
-        }
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void spinIntake(boolean SPIN){
-        if(SPIN){intakeServo.setPower(1);}
 
-        else {intakeServo.setPower(0);}
-    }
-    public void intake2Extake(boolean SPIN){
-        if(SPIN){omniIntake.setPower(1);}
+    public void spinIntake() { intakeServo.setPower(1); }
+    public void stopIntake() { intakeServo.setPower(0); }
 
-        else {intakeServo.setPower(0);}
-    }
+    public void spinOmni() { omniIntake.setPower(1); }
+    public void stopOmni() { omniIntake.setPower(0); }
+
 
 }

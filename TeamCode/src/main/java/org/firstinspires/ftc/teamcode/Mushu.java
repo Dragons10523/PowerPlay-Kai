@@ -12,6 +12,12 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvInternalCamera;
+
+
 public class Mushu extends Robot {
     private static Mushu instance;
 
@@ -32,6 +38,12 @@ public class Mushu extends Robot {
 
     private Mushu(CommandOpMode opMode) {
         HardwareMap hardwareMap = opMode.hardwareMap;
+
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier
+                ("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        WebcamName webcamName = hardwareMap.get(WebcamName.class, "webcam");
+        OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+
 
         Motor frontLeft = new Motor(hardwareMap, "FrontLeft");
         Motor frontRight = new Motor(hardwareMap, "FrontRight");

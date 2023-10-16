@@ -12,15 +12,15 @@ public class Tool extends CommandBase {
         m_toolSubsystem = subsystem;
         addRequirements(m_toolSubsystem);
     }
+
     @Override
     public void initialize(){
 
     }
+
     @Override
     public boolean isFinished(){
-
         return(true);
-
     }
 
 }

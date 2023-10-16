@@ -13,16 +13,13 @@ public class MecanumDriveWithSticks extends CommandBase {
     MecanumDriveSubsystems m_subsystem;
 
     public MecanumDriveWithSticks(MecanumDrive mecanumDrive, GamepadEx driverGamepad, MecanumDriveSubsystems subsystem) {
-
         this.mecanum = mecanumDrive;
         this.driverGamepad = driverGamepad;
         this.m_subsystem = subsystem;
     }
+
     @Override
     public void initialize(){
 
     }
-
-
-
 }
