@@ -22,10 +22,8 @@ public class Drive extends CommandOpMode {
         mushu = Mushu.GetInstance(this);
         schedule(new MecanumDriveWithSticks(mushu.mecanum, mushu.driverGamepad, m_driveSub));
 
-        m_driveSub = new MecanumDriveSubsystems(mushu.mecanum, mushu.driverGamepad);
+        m_driveSub = new MecanumDriveSubsystems(hardwareMap, "FrontLeft","FrontRight","BackLeft","BackRight", mushu.mecanum);
         m_toolSub = new ToolSubsystem(hardwareMap, "intakeServo", "arm", "omniServo");
-
-
         register(m_toolSub);
         register(m_driveSub);
     }

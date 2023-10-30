@@ -2,39 +2,37 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
+import com.arcrobotics.ftclib.drivebase.RobotDrive;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.geometry.Vector2d;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
+
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 
-public class MecanumDriveSubsystems extends SubsystemBase {
-    MecanumDrive mecanum;
-    GamepadEx driverGamepad;
-    public MecanumDriveSubsystems(MecanumDrive mecanumDrive, GamepadEx driverGamepad){
-        this.mecanum = mecanumDrive;
-        this.driverGamepad = driverGamepad;
-    }
-    public void driveWithVector(Vector2d vector) {
-        double[] speeds = normalize(new double[]{vector.getX(), vector.getY()});
-        mecanum.driveRobotCentric(speeds[0], speeds[1],0);
-    }
+public class MecanumDriveSubsystems extends SubsystemBase{
+    private final MecanumDrive mecanum;
+    private final Motor frontLeft;
+    private final Motor frontRight;
+    private final Motor bottomLeft;
+    private final Motor bottomRight;
 
-    public double[] normalize(double[] wheelSpeeds) {
-        double maxMagnitude = Math.abs(wheelSpeeds[0]);
-        for (int i = 1; i < wheelSpeeds.length; i++) {
-            double temp = Math.abs(wheelSpeeds[i]);
-            if (maxMagnitude < temp) {
-                maxMagnitude = temp;
-            }
-        }
-        if (maxMagnitude > 1.0) {
-            for (int i = 0; i < wheelSpeeds.length; i++) {
-                wheelSpeeds[i] = wheelSpeeds[i] / maxMagnitude;
-            }
-        }
 
-        return wheelSpeeds;
-    }
-    public void resetEncoders(){
+    public MecanumDriveSubsystems(final HardwareMap hMap, String frontLeft,
+                                  String frontRight, String bottomLeft,
+                                  String bottomRight, MecanumDrive mecanum){
+
+        this.mecanum = mecanum;
+        this.frontLeft = hMap.get(Motor.class, frontLeft);
+        this.frontRight = hMap.get(Motor.class, frontRight);
+        this.bottomLeft = hMap.get(Motor.class, bottomLeft);
+        this.bottomRight = hMap.get(Motor.class, bottomRight);
 
     }
+
+    public void mecanumDrive(){
+        mecanum.driveFieldCentric();
+    }
+
+
 }

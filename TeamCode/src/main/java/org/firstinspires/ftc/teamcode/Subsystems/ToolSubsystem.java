@@ -1,20 +1,21 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class ToolSubsystem extends SubsystemBase{
-    private final DcMotor arm;
+    private final Motor arm;
     private final CRServo intakeServo;
     private final CRServo omniIntake;
 
 
-    public ToolSubsystem(HardwareMap hMap, String CRServoName,
+    public ToolSubsystem(final HardwareMap hMap, String CRServoName,
                          String motorName, String omniName){
-        arm = hMap.get(DcMotor.class, motorName);
+        arm = hMap.get(Motor.class, motorName);
         intakeServo = hMap.get(CRServo.class, CRServoName);
         omniIntake = hMap.get(CRServo.class, omniName);
     }
