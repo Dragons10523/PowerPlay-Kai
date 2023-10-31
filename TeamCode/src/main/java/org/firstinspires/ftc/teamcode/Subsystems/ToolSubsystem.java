@@ -7,17 +7,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.Mushu;
+
 public class ToolSubsystem extends SubsystemBase{
-    private final Motor arm;
-    private final CRServo intakeServo;
-    private final CRServo omniIntake;
+  Mushu mushu;
 
+    public ToolSubsystem(){
 
-    public ToolSubsystem(final HardwareMap hMap, String CRServoName,
-                         String motorName, String omniName){
-        arm = hMap.get(Motor.class, motorName);
-        intakeServo = hMap.get(CRServo.class, CRServoName);
-        omniIntake = hMap.get(CRServo.class, omniName);
     }
 
 
@@ -25,16 +21,16 @@ public class ToolSubsystem extends SubsystemBase{
 
     public void setArmPosition(int targetPosition){
         if(targetPosition < 0) { targetPosition = 1000; }
-        arm.setTargetPosition(targetPosition);
-        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        mushu.arm.setTargetPosition(targetPosition);
+        mushu.arm.setRunMode(Motor.RunMode.PositionControl);
     }
 
 
-    public void spinIntake() { intakeServo.setPower(1); }
-    public void stopIntake() { intakeServo.setPower(0); }
+    public void spinIntake() { mushu.intakeServo.set(1); }
+    public void stopIntake() { mushu.intakeServo.set(0); }
 
-    public void spinOmni() { omniIntake.setPower(1); }
-    public void stopOmni() { omniIntake.setPower(0); }
+    public void spinOmni() { mushu.omniServo.set(1); }
+    public void stopOmni() { mushu.omniServo.set(0); }
 
 
 }
