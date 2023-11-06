@@ -10,16 +10,16 @@ import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveSubsystems;
 public class MecanumDriveWithSticks extends CommandBase {
     MecanumDrive mecanum;
     GamepadEx driverGamepad;
-    MecanumDriveSubsystems m_subsystem;
+    MecanumDriveSubsystems m_driveSubsystem;
 
     public MecanumDriveWithSticks(MecanumDrive mecanumDrive, GamepadEx driverGamepad, MecanumDriveSubsystems subsystem) {
         this.mecanum = mecanumDrive;
         this.driverGamepad = driverGamepad;
-        this.m_subsystem = subsystem;
+        this.m_driveSubsystem = subsystem;
     }
 
     @Override
     public void initialize(){
-
+        m_driveSubsystem.mecanumDrive();
     }
 }

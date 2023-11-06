@@ -30,8 +30,8 @@ public class MecanumDriveSubsystems extends SubsystemBase{
     }
 
     public void mecanumDrive(){
-       mecanum.driveFieldCentric(gamepadEx.getLeftX(), gamepadEx.getLeftY(), getBumper(),
-             , false);
+       mecanum.driveFieldCentric(gamepadEx.getLeftX(), gamepadEx.getLeftY(),
+               getBumper(), mushu.getHeading(), false);
     }
 
     public double getBumper(){

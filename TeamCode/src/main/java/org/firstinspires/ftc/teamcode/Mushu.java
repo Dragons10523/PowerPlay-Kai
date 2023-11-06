@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvInternalCamera;
@@ -31,16 +32,10 @@ public class Mushu extends Robot {
     public GamepadEx toolGamepad;
     public IMU imu;
 
-    public DifferentialDrive drivetrain;
     public MecanumDrive mecanum;
-    public Motor frontLeft;
-    public Motor frontRight;
-    public Motor backLeft;
-    public Motor backRight;
-    public Motor extake;
-    public Motor arm;
-    public CRServo intakeServo;
-    public CRServo omniServo;
+    public Motor frontLeft, frontRight, backLeft, backRight;
+    public Motor extakeArm, intakeArm;
+    public CRServo intakeServo, omniServo;
 
     public static Mushu GetInstance(CommandOpMode opMode) {
         if(instance == null)
@@ -53,7 +48,7 @@ public class Mushu extends Robot {
 
     public Mushu(CommandOpMode opMode) {
         HardwareMap hardwareMap = opMode.hardwareMap;
-
+        // TODO: set up camera
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier
                 ("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         WebcamName webcamName = hardwareMap.get(WebcamName.class, "webcam");
@@ -63,8 +58,8 @@ public class Mushu extends Robot {
         frontRight = new Motor(hardwareMap, "FrontRight");
         backLeft = new Motor(hardwareMap, "BackLeft");
         backRight = new Motor(hardwareMap, "BackRight");
-        extake = new Motor(hardwareMap, "extake");
-        arm = new Motor(hardwareMap, "arm");
+        extakeArm = new Motor(hardwareMap, "extake");
+        intakeArm = new Motor(hardwareMap, "arm");
         intakeServo = new CRServo(hardwareMap, "intakeServo");
         omniServo = new CRServo(hardwareMap, "omniServo");
 
@@ -86,8 +81,11 @@ public class Mushu extends Robot {
         toolGamepad = new GamepadEx(opMode.gamepad2);
     }
     public double getHeading(){
-        imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-        double tempValue =
-        return
+       Orientation Theta = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+        return Theta.firstAngle;
     }
+    public void resetIMU(){
+        imu.resetYaw();
+    }
+
 }
