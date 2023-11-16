@@ -40,8 +40,11 @@ public class MecanumDriveSubsystems extends SubsystemBase{
         if (rightBumper > 0 && leftBumper == 0) {
             return rightBumper;
         }
+        else if (leftBumper > 0 && rightBumper == 0) {
+            return -leftBumper;
+        }
         else {
-            return leftBumper;
+            return 0;
         }
     }
 

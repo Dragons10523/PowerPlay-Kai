@@ -108,6 +108,7 @@ public class AprilTagPipeline extends OpenCvPipeline {
     {
         return detections;
     }
+
     public ArrayList<AprilTagDetection> getDetectionsUpdate(){
         synchronized (detectionsUpdateSync)
         {

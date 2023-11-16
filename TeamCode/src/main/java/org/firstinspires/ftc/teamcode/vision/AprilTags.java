@@ -1,14 +1,21 @@
 package org.firstinspires.ftc.teamcode.vision;
 
 
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.openftc.apriltag.AprilTagDetection;
+import org.openftc.easyopencv.OpenCvCamera;
 
-public class AprilTags {
+import java.util.ArrayList;
+
+public class AprilTags extends LinearOpMode {
+    AprilTagPipeline aprilTagPipeline;
+
+    OpenCvCamera camera;
 
 
-    public AprilTags(){
+    @Override
+    public void runOpMode() throws InterruptedException {
 
     }
-  for (AprilTagDetection detection : .getDetections())
 
 }

@@ -20,6 +20,7 @@ public class MecanumDriveWithSticks extends CommandBase {
 
     @Override
     public void initialize(){
+
         m_driveSubsystem.mecanumDrive();
     }
 }
