@@ -17,11 +17,21 @@ import org.firstinspires.ftc.teamcode.Mushu;
 
 
 public class MecanumDriveSubsystems extends SubsystemBase{
-    Mushu mushu;
+    public final MecanumDrive drive;
+
+    public MecanumDriveSubsystems(final Mushu mushu) {
+        this.drive = mushu.mecanum;
+    }
+
+    public void driveFieldCentric(double forward, double strafe, double turn, double heading) {
+        drive.driveFieldCentric(strafe, forward, turn, heading, false);
+    }
+    /* Mushu mushu;
     private final MecanumDrive mecanum;
     private final GamepadEx gamepadEx;
     double rightBumper;
     double leftBumper;
+
 
     public MecanumDriveSubsystems(MecanumDrive mecanum, GamepadEx gamepadEx){
         this.mecanum = mecanum;
@@ -46,6 +56,6 @@ public class MecanumDriveSubsystems extends SubsystemBase{
         else {
             return 0;
         }
-    }
+    }*/
 
 }

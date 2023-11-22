@@ -32,7 +32,8 @@ public class Mushu extends Robot {
 
     public GamepadEx driverGamepad;
     public GamepadEx toolGamepad;
-    public BHI260IMU imu;
+    //public BHI260IMU imu;
+    public IMU imu;
 
     public MecanumDrive mecanum;
     public Motor frontLeft, frontRight, backLeft, backRight;
@@ -67,7 +68,7 @@ public class Mushu extends Robot {
         intakeArm = new Motor(hardwareMap, "arm");
         intakeServo = new CRServo(hardwareMap, "intakeServo");
         omniServo = new CRServo(hardwareMap, "omniServo");
-
+        imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters param;
         param = new IMU.Parameters(
                 new RevHubOrientationOnRobot(
@@ -88,7 +89,7 @@ public class Mushu extends Robot {
 
 // Initialize IMU using Parameters
         imu.initialize(param);
-        resetIMU();
+       // resetIMU();
     
 
 // Now use these simple methods to extract each angle
@@ -104,8 +105,9 @@ public class Mushu extends Robot {
         Orientation Theta = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
        return Theta.firstAngle;
     }
-    public void resetIMU(){
-       imu.resetYaw();
-    }
+   // public void resetIMU(){
+   //    imu.resetYaw();
+  //  }
+
 
 }

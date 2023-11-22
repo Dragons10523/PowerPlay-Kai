@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opModes;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Mushu;
@@ -24,8 +25,8 @@ public class Drive extends CommandOpMode {
         //get instance makes sure there is only ever ONE object of mushu around
         mushu = Mushu.GetInstance(this);
 
-        m_driveSub = new MecanumDriveSubsystems(mushu.mecanum, mushu.driverGamepad);
-        m_toolSub = new ToolSubsystem(mushu.toolGamepad);
+        m_driveSub = new MecanumDriveSubsystems(mushu);
+        m_toolSub = new ToolSubsystem(mushu.toolGamepad, mushu);
 
         schedule(new MecanumDriveWithSticks(mushu.mecanum, mushu.driverGamepad, m_driveSub));
         schedule(new Tool(mushu.toolGamepad, m_toolSub));

@@ -12,10 +12,12 @@ import org.firstinspires.ftc.teamcode.Mushu;
 
 public class ToolSubsystem extends SubsystemBase{
   Mushu mushu;
+
   GamepadEx toolGamepad;
 
-    public ToolSubsystem(GamepadEx toolGamepad){
+    public ToolSubsystem(GamepadEx toolGamepad,Mushu mushu){
         this.toolGamepad = toolGamepad;
+        this.mushu = mushu;
     }
 
 
