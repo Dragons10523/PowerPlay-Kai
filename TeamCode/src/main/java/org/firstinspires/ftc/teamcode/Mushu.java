@@ -44,7 +44,7 @@ public class Mushu extends Robot {
     double pitch;
     double roll;
 
-    public Byte[] byteData;
+    public byte[] byteData;
 
     public static Mushu GetInstance(CommandOpMode opMode) {
         if(instance == null)
