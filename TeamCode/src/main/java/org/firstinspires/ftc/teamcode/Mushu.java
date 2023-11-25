@@ -13,7 +13,6 @@ import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -22,6 +21,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.vision.AprilTagPipeline;
+import org.firstinspires.ftc.teamcode.vision.IMU;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvInternalCamera;
@@ -43,6 +44,8 @@ public class Mushu extends Robot {
     double pitch;
     double roll;
 
+    public Byte[] byteData;
+
     public static Mushu GetInstance(CommandOpMode opMode) {
         if(instance == null)
         {
@@ -58,6 +61,7 @@ public class Mushu extends Robot {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier
                 ("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         WebcamName webcamName = hardwareMap.get(WebcamName.class, "webcam");
+        byteData = AprilTagPipeline.APRIL_TAG_INIT_DATA;
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
 
         frontLeft = new Motor(hardwareMap, "FrontLeft");
@@ -74,7 +78,9 @@ public class Mushu extends Robot {
                 new RevHubOrientationOnRobot(
                         RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
                         RevHubOrientationOnRobot.UsbFacingDirection.UP
-                )
+                ),
+                opMode,
+                byteData
         );
 
         // Initialize IMU directly
@@ -83,7 +89,9 @@ public class Mushu extends Robot {
                         new RevHubOrientationOnRobot(
                                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
                                 RevHubOrientationOnRobot.UsbFacingDirection.UP
-                        )
+                        ),
+                        opMode,
+                        byteData
                 )
         );
 
