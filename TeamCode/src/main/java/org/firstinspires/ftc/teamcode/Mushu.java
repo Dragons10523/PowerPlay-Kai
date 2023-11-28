@@ -2,30 +2,22 @@ package org.firstinspires.ftc.teamcode;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.Robot;
-import com.arcrobotics.ftclib.drivebase.DifferentialDrive;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.hardware.GyroEx;
 import com.arcrobotics.ftclib.hardware.motors.CRServo;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
-import com.arcrobotics.ftclib.hardware.motors.MotorGroup;
-import com.qualcomm.hardware.bosch.BHI260IMU;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.vision.AprilTagPipeline;
-import org.firstinspires.ftc.teamcode.vision.IMU;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvInternalCamera;
 
 
 public class Mushu extends Robot {
@@ -39,6 +31,7 @@ public class Mushu extends Robot {
     public MecanumDrive mecanum;
     public Motor frontLeft, frontRight, backLeft, backRight;
     public Motor extakeArm, intakeArm;
+    public Motor hangMotor;
     public CRServo intakeServo, omniServo;
     double yaw;
     double pitch;
@@ -70,17 +63,17 @@ public class Mushu extends Robot {
         backRight = new Motor(hardwareMap, "BackRight");
         extakeArm = new Motor(hardwareMap, "extake");
         intakeArm = new Motor(hardwareMap, "arm");
+        hangMotor = new Motor (hardwareMap, "hangMotor");
         intakeServo = new CRServo(hardwareMap, "intakeServo");
         omniServo = new CRServo(hardwareMap, "omniServo");
+
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters param;
         param = new IMU.Parameters(
                 new RevHubOrientationOnRobot(
                         RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
                         RevHubOrientationOnRobot.UsbFacingDirection.UP
-                ),
-                opMode,
-                byteData
+                )
         );
 
         // Initialize IMU directly
@@ -89,9 +82,7 @@ public class Mushu extends Robot {
                         new RevHubOrientationOnRobot(
                                 RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
                                 RevHubOrientationOnRobot.UsbFacingDirection.UP
-                        ),
-                        opMode,
-                        byteData
+                        )
                 )
         );
 
@@ -111,7 +102,7 @@ public class Mushu extends Robot {
     }
     public double getHeading(){
         Orientation Theta = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-       return Theta.firstAngle;
+       return Theta.secondAngle;
     }
    // public void resetIMU(){
    //    imu.resetYaw();

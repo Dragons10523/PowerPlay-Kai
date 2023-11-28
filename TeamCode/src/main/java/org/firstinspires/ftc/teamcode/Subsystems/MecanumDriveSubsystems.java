@@ -20,42 +20,14 @@ public class MecanumDriveSubsystems extends SubsystemBase{
     public final MecanumDrive drive;
 
     public MecanumDriveSubsystems(final Mushu mushu) {
+
         this.drive = mushu.mecanum;
+
     }
 
     public void driveFieldCentric(double forward, double strafe, double turn, double heading) {
         drive.driveFieldCentric(strafe, forward, turn, heading, false);
     }
-    /* Mushu mushu;
-    private final MecanumDrive mecanum;
-    private final GamepadEx gamepadEx;
-    double rightBumper;
-    double leftBumper;
 
-
-    public MecanumDriveSubsystems(MecanumDrive mecanum, GamepadEx gamepadEx){
-        this.mecanum = mecanum;
-        this.gamepadEx = gamepadEx;
-
-    }
-
-    public void mecanumDrive(){
-       mecanum.driveFieldCentric(gamepadEx.getLeftX(), gamepadEx.getLeftY(),
-               getBumper(), mushu.getHeading(), false);
-    }
-
-    public double getBumper(){
-        rightBumper = gamepadEx.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER);
-        leftBumper = gamepadEx.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
-        if (rightBumper > 0 && leftBumper == 0) {
-            return rightBumper;
-        }
-        else if (leftBumper > 0 && rightBumper == 0) {
-            return -leftBumper;
-        }
-        else {
-            return 0;
-        }
-    }*/
 
 }

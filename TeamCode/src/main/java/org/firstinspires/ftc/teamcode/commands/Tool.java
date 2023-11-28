@@ -17,10 +17,13 @@ public class Tool extends CommandBase {
 
     @Override
     public void initialize(){
-        //hopefully this is the main function during teleOp
         //TODO: need to add tool at the end of the intake
-        toolSubsystem.manualIntake();
-        toolSubsystem.manualExtake();
+
+    }
+    @Override
+    public void execute(){
+        toolSubsystem.manualIntake(toolGamepad.getRightY());
+        toolSubsystem.manualExtake(toolGamepad.getLeftY());
     }
 
 

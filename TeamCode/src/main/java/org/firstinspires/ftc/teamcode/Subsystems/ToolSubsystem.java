@@ -15,7 +15,7 @@ public class ToolSubsystem extends SubsystemBase{
 
   GamepadEx toolGamepad;
 
-    public ToolSubsystem(GamepadEx toolGamepad,Mushu mushu){
+    public ToolSubsystem(GamepadEx toolGamepad, Mushu mushu){
         this.toolGamepad = toolGamepad;
         this.mushu = mushu;
     }
@@ -24,24 +24,31 @@ public class ToolSubsystem extends SubsystemBase{
      // @param targetPosition target position. -1 for default
 
     public void setArmExtakePosition(int targetPosition){
-        if(targetPosition == -1) { targetPosition = 1000; }
+        if(targetPosition == -1) {
+            targetPosition = 1000;
+        }
         mushu.extakeArm.setTargetPosition(targetPosition);
         mushu.extakeArm.setRunMode(Motor.RunMode.PositionControl);
     }
     public void setArmIntakePosition(int targetPosition){
-        if(targetPosition == -1){ targetPosition = 100;}
+        if(targetPosition == -1){
+            targetPosition = 100;
+        }
         mushu.intakeArm.setTargetPosition(targetPosition);
         mushu.extakeArm.setRunMode(Motor.RunMode.PositionControl);
     }
-    public void manualExtake(){
+    //TODO: make sure can't go below 0
+    public void manualExtake(double power){
         mushu.extakeArm.setRunMode(Motor.RunMode.RawPower);
-        mushu.extakeArm.set(toolGamepad.getRightY());
+        mushu.extakeArm.set(power);
     }
-    public void manualIntake(){
+    public void manualIntake(double power){
         mushu.intakeArm.setRunMode(Motor.RunMode.RawPower);
-        mushu.extakeArm.set(toolGamepad.getLeftY());
+        mushu.extakeArm.set(power);
     }
-
+    public void hang(double power){
+        mushu.hangMotor.set(power);
+    }
 
 
 

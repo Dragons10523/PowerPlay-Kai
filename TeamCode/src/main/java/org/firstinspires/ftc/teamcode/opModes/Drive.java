@@ -1,11 +1,16 @@
 package org.firstinspires.ftc.teamcode.opModes;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.ConditionalCommand;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.PerpetualCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveSubsystems;
+import org.firstinspires.ftc.teamcode.commands.HangCommand;
 import org.firstinspires.ftc.teamcode.commands.MecanumDriveWithSticks;
 import org.firstinspires.ftc.teamcode.commands.Tool;
 import org.firstinspires.ftc.teamcode.Subsystems.ToolSubsystem;
@@ -28,14 +33,27 @@ public class Drive extends CommandOpMode {
         m_driveSub = new MecanumDriveSubsystems(mushu);
         m_toolSub = new ToolSubsystem(mushu.toolGamepad, mushu);
 
-        schedule(new MecanumDriveWithSticks(mushu.mecanum, mushu.driverGamepad, m_driveSub));
-        schedule(new Tool(mushu.toolGamepad, m_toolSub));
+
+        schedule(new MecanumDriveWithSticks(mushu.mecanum, mushu.driverGamepad, m_driveSub, mushu, telemetry));
+        schedule(new HangCommand(mushu.toolGamepad, m_toolSub, mushu));
+        schedule(new PerpetualCommand(new InstantCommand(() -> {
+
+                })));
+        //schedule(new Tool(mushu.toolGamepad, m_toolSub));
+
+        //mushu.toolGamepad.getGamepadButton(GamepadKeys.Button.A).toggleWhenPressed(new ConditionalCommand(
+          //      schedule(new Tool(mushu.toolGamepad, m_toolSub)),
+            //    schedule(new HangCommand(mushu.toolGamepad, m_toolSub)),
+
+       // )
+
 
 
 
         //register gives priority to this main function to run these subsystems
         register(m_toolSub);
         register(m_driveSub);
+
     }
 
 }
