@@ -32,7 +32,7 @@ public class Mushu extends Robot {
     public Motor frontLeft, frontRight, backLeft, backRight;
     public Motor extakeArm, intakeArm;
     public Motor hangMotor;
-    public CRServo intakeServo, omniServo;
+    public CRServo intakeServo, omniServo, extakeServo;
     double yaw;
     double pitch;
     double roll;
@@ -65,6 +65,7 @@ public class Mushu extends Robot {
         intakeArm = new Motor(hardwareMap, "arm");
         hangMotor = new Motor (hardwareMap, "hangMotor");
         intakeServo = new CRServo(hardwareMap, "intakeServo");
+        extakeServo = new CRServo(hardwareMap, "extakeServo");
         omniServo = new CRServo(hardwareMap, "omniServo");
 
         imu = hardwareMap.get(IMU.class, "imu");

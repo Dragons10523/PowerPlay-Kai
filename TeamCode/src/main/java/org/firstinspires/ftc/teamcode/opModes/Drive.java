@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Mushu;
+import org.firstinspires.ftc.teamcode.Subsystems.InExtakeSub;
 import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveSubsystems;
 import org.firstinspires.ftc.teamcode.commands.HangCommand;
 import org.firstinspires.ftc.teamcode.commands.MecanumDriveWithSticks;
@@ -21,6 +22,8 @@ public class Drive extends CommandOpMode {
     ToolSubsystem m_toolSub;
     MecanumDriveSubsystems m_driveSub;
 
+    InExtakeSub m_inExtake;
+
 
 
     //scheduler loops over initialize function (Why is it called initialize then IDK)
@@ -32,6 +35,7 @@ public class Drive extends CommandOpMode {
 
         m_driveSub = new MecanumDriveSubsystems(mushu);
         m_toolSub = new ToolSubsystem(mushu.toolGamepad, mushu);
+        m_inExtake = new InExtakeSub(mushu);
 
 
         schedule(new MecanumDriveWithSticks(mushu.mecanum, mushu.driverGamepad, m_driveSub, mushu, telemetry));
@@ -39,6 +43,8 @@ public class Drive extends CommandOpMode {
         schedule(new HangCommand(mushu.toolGamepad, m_toolSub, mushu));
 
         schedule(new MecanumDriveWithSticks.ResetYaw(mushu, mushu.toolGamepad));
+
+        schedule(new Tool.InExtake(mushu.toolGamepad, m_inExtake));
 
         schedule(new PerpetualCommand(new InstantCommand(() -> {
 

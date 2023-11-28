@@ -56,7 +56,7 @@ public class MecanumDriveWithSticks extends CommandBase {
             this.gamepad = gamepad;
         }
         @Override
-        public void initialize(){
+        public void execute(){
             gamepad.getGamepadButton(GamepadKeys.Button.BACK)
                     .whenPressed(new InstantCommand(() -> mushu.resetIMU()));
 
