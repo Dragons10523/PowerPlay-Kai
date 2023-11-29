@@ -44,7 +44,7 @@ public class ToolSubsystem extends SubsystemBase{
     }
     public void manualIntake(double power){
         mushu.intakeArm.setRunMode(Motor.RunMode.RawPower);
-        mushu.extakeArm.set(power);
+        mushu.intakeArm.set(power);
     }
     public void hang(double power){
         mushu.hangMotor.set(power);
