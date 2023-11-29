@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.commands;
 
+
+
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -15,6 +17,8 @@ public class Tool extends CommandBase {
 
     Mushu mushu;
 
+    int intakeStartPos;
+    int extakeStartPos;
     public Tool(GamepadEx toolGamepad, ToolSubsystem subsystem, Mushu mushu){
         toolSubsystem = subsystem;
         this.toolGamepad = toolGamepad;
@@ -23,13 +27,25 @@ public class Tool extends CommandBase {
 
     @Override
     public void initialize(){
-        //TODO: need to add tool at the end of the intake
-
+        intakeStartPos = mushu.intakeArm.getCurrentPosition();
+        extakeStartPos = mushu.extakeArm.getCurrentPosition();
     }
     @Override
     public void execute(){
-        toolSubsystem.manualIntake(toolGamepad.getRightY());
-        toolSubsystem.manualExtake(toolGamepad.getLeftY());
+        if(intakeStartPos >= mushu.intakeArm.getCurrentPosition() + 5){
+            toolSubsystem.manualIntake(Math.max(0, toolGamepad.getRightY()));
+        }
+        else {
+            toolSubsystem.manualIntake(toolGamepad.getRightY());
+        }
+        if(extakeStartPos >= mushu.extakeArm.getCurrentPosition() + 5){
+            toolSubsystem.manualExtake(Math.max(0, toolGamepad.getLeftY()));
+        }
+        else {
+            toolSubsystem.manualExtake(toolGamepad.getLeftY());
+        }
+
+
     }
 
     public static class InExtake extends CommandBase{

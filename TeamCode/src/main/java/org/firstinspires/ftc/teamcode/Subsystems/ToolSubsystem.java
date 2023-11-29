@@ -50,11 +50,6 @@ public class ToolSubsystem extends SubsystemBase{
         mushu.hangMotor.set(power);
     }
 
-
-
-    public void spinIntake() { mushu.intakeServo.set(1); }
-    public void stopIntake() { mushu.intakeServo.set(0); }
-
     public void spinOmni() { mushu.omniServo.set(1); }
     public void stopOmni() { mushu.omniServo.set(0); }
 

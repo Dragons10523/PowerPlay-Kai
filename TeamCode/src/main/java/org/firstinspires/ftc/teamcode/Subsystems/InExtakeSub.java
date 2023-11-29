@@ -11,7 +11,7 @@ public class InExtakeSub extends SubsystemBase {
         this.mushu = mushu;
     }
     public void runIN(double power){
-        mushu.intakeServo.set(power);
+        mushu.intakeMotor.set(power);
     }
     public void runEX(double power){
         mushu.extakeServo.set(power);

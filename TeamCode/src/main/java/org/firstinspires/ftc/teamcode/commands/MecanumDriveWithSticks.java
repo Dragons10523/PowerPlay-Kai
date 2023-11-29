@@ -44,6 +44,7 @@ public class MecanumDriveWithSticks extends CommandBase {
 
 
         telemetry.addData("imu heading", mushu.getHeading());
+        telemetry.addData("BACK", driverGamepad.getGamepadButton(GamepadKeys.Button.BACK).get());
         telemetry.update();
 
     }
@@ -60,10 +61,6 @@ public class MecanumDriveWithSticks extends CommandBase {
             gamepad.getGamepadButton(GamepadKeys.Button.BACK)
                     .whenPressed(new InstantCommand(() -> mushu.resetIMU()));
 
-        }
-        @Override
-        public boolean isFinished(){
-            return true;
         }
     }
 

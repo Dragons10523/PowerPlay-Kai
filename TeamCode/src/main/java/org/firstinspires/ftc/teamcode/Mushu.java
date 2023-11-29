@@ -31,8 +31,8 @@ public class Mushu extends Robot {
     public MecanumDrive mecanum;
     public Motor frontLeft, frontRight, backLeft, backRight;
     public Motor extakeArm, intakeArm;
-    public Motor hangMotor;
-    public CRServo intakeServo, omniServo, extakeServo;
+    public Motor hangMotor, intakeMotor;
+    public CRServo omniServo, extakeServo;
     double yaw;
     double pitch;
     double roll;
@@ -64,7 +64,7 @@ public class Mushu extends Robot {
         extakeArm = new Motor(hardwareMap, "extake");
         intakeArm = new Motor(hardwareMap, "arm");
         hangMotor = new Motor (hardwareMap, "hangMotor");
-        intakeServo = new CRServo(hardwareMap, "intakeServo");
+        intakeMotor = new Motor(hardwareMap, "intakeMotor");
         extakeServo = new CRServo(hardwareMap, "extakeServo");
         omniServo = new CRServo(hardwareMap, "omniServo");
 
