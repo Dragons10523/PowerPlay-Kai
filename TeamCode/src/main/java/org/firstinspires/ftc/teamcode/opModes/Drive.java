@@ -42,7 +42,7 @@ public class Drive extends CommandOpMode {
 
         schedule(new HangCommand(mushu.toolGamepad, m_toolSub, mushu));
 
-        schedule(new Tool(mushu.toolGamepad,m_toolSub, mushu));
+        schedule(new Tool(mushu.toolGamepad,m_toolSub, mushu, telemetry));
 
         schedule(new MecanumDriveWithSticks.ResetYaw(mushu, mushu.toolGamepad));
 

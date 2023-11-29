@@ -15,14 +15,25 @@ public class HangCommand extends CommandBase {
     ToolSubsystem tool;
     Mushu mushu;
     double hangPower;
+    double hangStartPos;
     public HangCommand(GamepadEx toolGamepad, ToolSubsystem tool, Mushu mushu) {
         this.toolGamepad = toolGamepad;
         this.mushu = mushu;
         this.tool = tool;
     }
+    public void initialize(){
+        hangStartPos = mushu.hangMotor.getCurrentPosition();
+    }
     @Override
     public void execute(){
-        tool.hang(hangPower);
         hangPower = toolGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - toolGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
+
+        if(hangStartPos >= mushu.hangMotor.getCurrentPosition() + 5){
+           tool.hang(Math.max(hangPower, 0));
+        }
+        else{
+            tool.hang(hangPower);
+        }
+
     }
 }

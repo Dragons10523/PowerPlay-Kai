@@ -7,6 +7,7 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.Subsystems.InExtakeSub;
 import org.firstinspires.ftc.teamcode.Subsystems.ToolSubsystem;
@@ -19,10 +20,14 @@ public class Tool extends CommandBase {
 
     int intakeStartPos;
     int extakeStartPos;
-    public Tool(GamepadEx toolGamepad, ToolSubsystem subsystem, Mushu mushu){
+    Telemetry telemetry;
+    boolean isLimitingIn = false;
+    boolean isLimitingEx = false;
+    public Tool(GamepadEx toolGamepad, ToolSubsystem subsystem, Mushu mushu, Telemetry telemetry){
         toolSubsystem = subsystem;
         this.toolGamepad = toolGamepad;
         this.mushu = mushu;
+        this.telemetry = telemetry;
     }
 
     @Override
@@ -34,17 +39,28 @@ public class Tool extends CommandBase {
     public void execute(){
         if(intakeStartPos >= mushu.intakeArm.getCurrentPosition() + 5){
             toolSubsystem.manualIntake(Math.max(0, toolGamepad.getRightY()));
+            isLimitingIn = true;
         }
         else {
             toolSubsystem.manualIntake(toolGamepad.getRightY());
+            isLimitingIn = false;
         }
         if(extakeStartPos >= mushu.extakeArm.getCurrentPosition() + 5){
             toolSubsystem.manualExtake(Math.max(0, toolGamepad.getLeftY()));
+            isLimitingEx = true;
         }
         else {
             toolSubsystem.manualExtake(toolGamepad.getLeftY());
+            isLimitingEx = false;
         }
 
+        telemetry.addData("intakeArmPos", mushu.intakeArm.getCurrentPosition());
+        telemetry.addData("RightY Pos",toolGamepad.getRightY());
+        telemetry.addData("isLimitingIn", isLimitingIn);
+        telemetry.addData("extakeArmPos", mushu.extakeArm.getCurrentPosition());
+        telemetry.addData("LeftY Pos", toolGamepad.getLeftY());
+        telemetry.addData("isLimitingEx", isLimitingEx);
+        telemetry.update();
 
     }
 

@@ -43,9 +43,9 @@ public class MecanumDriveWithSticks extends CommandBase {
         heading = mushu.getHeading();
 
 
-        telemetry.addData("imu heading", mushu.getHeading());
-        telemetry.addData("BACK", driverGamepad.getGamepadButton(GamepadKeys.Button.BACK).get());
-        telemetry.update();
+        //telemetry.addData("imu heading", mushu.getHeading());
+        //telemetry.addData("BACK", driverGamepad.getGamepadButton(GamepadKeys.Button.BACK).get());
+        //telemetry.update();
 
     }
 
