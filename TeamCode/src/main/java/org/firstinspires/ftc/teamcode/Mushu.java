@@ -16,6 +16,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.vision.AprilTagPipeline;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 
@@ -54,8 +56,15 @@ public class Mushu extends Robot {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier
                 ("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         WebcamName webcamName = hardwareMap.get(WebcamName.class, "webcam");
+
+        AprilTagProcessor aprilTagProcessor = AprilTagProcessor.easyCreateWithDefaults();
+
+        VisionPortal visionPortal = VisionPortal.easyCreateWithDefaults(webcamName, aprilTagProcessor);
+
         byteData = AprilTagPipeline.APRIL_TAG_INIT_DATA;
+
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+
 
         frontLeft = new Motor(hardwareMap, "FrontLeft");
         frontRight = new Motor(hardwareMap, "FrontRight");
