@@ -12,6 +12,8 @@ import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.Subsystems.InExtakeSub;
 import org.firstinspires.ftc.teamcode.Subsystems.ToolSubsystem;
 
+import java.util.Objects;
+
 public class Tool extends CommandBase {
     private final ToolSubsystem toolSubsystem;
     GamepadEx toolGamepad;
@@ -54,13 +56,18 @@ public class Tool extends CommandBase {
             isLimitingEx = false;
         }
 
-        telemetry.addData("intakeArmPos", mushu.intakeArm.getCurrentPosition());
+        /*telemetry.addData("intakeArmPos", mushu.intakeArm.getCurrentPosition());
         telemetry.addData("RightY Pos",toolGamepad.getRightY());
         telemetry.addData("isLimitingIn", isLimitingIn);
         telemetry.addData("extakeArmPos", mushu.extakeArm.getCurrentPosition());
         telemetry.addData("LeftY Pos", toolGamepad.getLeftY());
         telemetry.addData("isLimitingEx", isLimitingEx);
+         */
+
+        telemetry.addData("leftBumper", toolGamepad.getButton(GamepadKeys.Button.LEFT_BUMPER));
+        telemetry.addData("rightBumper", toolGamepad.getButton(GamepadKeys.Button.RIGHT_BUMPER));
         telemetry.update();
+
 
     }
 
@@ -68,19 +75,30 @@ public class Tool extends CommandBase {
         GamepadEx gamepad;
         double intakePower;
         double extakePower;
+        Telemetry telemetry;
 
         InExtakeSub sub;
-        public InExtake(GamepadEx gamepad, InExtakeSub sub){
+        public InExtake(GamepadEx gamepad, InExtakeSub sub, Telemetry telemetry){
             this.gamepad = gamepad;
             this.sub = sub;
+            this.telemetry = telemetry;
         }
         @Override
         public void execute(){
-           intakePower = gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER); // INTAKE IS LEFT TRIGGER
-           extakePower = gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER); // INTAKE IS RIGHT TRIGGER
+           intakePower = gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) - gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER); // INTAKE IS LEFT TRIGGER
+            if(gamepad.getButton(GamepadKeys.Button.LEFT_BUMPER)){
+                extakePower = .6;
+            }
+            else if(gamepad.getButton(GamepadKeys.Button.RIGHT_BUMPER)){
+               extakePower = -.6;
+            }
+            else {
+                extakePower = 0;
+            }
 
             sub.runIN(intakePower);
             sub.runEX(extakePower);
+            telemetry.addData("extakePower", extakePower);
         }
     }
 }

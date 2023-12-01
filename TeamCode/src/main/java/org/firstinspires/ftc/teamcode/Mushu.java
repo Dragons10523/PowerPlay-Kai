@@ -29,16 +29,15 @@ public class Mushu extends Robot {
     public GamepadEx toolGamepad;
     //public BHI260IMU imu;
     public IMU imu;
-
     public MecanumDrive mecanum;
     public Motor frontLeft, frontRight, backLeft, backRight;
     public Motor extakeArm, intakeArm;
     public Motor hangMotor, intakeMotor;
     public CRServo omniServo, extakeServo;
-    double yaw;
-    double pitch;
-    double roll;
-
+    WebcamName webcamName;
+    AprilTagProcessor aprilTagProcessor;
+    VisionPortal visionPortal;
+    OpenCvCamera camera;
     public byte[] byteData;
 
     public static Mushu GetInstance(CommandOpMode opMode) {
@@ -55,15 +54,15 @@ public class Mushu extends Robot {
         // TODO: set up camera
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier
                 ("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        WebcamName webcamName = hardwareMap.get(WebcamName.class, "webcam");
+        webcamName = hardwareMap.get(WebcamName.class, "webcam");
 
-        AprilTagProcessor aprilTagProcessor = AprilTagProcessor.easyCreateWithDefaults();
+        aprilTagProcessor = AprilTagProcessor.easyCreateWithDefaults();
 
-        VisionPortal visionPortal = VisionPortal.easyCreateWithDefaults(webcamName, aprilTagProcessor);
+        visionPortal = VisionPortal.easyCreateWithDefaults(webcamName, aprilTagProcessor);
 
         byteData = AprilTagPipeline.APRIL_TAG_INIT_DATA;
 
-        OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+        camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
 
 
         frontLeft = new Motor(hardwareMap, "FrontLeft");

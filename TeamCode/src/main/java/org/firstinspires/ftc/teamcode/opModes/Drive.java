@@ -40,17 +40,17 @@ public class Drive extends CommandOpMode {
 
         schedule(new MecanumDriveWithSticks(mushu.mecanum, mushu.driverGamepad, m_driveSub, mushu, telemetry));
 
-        schedule(new HangCommand(mushu.toolGamepad, m_toolSub, mushu));
+        schedule(new HangCommand(mushu.driverGamepad, m_toolSub, mushu));
 
         schedule(new Tool(mushu.toolGamepad,m_toolSub, mushu, telemetry));
 
         schedule(new MecanumDriveWithSticks.ResetYaw(mushu, mushu.toolGamepad));
 
-        schedule(new Tool.InExtake(mushu.toolGamepad, m_inExtake));
+        schedule(new Tool.InExtake(mushu.toolGamepad, m_inExtake, telemetry));
 
-        schedule(new PerpetualCommand(new InstantCommand(() -> {
+        //  schedule(new PerpetualCommand(new InstantCommand(() -> {
 
-                })));
+           //     })));
 
 
         //mushu.toolGamepad.getGamepadButton(GamepadKeys.Button.A).toggleWhenPressed(new ConditionalCommand(
