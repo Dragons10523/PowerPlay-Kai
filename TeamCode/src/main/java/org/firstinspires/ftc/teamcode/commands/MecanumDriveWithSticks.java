@@ -12,22 +12,19 @@ import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveSubsystems;
 
 public class MecanumDriveWithSticks extends CommandBase {
     Mushu mushu;
-    MecanumDrive mecanum;
-    GamepadEx driverGamepad;
     MecanumDriveSubsystems m_driveSubsystem;
 
     double forward;
     double strafe;
     double turn;
     double heading;
+
     Telemetry telemetry;
 
 
 
 
-    public MecanumDriveWithSticks(MecanumDrive mecanumDrive, GamepadEx driverGamepad, MecanumDriveSubsystems subsystem, Mushu mushu, Telemetry telemetry) {
-        this.mecanum = mecanumDrive;
-        this.driverGamepad = driverGamepad;
+    public MecanumDriveWithSticks(MecanumDriveSubsystems subsystem, Mushu mushu, Telemetry telemetry) {
         this.m_driveSubsystem = subsystem;
         this.mushu = mushu;
         this.telemetry = telemetry;
@@ -37,29 +34,22 @@ public class MecanumDriveWithSticks extends CommandBase {
     public void execute(){
 
         m_driveSubsystem.driveFieldCentric(forward, strafe, turn, heading);
-        forward = -driverGamepad.getLeftY();
-        strafe = -driverGamepad.getLeftX();
-        turn = driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
+        forward = -mushu.driverGamepad.getLeftY();
+        strafe = -mushu.driverGamepad.getLeftX();
+        turn = mushu.driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - mushu.driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
         heading = mushu.getHeading();
-
-
-        //telemetry.addData("imu heading", mushu.getHeading());
-        //telemetry.update();
 
     }
 
     public static class ResetYaw extends CommandBase {
         Mushu mushu;
-        GamepadEx gamepad;
-        public ResetYaw(Mushu mushu, GamepadEx gamepad){
+        double theta;
+        public ResetYaw(Mushu mushu){
             this.mushu = mushu;
-            this.gamepad = gamepad;
         }
         @Override
-        public void execute(){
-            gamepad.getGamepadButton(GamepadKeys.Button.BACK)
-                    .whenPressed(new InstantCommand(() -> mushu.resetIMU()));
-
+        public void initialize(){
+            theta = mushu.resetIMU();
         }
     }
 

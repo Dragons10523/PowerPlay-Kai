@@ -4,6 +4,8 @@ package org.firstinspires.ftc.teamcode.commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.button.Button;
+import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
@@ -75,13 +77,13 @@ public class Tool extends CommandBase {
         GamepadEx gamepad;
         double intakePower;
         double extakePower;
-        Telemetry telemetry;
+
 
         InExtakeSub sub;
-        public InExtake(GamepadEx gamepad, InExtakeSub sub, Telemetry telemetry){
+        public InExtake(GamepadEx gamepad, InExtakeSub sub){
             this.gamepad = gamepad;
             this.sub = sub;
-            this.telemetry = telemetry;
+
         }
         @Override
         public void execute(){
@@ -98,7 +100,24 @@ public class Tool extends CommandBase {
 
             sub.runIN(intakePower);
             sub.runEX(extakePower);
-            telemetry.addData("extakePower", extakePower);
         }
+    }
+    public static class extakeSpin extends CommandBase{
+        InExtakeSub sub;
+        double power;
+        public extakeSpin(InExtakeSub sub, double power){this.sub = sub; this.power = power;}
+        public void execute(){
+            sub.runEX(power);
+        }
+    }
+    public static class flipServo extends CommandBase{
+        InExtakeSub sub;
+        public flipServo(InExtakeSub sub){this.sub = sub;}
+        public void initialize(){sub.flipGate();}
+    }
+    public static class retractServo extends CommandBase{
+        InExtakeSub sub;
+        public retractServo(InExtakeSub sub){this.sub = sub;}
+        public void initialize() {sub.retractGate();}
     }
 }

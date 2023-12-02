@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.opModes;
 
+import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.PerpetualCommand;
 import com.arcrobotics.ftclib.command.button.Button;
@@ -11,6 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.Subsystems.InExtakeSub;
 import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveSubsystems;
+import org.firstinspires.ftc.teamcode.commands.ButtonCall;
 import org.firstinspires.ftc.teamcode.commands.HangCommand;
 import org.firstinspires.ftc.teamcode.commands.MecanumDriveWithSticks;
 import org.firstinspires.ftc.teamcode.commands.Tool;
@@ -37,16 +40,15 @@ public class Drive extends CommandOpMode {
         m_toolSub = new ToolSubsystem(mushu.toolGamepad, mushu);
         m_inExtake = new InExtakeSub(mushu);
 
+        schedule(new MecanumDriveWithSticks(m_driveSub, mushu, telemetry));
 
-        schedule(new MecanumDriveWithSticks(mushu.mecanum, mushu.driverGamepad, m_driveSub, mushu, telemetry));
+        schedule(new ButtonCall(mushu, m_inExtake));
 
         schedule(new HangCommand(mushu.driverGamepad, m_toolSub, mushu));
 
-        schedule(new Tool(mushu.toolGamepad,m_toolSub, mushu, telemetry));
+        schedule(new Tool(mushu.toolGamepad,m_toolSub, mushu, telemetry));;
 
-        schedule(new MecanumDriveWithSticks.ResetYaw(mushu, mushu.toolGamepad));
-
-        schedule(new Tool.InExtake(mushu.toolGamepad, m_inExtake, telemetry));
+        schedule(new Tool.InExtake(mushu.toolGamepad, m_inExtake));
 
         //  schedule(new PerpetualCommand(new InstantCommand(() -> {
 

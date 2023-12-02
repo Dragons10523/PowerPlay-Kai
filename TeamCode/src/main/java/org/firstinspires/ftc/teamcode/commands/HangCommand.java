@@ -27,7 +27,7 @@ public class HangCommand extends CommandBase {
     @Override
     public void execute(){
         hangPower = driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
-
+        //TODO: adjust limiters might need to be inversed
         if(hangStartPos >= mushu.hangMotor.getCurrentPosition() + 5){
            tool.hang(Math.max(hangPower, 0));
         }
