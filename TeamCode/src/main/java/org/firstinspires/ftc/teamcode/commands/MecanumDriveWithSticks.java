@@ -49,7 +49,11 @@ public class MecanumDriveWithSticks extends CommandBase {
         }
         @Override
         public void initialize(){
-            theta = mushu.resetIMU();
+           mushu.resetIMU();
+        }
+        @Override
+        public boolean isFinished(){
+            return true;
         }
     }
 

@@ -120,17 +120,16 @@ public class Mushu extends Robot {
     }
     public double getHeading(){
         Theta = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-        return Theta.thirdAngle - resetThetaDouble;
-       // first angle PITCH facing towards the front
-       // second angle ROLL facing towards the front
+        return Theta.thirdAngle; // - resetThetaDouble;
+       // first angle PITCH facing towards the front set by gravity
+       // second angle ROLL facing towards the front set by gravity
        // third angle YAW facing towards the front
         //https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fpepijndevos.nl%2Fimages%2F638px-Yaw_Axis_Corrected.svg.png&f=1&nofb=1&ipt=de4a93d65083eb716c740d6eae10504fbe1af10cdde294d327fca79cd27a8953&ipo=images
     }
-   public double resetIMU(){
-        resetTheta = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-        resetThetaDouble = resetTheta.thirdAngle;
-        return resetThetaDouble;
-
+   public void resetIMU(){
+        imu.resetYaw();
+        //resetTheta = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+        //resetThetaDouble = resetTheta.thirdAngle;
     }
 
 

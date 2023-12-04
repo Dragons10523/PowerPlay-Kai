@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
@@ -17,8 +18,8 @@ public class ButtonCall extends CommandBase {
     Button Left_Bumper;
     Button Right_Bumper;
     Button BACK;
+    Button A;
     InExtakeSub m_InExtakeSub;
-
     public ButtonCall(Mushu mushu, InExtakeSub sub){
         this.mushu = mushu;
         m_InExtakeSub = sub;
@@ -39,11 +40,17 @@ public class ButtonCall extends CommandBase {
         BACK = new GamepadButton(
                 mushu.toolGamepad, GamepadKeys.Button.BACK
         );
+        A = new GamepadButton(
+                mushu.toolGamepad, GamepadKeys.Button.A
+        );
+
     }
     public void execute(){
+      //Dpad_DOWN.whenPressed(new InstantCommand())
       Dpad_DOWN.whenPressed(new Tool.flipServo(m_InExtakeSub));
       Dpad_UP.whenPressed(new Tool.retractServo(m_InExtakeSub));
+      Right_Bumper.whileHeld(new Tool.extakeSpin(m_InExtakeSub, .75)).whenReleased(new Tool.extakeSpin(m_InExtakeSub, 0));
+      Left_Bumper.whileHeld(new Tool.extakeSpin(m_InExtakeSub, -.75)).whenReleased(new Tool.extakeSpin(m_InExtakeSub, 0));
       BACK.whenPressed(new MecanumDriveWithSticks.ResetYaw(mushu));
-
     }
 }

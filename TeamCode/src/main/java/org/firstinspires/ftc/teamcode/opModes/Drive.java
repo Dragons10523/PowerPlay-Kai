@@ -1,13 +1,6 @@
 package org.firstinspires.ftc.teamcode.opModes;
 
-import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.PerpetualCommand;
-import com.arcrobotics.ftclib.command.button.Button;
-import com.arcrobotics.ftclib.command.button.GamepadButton;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Mushu;
@@ -48,7 +41,7 @@ public class Drive extends CommandOpMode {
 
         schedule(new Tool(mushu.toolGamepad,m_toolSub, mushu, telemetry));;
 
-        schedule(new Tool.InExtake(mushu.toolGamepad, m_inExtake));
+        schedule(new Tool.Intake(mushu.toolGamepad, m_inExtake));
 
         //  schedule(new PerpetualCommand(new InstantCommand(() -> {
 

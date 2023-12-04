@@ -21,6 +21,7 @@ public class HangCommand extends CommandBase {
         this.mushu = mushu;
         this.tool = tool;
     }
+    @Override
     public void initialize(){
         hangStartPos = mushu.hangMotor.getCurrentPosition();
     }

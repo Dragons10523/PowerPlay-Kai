@@ -3,9 +3,6 @@ package org.firstinspires.ftc.teamcode.commands;
 
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.arcrobotics.ftclib.command.button.Button;
-import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
@@ -13,8 +10,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.Subsystems.InExtakeSub;
 import org.firstinspires.ftc.teamcode.Subsystems.ToolSubsystem;
-
-import java.util.Objects;
 
 public class Tool extends CommandBase {
     private final ToolSubsystem toolSubsystem;
@@ -73,14 +68,14 @@ public class Tool extends CommandBase {
 
     }
 
-    public static class InExtake extends CommandBase{
+    public static class Intake extends CommandBase{
         GamepadEx gamepad;
         double intakePower;
         double extakePower;
 
 
         InExtakeSub sub;
-        public InExtake(GamepadEx gamepad, InExtakeSub sub){
+        public Intake(GamepadEx gamepad, InExtakeSub sub){
             this.gamepad = gamepad;
             this.sub = sub;
 
@@ -88,18 +83,7 @@ public class Tool extends CommandBase {
         @Override
         public void execute(){
            intakePower = gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) - gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER); // INTAKE IS LEFT TRIGGER
-            if(gamepad.getButton(GamepadKeys.Button.LEFT_BUMPER)){
-                extakePower = .6;
-            }
-            else if(gamepad.getButton(GamepadKeys.Button.RIGHT_BUMPER)){
-               extakePower = -.6;
-            }
-            else {
-                extakePower = 0;
-            }
-
             sub.runIN(intakePower);
-            sub.runEX(extakePower);
         }
     }
     public static class extakeSpin extends CommandBase{
