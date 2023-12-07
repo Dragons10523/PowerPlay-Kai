@@ -19,10 +19,12 @@ public class ButtonCall extends CommandBase {
     Button Right_Bumper;
     Button BACK;
     Button A;
+    Telemetry telemetry;
     InExtakeSub m_InExtakeSub;
-    public ButtonCall(Mushu mushu, InExtakeSub sub){
+    public ButtonCall(Mushu mushu, InExtakeSub sub, Telemetry telemetry){
         this.mushu = mushu;
         m_InExtakeSub = sub;
+        this.telemetry = telemetry;
     }
     public void initialize(){
         Dpad_DOWN = new GamepadButton(
@@ -38,7 +40,7 @@ public class ButtonCall extends CommandBase {
                 mushu.toolGamepad, GamepadKeys.Button.RIGHT_BUMPER
         );
         BACK = new GamepadButton(
-                mushu.toolGamepad, GamepadKeys.Button.BACK
+                mushu.driverGamepad, GamepadKeys.Button.BACK
         );
         A = new GamepadButton(
                 mushu.toolGamepad, GamepadKeys.Button.A
@@ -51,6 +53,6 @@ public class ButtonCall extends CommandBase {
       Dpad_UP.whenPressed(new Tool.retractServo(m_InExtakeSub));
       Right_Bumper.whileHeld(new Tool.extakeSpin(m_InExtakeSub, .75)).whenReleased(new Tool.extakeSpin(m_InExtakeSub, 0));
       Left_Bumper.whileHeld(new Tool.extakeSpin(m_InExtakeSub, -.75)).whenReleased(new Tool.extakeSpin(m_InExtakeSub, 0));
-      BACK.whenPressed(new MecanumDriveWithSticks.ResetYaw(mushu));
+      BACK.whenPressed(new MecanumDriveWithSticks.ResetYaw(mushu, telemetry));
     }
 }

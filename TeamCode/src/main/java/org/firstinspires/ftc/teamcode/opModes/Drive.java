@@ -35,7 +35,7 @@ public class Drive extends CommandOpMode {
 
         schedule(new MecanumDriveWithSticks(m_driveSub, mushu, telemetry));
 
-        schedule(new ButtonCall(mushu, m_inExtake));
+        schedule(new ButtonCall(mushu, m_inExtake, telemetry));
 
         schedule(new HangCommand(mushu.driverGamepad, m_toolSub, mushu));
 
@@ -46,16 +46,6 @@ public class Drive extends CommandOpMode {
         //  schedule(new PerpetualCommand(new InstantCommand(() -> {
 
            //     })));
-
-
-        //mushu.toolGamepad.getGamepadButton(GamepadKeys.Button.A).toggleWhenPressed(new ConditionalCommand(
-          //      schedule(new Tool(mushu.toolGamepad, m_toolSub)),
-            //    schedule(new HangCommand(mushu.toolGamepad, m_toolSub)),
-
-       // )
-
-
-
 
         //register gives priority to this main function to run these subsystems
         register(m_toolSub);

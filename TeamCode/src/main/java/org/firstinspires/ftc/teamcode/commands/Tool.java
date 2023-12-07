@@ -5,6 +5,7 @@ package org.firstinspires.ftc.teamcode.commands;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Mushu;
@@ -31,8 +32,12 @@ public class Tool extends CommandBase {
 
     @Override
     public void initialize(){
+        mushu.intakeArm.stopAndResetEncoder();
+        mushu.extakeServo.stopAndResetEncoder();
+
         intakeStartPos = mushu.intakeArm.getCurrentPosition();
         extakeStartPos = mushu.extakeArm.getCurrentPosition();
+
     }
     @Override
     public void execute(){
@@ -53,17 +58,13 @@ public class Tool extends CommandBase {
             isLimitingEx = false;
         }
 
-        /*telemetry.addData("intakeArmPos", mushu.intakeArm.getCurrentPosition());
-        telemetry.addData("RightY Pos",toolGamepad.getRightY());
+        telemetry.addData("intakeArmPos", mushu.intakeArm.getCurrentPosition());
         telemetry.addData("isLimitingIn", isLimitingIn);
         telemetry.addData("extakeArmPos", mushu.extakeArm.getCurrentPosition());
-        telemetry.addData("LeftY Pos", toolGamepad.getLeftY());
         telemetry.addData("isLimitingEx", isLimitingEx);
-         */
-
-        telemetry.addData("leftBumper", toolGamepad.getButton(GamepadKeys.Button.LEFT_BUMPER));
-        telemetry.addData("rightBumper", toolGamepad.getButton(GamepadKeys.Button.RIGHT_BUMPER));
         telemetry.update();
+
+
 
 
     }

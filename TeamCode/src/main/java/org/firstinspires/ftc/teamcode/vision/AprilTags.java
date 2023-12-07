@@ -29,6 +29,8 @@ public class AprilTags extends SubsystemBase {
         this.aprilTagPipeline = aprilTagPipeline;
     }
 
+
+
     public int getAprilTagID(){
 
         detections = aprilTagPipeline.getLatestDetections();

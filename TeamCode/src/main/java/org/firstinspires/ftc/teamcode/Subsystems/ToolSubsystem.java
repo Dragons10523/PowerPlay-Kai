@@ -28,22 +28,18 @@ public class ToolSubsystem extends SubsystemBase{
             targetPosition = 1000;
         }
         mushu.extakeArm.setTargetPosition(targetPosition);
-        mushu.extakeArm.setRunMode(Motor.RunMode.PositionControl);
     }
     public void setArmIntakePosition(int targetPosition){
         if(targetPosition == -1){
             targetPosition = 100;
         }
         mushu.intakeArm.setTargetPosition(targetPosition);
-        mushu.extakeArm.setRunMode(Motor.RunMode.PositionControl);
     }
     //TODO: make sure can't go below 0
     public void manualExtake(double power){
-        mushu.extakeArm.setRunMode(Motor.RunMode.RawPower);
         mushu.extakeArm.set(power);
     }
     public void manualIntake(double power){
-        mushu.intakeArm.setRunMode(Motor.RunMode.RawPower);
         mushu.intakeArm.set(power);
     }
     public void hang(double power){

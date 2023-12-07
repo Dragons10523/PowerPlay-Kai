@@ -38,18 +38,20 @@ public class MecanumDriveWithSticks extends CommandBase {
         strafe = -mushu.driverGamepad.getLeftX();
         turn = mushu.driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - mushu.driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
         heading = mushu.getHeading();
+        telemetry.update();
 
     }
 
     public static class ResetYaw extends CommandBase {
         Mushu mushu;
         double theta;
-        public ResetYaw(Mushu mushu){
+        Telemetry telemetry;
+        public ResetYaw(Mushu mushu,Telemetry telemetry){
             this.mushu = mushu;
+            this.telemetry = telemetry;
         }
-        @Override
-        public void initialize(){
-           mushu.resetIMU();
+        public void execute(){
+            mushu.resetIMU();
         }
         @Override
         public boolean isFinished(){

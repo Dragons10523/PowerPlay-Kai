@@ -38,16 +38,12 @@ public class Mushu extends Robot {
     public Motor hangMotor, intakeMotor;
     public CRServo omniServo, extakeServo;
     public ServoEx gateServo;
-    WebcamName webcamName;
-    AprilTagProcessor aprilTagProcessor;
-    VisionPortal visionPortal;
-    OpenCvCamera camera;
+    public WebcamName webcamName;
+    public AprilTagProcessor aprilTagProcessor;
+    public VisionPortal visionPortal;
+    public OpenCvCamera camera;
     public byte[] byteData;
     Orientation Theta;
-    Orientation resetTheta;
-    double resetThetaDouble = 0;
-
-
     public static Mushu GetInstance(CommandOpMode opMode) {
         if(instance == null)
         {
@@ -59,18 +55,14 @@ public class Mushu extends Robot {
 
     public Mushu(CommandOpMode opMode) {
         HardwareMap hardwareMap = opMode.hardwareMap;
-        // TODO: set up camera
+
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier
                 ("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        webcamName = hardwareMap.get(WebcamName.class, "webcam");
-
-        aprilTagProcessor = AprilTagProcessor.easyCreateWithDefaults();
-
-        visionPortal = VisionPortal.easyCreateWithDefaults(webcamName, aprilTagProcessor);
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
 
         byteData = AprilTagPipeline.APRIL_TAG_INIT_DATA;
 
-        camera = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
+
 
 
         frontLeft = new Motor(hardwareMap, "FrontLeft");
@@ -120,7 +112,7 @@ public class Mushu extends Robot {
     }
     public double getHeading(){
         Theta = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-        return Theta.thirdAngle; // - resetThetaDouble;
+        return Theta.thirdAngle;
        // first angle PITCH facing towards the front set by gravity
        // second angle ROLL facing towards the front set by gravity
        // third angle YAW facing towards the front
@@ -128,8 +120,6 @@ public class Mushu extends Robot {
     }
    public void resetIMU(){
         imu.resetYaw();
-        //resetTheta = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-        //resetThetaDouble = resetTheta.thirdAngle;
     }
 
 
