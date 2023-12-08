@@ -13,23 +13,25 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.ArrayList;
+import java.util.function.BooleanSupplier;
 
 public class AprilTagCommand extends CommandBase {
     Mushu mushu;
     Telemetry telemetry;
     OpenCvCamera camera;
+    BooleanSupplier isStopRequested;
     int numFramesWithoutDetection = 0;
     final float DECIMATION_HIGH = 3;
     final float DECIMATION_LOW = 2;
     final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
     final int THRESHOLD_NUM_FRAMES_NO_DETECTIONS_BEFORE_LOW_DECIMATION = 4;
-    boolean isStopRequested;
     AprilTagPipeline aprilTagDetectionPipeline;
     static final double FEET_PER_METER = 3.28084;
-    public AprilTagCommand(Mushu mushu, Telemetry telemetry){
+    public AprilTagCommand(Mushu mushu, Telemetry telemetry, BooleanSupplier isStopRequested){
         this.mushu = mushu;
         this.telemetry = telemetry;
         this.isStopRequested = isStopRequested;
+
 
     }
     @Override
@@ -97,7 +99,13 @@ public class AprilTagCommand extends CommandBase {
         telemetry.update();
     }
     @Override
-    public boolean isFinished(){
-        return isStopRequested;
+    public void end(boolean interrupted){
+        telemetry.clear();
+        camera.closeCameraDevice();
     }
+    @Override
+    public boolean isFinished(){
+        return isStopRequested.getAsBoolean();
+    }
+
 }
