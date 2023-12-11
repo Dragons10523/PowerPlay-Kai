@@ -1,11 +1,10 @@
-package org.firstinspires.ftc.teamcode.commands;
-
+package org.firstinspires.ftc.teamcode.commands.AutoCommands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.Mushu;
 
-public class DriveAuto extends CommandBase {
+public class AutoDrive extends CommandBase {
     Mushu mushu;
     public enum TeamColor{
         BLUE,
@@ -14,7 +13,7 @@ public class DriveAuto extends CommandBase {
     TeamColor color;
 
 
-    public DriveAuto(Mushu mushu){
+    public AutoDrive(Mushu mushu){
         this.mushu = mushu;
 
     }
@@ -34,3 +33,4 @@ public class DriveAuto extends CommandBase {
     }
 
 }
+

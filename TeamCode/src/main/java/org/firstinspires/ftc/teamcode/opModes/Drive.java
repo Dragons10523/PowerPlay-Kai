@@ -22,7 +22,7 @@ public class Drive extends CommandOpMode {
 
 
 
-    //scheduler loops over initialize function (Why is it called initialize then IDK)
+    //scheduler loops over initialize function
 
     @Override
     public void initialize() {

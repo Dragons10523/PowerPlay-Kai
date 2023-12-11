@@ -84,7 +84,7 @@ public class AprilTagPipeline extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
         //Convert to greyscale
-        Imgproc.cvtColor(input,grey, Imgproc.COLOR_RGBA2GRAY);
+        Imgproc.cvtColor(input, grey, Imgproc.COLOR_RGBA2GRAY);
 
         synchronized (decimationSync)
         {
