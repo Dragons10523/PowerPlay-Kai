@@ -32,8 +32,8 @@ public class Tool extends CommandBase {
 
     @Override
     public void initialize(){
-        mushu.intakeArm.stopAndResetEncoder();
-        mushu.extakeServo.stopAndResetEncoder();
+       // mushu.intakeArm.stopAndResetEncoder();
+       // mushu.extakeServo.stopAndResetEncoder();
 
         intakeStartPos = mushu.intakeArm.getCurrentPosition();
         extakeStartPos = mushu.extakeArm.getCurrentPosition();
