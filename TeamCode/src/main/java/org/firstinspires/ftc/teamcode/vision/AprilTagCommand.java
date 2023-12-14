@@ -20,44 +20,66 @@ public class AprilTagCommand extends CommandBase {
     Telemetry telemetry;
     OpenCvCamera camera;
     BooleanSupplier isStopRequested;
+    AprilTags sub;
     int numFramesWithoutDetection = 0;
     final float DECIMATION_HIGH = 3;
     final float DECIMATION_LOW = 2;
     final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
     final int THRESHOLD_NUM_FRAMES_NO_DETECTIONS_BEFORE_LOW_DECIMATION = 4;
     AprilTagPipeline aprilTagDetectionPipeline;
+    ColorPipeline colorPipeline;
+    int initialLocation;
     static final double FEET_PER_METER = 3.28084;
-    public AprilTagCommand(Mushu mushu, Telemetry telemetry, BooleanSupplier isStopRequested){
+
+    public AprilTagCommand(Mushu mushu, Telemetry telemetry, BooleanSupplier isStopRequested, AprilTags april_sub) {
         this.mushu = mushu;
         this.telemetry = telemetry;
         this.isStopRequested = isStopRequested;
+        sub = april_sub;
 
 
     }
-    @Override
-    public void initialize(){
-        camera = mushu.camera;
-        aprilTagDetectionPipeline = new AprilTagPipeline(0.166 ,0,0,0,0);
-        camera.setPipeline(aprilTagDetectionPipeline);
-        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
-        {
-            @Override
-            public void onOpened()
-            {
-                camera.startStreaming(1280,720, OpenCvCameraRotation.UPRIGHT);
-            }
-            @Override
-            public void onError(int errorCode)
-            {
 
+    @Override
+    public void initialize() {
+        camera = mushu.camera;
+        aprilTagDetectionPipeline = new AprilTagPipeline(0.166, 0, 0, 0, 0);
+        colorPipeline = new ColorPipeline();
+        initialLocation = colorPipeline.getLocation();
+
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                camera.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+                System.out.println("errorCode:" + errorCode);
             }
 
         });
 
 
     }
+
     @Override
-    public void execute(){
+    public void execute() {
+        camera.setPipeline(colorPipeline);
+
+        if (initialLocation == 0) {
+            //perform task on the right
+
+        } else if (initialLocation == 1) {
+            //perform task in the center
+        } else {
+            //perform default task(LEFT)
+        }
+        telemetry.addData("location", initialLocation);
+
+
+        /*
+        camera.setPipeline(aprilTagDetectionPipeline);
         ArrayList<AprilTagDetection> detections = aprilTagDetectionPipeline.getLatestDetections();
 
         if(detections != null)
@@ -96,11 +118,15 @@ public class AprilTagCommand extends CommandBase {
                 telemetry.addLine(String.format("Rotation Roll: %.2f degrees", rot.thirdAngle));
             }
         }
+
+         */
         telemetry.update();
+
+
     }
     @Override
     public void end(boolean interrupted){
-        telemetry.clear();
+
         camera.closeCameraDevice();
     }
     @Override
@@ -108,4 +134,7 @@ public class AprilTagCommand extends CommandBase {
         return isStopRequested.getAsBoolean();
     }
 
+
+
 }
+
