@@ -35,9 +35,7 @@ public class Drive extends CommandOpMode {
 
         schedule(new MecanumDriveWithSticks(m_driveSub, mushu, telemetry));
 
-        schedule(new ButtonCall(mushu, m_inExtake, telemetry));
-
-        schedule(new HangCommand(mushu.driverGamepad, m_toolSub, mushu));
+        schedule(new ButtonCall(mushu, m_inExtake, m_toolSub));
 
         schedule(new Tool(mushu.toolGamepad,m_toolSub, mushu, telemetry));;
 

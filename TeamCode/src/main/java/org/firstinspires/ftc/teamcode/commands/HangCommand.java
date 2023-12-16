@@ -11,30 +11,22 @@ import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.Subsystems.ToolSubsystem;
 
 public class HangCommand extends CommandBase {
-    GamepadEx driverGamepad;
-    ToolSubsystem tool;
-    Mushu mushu;
+    ToolSubsystem toolSub;
+
     double hangPower;
     double hangStartPos;
-    public HangCommand(GamepadEx driverGamepad, ToolSubsystem tool, Mushu mushu) {
-        this.driverGamepad = driverGamepad;
-        this.mushu = mushu;
-        this.tool = tool;
-    }
-    @Override
-    public void initialize(){
-        hangStartPos = mushu.hangMotor.getCurrentPosition();
+    int power = 0;
+    public HangCommand(ToolSubsystem tool, int power) {
+
+        this.toolSub = tool;
+        this.power = power;
     }
     @Override
     public void execute(){
-        hangPower = driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
-        //TODO: adjust limiters might need to be inversed
-        if(hangStartPos >= mushu.hangMotor.getCurrentPosition() + 5){
-           tool.hang(Math.max(hangPower, 0));
-        }
-        else{
-            tool.hang(hangPower);
-        }
-
+        toolSub.hang(power);
+    }
+    @Override
+    public boolean isFinished(){
+        return power == 0;
     }
 }

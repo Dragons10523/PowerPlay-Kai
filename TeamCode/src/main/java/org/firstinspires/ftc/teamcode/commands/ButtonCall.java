@@ -1,36 +1,37 @@
 package org.firstinspires.ftc.teamcode.commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
-import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.Subsystems.InExtakeSub;
+import org.firstinspires.ftc.teamcode.Subsystems.ToolSubsystem;
 
 public class ButtonCall extends CommandBase {
     Mushu mushu;
-    Button Dpad_DOWN;
-    Button Dpad_UP;
+    Button Dpad_DOWN_Tool, Dpad_DOWN_Drive;
+    Button Dpad_UP_Tool, Dpad_UP_Drive;
     Button Left_Bumper;
     Button Right_Bumper;
     Button BACK;
     Button A;
-    Telemetry telemetry;
+
     InExtakeSub m_InExtakeSub;
-    public ButtonCall(Mushu mushu, InExtakeSub sub, Telemetry telemetry){
+    ToolSubsystem m_toolSub;
+    public ButtonCall(Mushu mushu, InExtakeSub sub, ToolSubsystem toolSub){
         this.mushu = mushu;
         m_InExtakeSub = sub;
-        this.telemetry = telemetry;
+        m_toolSub = toolSub;
+
     }
     public void initialize(){
-        Dpad_DOWN = new GamepadButton(
+        Dpad_DOWN_Tool = new GamepadButton(
                 mushu.toolGamepad, GamepadKeys.Button.DPAD_DOWN
         );
-        Dpad_UP = new GamepadButton(
+        Dpad_UP_Tool = new GamepadButton(
                 mushu.toolGamepad, GamepadKeys.Button.DPAD_UP
         );
         Left_Bumper = new GamepadButton(
@@ -42,6 +43,12 @@ public class ButtonCall extends CommandBase {
         BACK = new GamepadButton(
                 mushu.driverGamepad, GamepadKeys.Button.BACK
         );
+        Dpad_UP_Drive = new GamepadButton(
+                mushu.driverGamepad, GamepadKeys.Button.DPAD_UP
+        );
+        Dpad_DOWN_Drive = new GamepadButton(
+                mushu.driverGamepad, GamepadKeys.Button.DPAD_DOWN
+        );
         A = new GamepadButton(
                 mushu.toolGamepad, GamepadKeys.Button.A
         );
@@ -49,10 +56,13 @@ public class ButtonCall extends CommandBase {
     }
     public void execute(){
       //Dpad_DOWN.whenPressed(new InstantCommand())
-      Dpad_DOWN.whenPressed(new Tool.flipServo(m_InExtakeSub));
-      Dpad_UP.whenPressed(new Tool.retractServo(m_InExtakeSub));
+      Dpad_DOWN_Tool.whenPressed(new Tool.flipServo(m_InExtakeSub));
+      Dpad_UP_Tool.whenPressed(new Tool.retractServo(m_InExtakeSub));
+      Right_Bumper.whenHeld(new Tool.extakeSpin(m_InExtakeSub, .75));
       Right_Bumper.whileHeld(new Tool.extakeSpin(m_InExtakeSub, .75)).whenReleased(new Tool.extakeSpin(m_InExtakeSub, 0));
       Left_Bumper.whileHeld(new Tool.extakeSpin(m_InExtakeSub, -.75)).whenReleased(new Tool.extakeSpin(m_InExtakeSub, 0));
-      BACK.whenPressed(new MecanumDriveWithSticks.ResetYaw(mushu, telemetry));
+      BACK.whenPressed(new MecanumDriveWithSticks.ResetYaw(mushu));
+      Dpad_DOWN_Drive.whileHeld(new HangCommand(m_toolSub, -1)).whenReleased(new HangCommand(m_toolSub, 0));
+      Dpad_UP_Drive.whileHeld(new HangCommand(m_toolSub, 1)).whenReleased(new HangCommand(m_toolSub, 0));
     }
 }

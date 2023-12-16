@@ -44,16 +44,14 @@ public class MecanumDriveWithSticks extends CommandBase {
 
     public static class ResetYaw extends CommandBase {
         Mushu mushu;
-        double theta;
-        Telemetry telemetry;
-        public ResetYaw(Mushu mushu,Telemetry telemetry){
+        public ResetYaw(Mushu mushu){
             this.mushu = mushu;
-            this.telemetry = telemetry;
+
         }
-        public void execute(){
+        public void initialize(){
             mushu.resetIMU();
         }
-        @Override
+        @Override 
         public boolean isFinished(){
             return true;
         }
