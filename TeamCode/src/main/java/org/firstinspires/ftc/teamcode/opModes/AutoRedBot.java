@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.opModes;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.ColorEnum;
 import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.vision.AprilTagCommand;
 import org.firstinspires.ftc.teamcode.vision.AprilTagPipeline;
 import org.firstinspires.ftc.teamcode.vision.AprilTags;
+@Autonomous
 
 public class AutoRedBot extends CommandOpMode {
     Mushu mushu;

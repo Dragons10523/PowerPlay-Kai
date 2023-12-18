@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.commands;
 
+import android.speech.RecognitionService;
+
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
@@ -8,6 +11,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.Subsystems.InExtakeSub;
+import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveSubsystems;
 import org.firstinspires.ftc.teamcode.Subsystems.ToolSubsystem;
 
 public class ButtonCall extends CommandBase {
@@ -21,10 +25,12 @@ public class ButtonCall extends CommandBase {
 
     InExtakeSub m_InExtakeSub;
     ToolSubsystem m_toolSub;
-    public ButtonCall(Mushu mushu, InExtakeSub sub, ToolSubsystem toolSub){
+    MecanumDriveSubsystems m_driveSub;
+    public ButtonCall(Mushu mushu, InExtakeSub sub, ToolSubsystem toolSub, MecanumDriveSubsystems m_driveSub){
         this.mushu = mushu;
         m_InExtakeSub = sub;
         m_toolSub = toolSub;
+        this.m_driveSub = m_driveSub;
 
     }
     public void initialize(){
@@ -61,7 +67,7 @@ public class ButtonCall extends CommandBase {
       Right_Bumper.whenHeld(new Tool.extakeSpin(m_InExtakeSub, .75));
       Right_Bumper.whileHeld(new Tool.extakeSpin(m_InExtakeSub, .75)).whenReleased(new Tool.extakeSpin(m_InExtakeSub, 0));
       Left_Bumper.whileHeld(new Tool.extakeSpin(m_InExtakeSub, -.75)).whenReleased(new Tool.extakeSpin(m_InExtakeSub, 0));
-      BACK.whenPressed(new MecanumDriveWithSticks.ResetYaw(mushu));
+      BACK.whenPressed(new InstantCommand(m_driveSub::resetIMU));
       Dpad_DOWN_Drive.whileHeld(new HangCommand(m_toolSub, -1)).whenReleased(new HangCommand(m_toolSub, 0));
       Dpad_UP_Drive.whileHeld(new HangCommand(m_toolSub, 1)).whenReleased(new HangCommand(m_toolSub, 0));
     }

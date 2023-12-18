@@ -13,6 +13,7 @@ public class AutoDrive extends CommandBase {
     TeamColor color;
 
 
+
     public AutoDrive(Mushu mushu){
         this.mushu = mushu;
 
@@ -26,10 +27,13 @@ public class AutoDrive extends CommandBase {
             throw new RuntimeException(e);
         }
         mushu.mecanum.stop();
+        end(true);
 
     }
-    public boolean isFinished(){
-        return true;
+    @Override
+    public void end(boolean interrupted){
+        mushu.mecanum.driveWithMotorPowers(0,0,0,0);
+        mushu.mecanum.stop();
     }
 
 }

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
@@ -18,11 +19,7 @@ public class MecanumDriveWithSticks extends CommandBase {
     double strafe;
     double turn;
     double heading;
-
     Telemetry telemetry;
-
-
-
 
     public MecanumDriveWithSticks(MecanumDriveSubsystems subsystem, Mushu mushu, Telemetry telemetry) {
         this.m_driveSubsystem = subsystem;
@@ -38,23 +35,9 @@ public class MecanumDriveWithSticks extends CommandBase {
         strafe = -mushu.driverGamepad.getLeftX();
         turn = mushu.driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - mushu.driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
         heading = mushu.getHeading();
+        telemetry.addData("Theta", mushu.getHeading());
         telemetry.update();
 
-    }
-
-    public static class ResetYaw extends CommandBase {
-        Mushu mushu;
-        public ResetYaw(Mushu mushu){
-            this.mushu = mushu;
-
-        }
-        public void initialize(){
-            mushu.resetIMU();
-        }
-        @Override 
-        public boolean isFinished(){
-            return true;
-        }
     }
 
 }
