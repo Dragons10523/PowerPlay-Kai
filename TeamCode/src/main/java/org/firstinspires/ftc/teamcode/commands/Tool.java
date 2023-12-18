@@ -42,67 +42,20 @@ public class Tool extends CommandBase {
     @Override
     public void execute(){
         if(intakeStartPos >= mushu.intakeArm.getCurrentPosition() + 5){
-            toolSubsystem.manualIntake(Math.max(0, toolGamepad.getRightY()));
+            toolSubsystem.manualIntake(Math.max(0, -toolGamepad.getLeftY()));
             isLimitingIn = true;
         }
         else {
-            toolSubsystem.manualIntake(toolGamepad.getRightY());
+            toolSubsystem.manualIntake(-toolGamepad.getLeftY());
             isLimitingIn = false;
         }
         if(extakeStartPos >= mushu.extakeArm.getCurrentPosition() + 5){
-            toolSubsystem.manualExtake(Math.max(0, toolGamepad.getLeftY()));
+            toolSubsystem.manualExtake(Math.max(0, toolGamepad.getRightY()));
             isLimitingEx = true;
         }
         else {
-            toolSubsystem.manualExtake(toolGamepad.getLeftY());
+            toolSubsystem.manualExtake(toolGamepad.getRightY());
             isLimitingEx = false;
         }
-
-        telemetry.addData("intakeArmPos", mushu.intakeArm.getCurrentPosition());
-        telemetry.addData("isLimitingIn", isLimitingIn);
-        telemetry.addData("extakeArmPos", mushu.extakeArm.getCurrentPosition());
-        telemetry.addData("isLimitingEx", isLimitingEx);
-        telemetry.update();
-
-
-
-
-    }
-
-    public static class Intake extends CommandBase{
-        GamepadEx gamepad;
-        double intakePower;
-        double extakePower;
-
-
-        InExtakeSub sub;
-        public Intake(GamepadEx gamepad, InExtakeSub sub){
-            this.gamepad = gamepad;
-            this.sub = sub;
-
-        }
-        @Override
-        public void execute(){
-           intakePower = gamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) - gamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER); // INTAKE IS LEFT TRIGGER
-            sub.runIN(intakePower);
-        }
-    }
-    public static class extakeSpin extends CommandBase{
-        InExtakeSub sub;
-        double power;
-        public extakeSpin(InExtakeSub sub, double power){this.sub = sub; this.power = power;}
-        public void execute(){
-            sub.runEX(power);
-        }
-    }
-    public static class flipServo extends CommandBase{
-        InExtakeSub sub;
-        public flipServo(InExtakeSub sub){this.sub = sub;}
-        public void initialize(){sub.flipGate();}
-    }
-    public static class retractServo extends CommandBase{
-        InExtakeSub sub;
-        public retractServo(InExtakeSub sub){this.sub = sub;}
-        public void initialize() {sub.retractGate();}
     }
 }

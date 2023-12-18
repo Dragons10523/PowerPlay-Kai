@@ -13,6 +13,9 @@ import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.Subsystems.InExtakeSub;
 import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveSubsystems;
 import org.firstinspires.ftc.teamcode.Subsystems.ToolSubsystem;
+import org.firstinspires.ftc.teamcode.commands.InExtakeCommands.ExtakeSpin;
+import org.firstinspires.ftc.teamcode.commands.InExtakeCommands.FlipServo;
+import org.firstinspires.ftc.teamcode.commands.InExtakeCommands.RetractServo;
 
 public class ButtonCall extends CommandBase {
     Mushu mushu;
@@ -59,16 +62,21 @@ public class ButtonCall extends CommandBase {
                 mushu.toolGamepad, GamepadKeys.Button.A
         );
 
+        Dpad_DOWN_Tool.whenPressed(new FlipServo(m_InExtakeSub));
+        Dpad_UP_Tool.whenPressed(new RetractServo(m_InExtakeSub));
+
+        Right_Bumper.whileHeld(new ExtakeSpin(m_InExtakeSub, .75)).whenReleased(new ExtakeSpin(m_InExtakeSub, 0));
+        Left_Bumper.whileHeld(new ExtakeSpin(m_InExtakeSub, -.75)).whenReleased(new ExtakeSpin(m_InExtakeSub, 0));
+
+        BACK.whenPressed(new InstantCommand(m_driveSub::resetIMU));
+
+        Dpad_DOWN_Drive.whileHeld(new HangCommand(m_toolSub, -1)).whenReleased(new HangCommand(m_toolSub, 0));
+        Dpad_UP_Drive.whileHeld(new HangCommand(m_toolSub, 1)).whenReleased(new HangCommand(m_toolSub, 0));
+
     }
-    public void execute(){
-      //Dpad_DOWN.whenPressed(new InstantCommand())
-      Dpad_DOWN_Tool.whenPressed(new Tool.flipServo(m_InExtakeSub));
-      Dpad_UP_Tool.whenPressed(new Tool.retractServo(m_InExtakeSub));
-      Right_Bumper.whenHeld(new Tool.extakeSpin(m_InExtakeSub, .75));
-      Right_Bumper.whileHeld(new Tool.extakeSpin(m_InExtakeSub, .75)).whenReleased(new Tool.extakeSpin(m_InExtakeSub, 0));
-      Left_Bumper.whileHeld(new Tool.extakeSpin(m_InExtakeSub, -.75)).whenReleased(new Tool.extakeSpin(m_InExtakeSub, 0));
-      BACK.whenPressed(new InstantCommand(m_driveSub::resetIMU));
-      Dpad_DOWN_Drive.whileHeld(new HangCommand(m_toolSub, -1)).whenReleased(new HangCommand(m_toolSub, 0));
-      Dpad_UP_Drive.whileHeld(new HangCommand(m_toolSub, 1)).whenReleased(new HangCommand(m_toolSub, 0));
+
+    @Override
+    public boolean isFinished() {
+        return true;
     }
 }

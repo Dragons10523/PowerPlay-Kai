@@ -17,7 +17,7 @@ public class InExtakeSub extends SubsystemBase {
     public void runEX(double power){
         mushu.extakeServo.set(power);
     }
-    public void flipGate(){mushu.gateServo.setPosition(1);}
-    public void retractGate(){mushu.gateServo.setPosition(0);}
+    public void flipGate(){mushu.gateServo.setPosition(0);}
+    public void retractGate(){mushu.gateServo.setPosition(1);}
 
 }
