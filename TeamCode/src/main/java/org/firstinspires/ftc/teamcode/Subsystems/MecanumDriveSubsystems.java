@@ -21,8 +21,8 @@ public class MecanumDriveSubsystems extends SubsystemBase{
     public void manualDrive(double botLeft, double botRight, double topLeft, double topRight){
         drive.driveWithMotorPowers(topLeft, topRight, botLeft, botRight);
     }
-    public void driveMecanum(double power, double angle, boolean Interupted){
-        if(Interupted)
+    public void driveMecanum(double power, double angle, boolean interrupted){
+        if(interrupted)
         {
             drive.stop();
         }

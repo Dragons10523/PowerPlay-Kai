@@ -8,6 +8,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.InExtakeSub;
 import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveSubsystems;
 import org.firstinspires.ftc.teamcode.commands.ButtonCall;
 import org.firstinspires.ftc.teamcode.commands.HangCommand;
+import org.firstinspires.ftc.teamcode.commands.InExtakeCommands.IntakeSpin;
 import org.firstinspires.ftc.teamcode.commands.MecanumDriveWithSticks;
 import org.firstinspires.ftc.teamcode.commands.Tool;
 import org.firstinspires.ftc.teamcode.Subsystems.ToolSubsystem;
@@ -39,7 +40,7 @@ public class Drive extends CommandOpMode {
 
         schedule(new Tool(mushu.toolGamepad,m_toolSub, mushu, telemetry));;
 
-        schedule(new Tool.Intake(mushu.toolGamepad, m_inExtake));
+        schedule(new IntakeSpin(mushu.toolGamepad, m_inExtake));
 
         //  schedule(new PerpetualCommand(new InstantCommand(() -> {
 

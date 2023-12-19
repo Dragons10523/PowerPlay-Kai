@@ -13,61 +13,79 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ColorPipeline extends OpenCvPipeline {
-
-    Mat blue = new Mat();
-    Mat red = new Mat();
-
-    Mat mask = new Mat();
-    Mat hsv = new Mat();
-
     Scalar lowerRed = new Scalar(0, 100, 100);
     Scalar upperRed = new Scalar(10, 255, 255);
 
     Scalar lowerBlue = new Scalar(90, 100, 100);
     Scalar upperBlue = new Scalar(130, 255, 255);
 
-    int location = -1;
-    // location 0 is right<------
-    // location 1 is center------
-    // location 2 is left  ------>
+    PieceLocation location = null;
 
-
+    public enum PieceLocation {
+        LEFT,
+        CENTER,
+        RIGHT,
+    }
 
 
 
     @Override
     public Mat processFrame(Mat input) {
+        Mat hsv = new Mat();
         Imgproc.cvtColor(input, hsv, Imgproc.COLOR_BGR2HSV);
-        if(ColorEnum.color == ColorEnum.Color.BLUE_DOWN || ColorEnum.color == ColorEnum.Color.BLUE_UP){
-            Core.inRange(hsv, lowerBlue, upperBlue, mask);
-        }
-        else {
-            Core.inRange(hsv, lowerRed, upperRed, mask);
-        }
+
+        Mat mask = getMask(input);
+
         Mat hierarchy = new Mat();
         List<MatOfPoint> contours = new ArrayList<>();
         Imgproc.findContours(mask, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        double rectArea = 0;
+        Rect largestRect = null;
+
         for(MatOfPoint contour : contours){
             Rect rect = Imgproc.boundingRect(contour);
-            int centerX = rect.x + rect.width /2;
-            int centerY = rect.y + rect.height /2 ;
 
-            int frameCenterX = input.width() /2;
-            if(centerX < frameCenterX - 200 ){
-                location = 0;// might be right
+            if(rect.area() > rectArea){
+                largestRect = rect;
+                rectArea = rect.area();
             }
-            else if(centerX > frameCenterX - 200 ){
-                location = 1;
-            }
-            else{
-                location = 2;
-            }
+        }
+        if(largestRect == null){
+            return input;
+        }
+        int centerX = largestRect.x + largestRect.width /2;
+        int centerY = largestRect.y + largestRect.height /2 ;
+
+        int frameCenterX = input.width() /2;
+        if(centerX < frameCenterX - 200 ){
+            location = PieceLocation.RIGHT;// might be right
+        }
+        else if(centerX > frameCenterX - 200 ){
+            location = PieceLocation.LEFT;
+        }
+        else{
+            location = PieceLocation.CENTER;
+        }
+
+        Imgproc.drawContours(input, contours, -1, new Scalar(0, 255, 0));
+
+
+        return input;
+    }
+    public PieceLocation getLocation(){
+        return location;
+    }
+    public Mat getMask(Mat input){
+        Mat mask = new Mat();
+
+        if(ColorEnum.color == ColorEnum.Color.BLUE_DOWN || ColorEnum.color == ColorEnum.Color.BLUE_UP){
+            Core.inRange(input, lowerBlue, upperBlue, mask);
+        }
+        else {
+            Core.inRange(input, lowerRed, upperRed, mask);
         }
 
         return mask;
     }
-    public int getLocation(){
-        return location;
-    }
-
 }

@@ -28,7 +28,7 @@ public class AprilTagCommand extends CommandBase {
     final int THRESHOLD_NUM_FRAMES_NO_DETECTIONS_BEFORE_LOW_DECIMATION = 4;
     AprilTagPipeline aprilTagDetectionPipeline;
     ColorPipeline colorPipeline;
-    int initialLocation;
+    ColorPipeline.PieceLocation initialLocation;
     static final double FEET_PER_METER = 3.28084;
 
     public AprilTagCommand(Mushu mushu, Telemetry telemetry, BooleanSupplier isStopRequested, AprilTags april_sub) {
@@ -65,20 +65,20 @@ public class AprilTagCommand extends CommandBase {
 
     @Override
     public void execute() {
-        camera.setPipeline(colorPipeline);
+//          camera.setPipeline(colorPipeline);
 
-        if (initialLocation == 0) {
-            //perform task on the right
+//        if (initialLocation == ColorPipeline.PieceLocation.RIGHT) {
+//            //perform task on the right
+//
+//        } else if (initialLocation == ColorPipeline.PieceLocation.CENTER) {
+//            //perform task in the center
+//        } else {
+//            //perform default task(LEFT)
+//        }
+//        telemetry.addData("location", initialLocation);
 
-        } else if (initialLocation == 1) {
-            //perform task in the center
-        } else {
-            //perform default task(LEFT)
-        }
-        telemetry.addData("location", initialLocation);
 
 
-        /*
         camera.setPipeline(aprilTagDetectionPipeline);
         ArrayList<AprilTagDetection> detections = aprilTagDetectionPipeline.getLatestDetections();
 
@@ -119,7 +119,7 @@ public class AprilTagCommand extends CommandBase {
             }
         }
 
-         */
+
         telemetry.update();
 
 
