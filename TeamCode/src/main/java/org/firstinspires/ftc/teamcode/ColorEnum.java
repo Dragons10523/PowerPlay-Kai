@@ -6,7 +6,7 @@ public class ColorEnum {
         RED_UP,
         RED_DOWN,
         BLUE_UP,
-        BLUE_DOWN;
+        BLUE_DOWN
 
     }
     public static Color color;

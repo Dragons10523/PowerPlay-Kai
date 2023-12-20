@@ -37,7 +37,7 @@ public class Mushu extends Robot {
     public Motor extakeArm, intakeArm;
     public Motor hangMotor, intakeMotor;
     public CRServo omniServo, extakeServo;
-    public ServoEx gateServo;
+    public ServoEx gateServo, droneServo;
     public WebcamName webcamName;
     public AprilTagProcessor aprilTagProcessor;
     public VisionPortal visionPortal;
@@ -75,7 +75,8 @@ public class Mushu extends Robot {
         intakeMotor = new Motor(hardwareMap, "intakeMotor");
         extakeServo = new CRServo(hardwareMap, "extakeServo");
         omniServo = new CRServo(hardwareMap, "omniServo");
-        gateServo = new SimpleServo(hardwareMap,"gateServo",0,360,AngleUnit.DEGREES);
+        gateServo = new SimpleServo(hardwareMap,"gateServo", 0, 360, AngleUnit.DEGREES);
+        droneServo = new SimpleServo(hardwareMap, "droneServo", 0, 180, AngleUnit.DEGREES);
 
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters param;

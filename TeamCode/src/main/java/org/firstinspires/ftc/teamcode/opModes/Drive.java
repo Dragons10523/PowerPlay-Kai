@@ -4,6 +4,7 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Mushu;
+import org.firstinspires.ftc.teamcode.Subsystems.DroneSub;
 import org.firstinspires.ftc.teamcode.Subsystems.InExtakeSub;
 import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveSubsystems;
 import org.firstinspires.ftc.teamcode.commands.ButtonCall;
@@ -20,6 +21,7 @@ public class Drive extends CommandOpMode {
     MecanumDriveSubsystems m_driveSub;
 
     InExtakeSub m_inExtake;
+    DroneSub m_droneSub;
 
 
 
@@ -33,12 +35,13 @@ public class Drive extends CommandOpMode {
         m_driveSub = new MecanumDriveSubsystems(mushu);
         m_toolSub = new ToolSubsystem(mushu.toolGamepad, mushu);
         m_inExtake = new InExtakeSub(mushu);
+        m_droneSub  = new DroneSub(mushu);
 
         schedule(new MecanumDriveWithSticks(m_driveSub, mushu, telemetry));
 
-        schedule(new ButtonCall(mushu, m_inExtake, m_toolSub, m_driveSub));
+        schedule(new ButtonCall(mushu, m_inExtake, m_toolSub, m_driveSub, m_droneSub));
 
-        schedule(new Tool(mushu.toolGamepad,m_toolSub, mushu, telemetry));;
+        schedule(new Tool(mushu.toolGamepad,m_toolSub, mushu, telemetry));
 
         schedule(new IntakeSpin(mushu.toolGamepad, m_inExtake));
 

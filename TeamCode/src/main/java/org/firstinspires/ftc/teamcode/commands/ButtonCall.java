@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Mushu;
+import org.firstinspires.ftc.teamcode.Subsystems.DroneSub;
 import org.firstinspires.ftc.teamcode.Subsystems.InExtakeSub;
 import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveSubsystems;
 import org.firstinspires.ftc.teamcode.Subsystems.ToolSubsystem;
@@ -29,11 +30,13 @@ public class ButtonCall extends CommandBase {
     InExtakeSub m_InExtakeSub;
     ToolSubsystem m_toolSub;
     MecanumDriveSubsystems m_driveSub;
-    public ButtonCall(Mushu mushu, InExtakeSub sub, ToolSubsystem toolSub, MecanumDriveSubsystems m_driveSub){
+    DroneSub droneSub;
+    public ButtonCall(Mushu mushu, InExtakeSub sub, ToolSubsystem toolSub, MecanumDriveSubsystems m_driveSub, DroneSub droneSub){
         this.mushu = mushu;
         m_InExtakeSub = sub;
         m_toolSub = toolSub;
         this.m_driveSub = m_driveSub;
+        this.droneSub = droneSub;
 
     }
     public void initialize(){
@@ -72,6 +75,7 @@ public class ButtonCall extends CommandBase {
 
         Dpad_DOWN_Drive.whileHeld(new HangCommand(m_toolSub, -1)).whenReleased(new HangCommand(m_toolSub, 0));
         Dpad_UP_Drive.whileHeld(new HangCommand(m_toolSub, 1)).whenReleased(new HangCommand(m_toolSub, 0));
+        A.whenPressed(new InstantCommand(droneSub::flipDrone));
 
     }
 

@@ -33,12 +33,15 @@ public class ColorPipeline extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
         Mat hsv = new Mat();
         Imgproc.cvtColor(input, hsv, Imgproc.COLOR_BGR2HSV);
+        hsv.release();
 
         Mat mask = getMask(input);
 
         Mat hierarchy = new Mat();
         List<MatOfPoint> contours = new ArrayList<>();
         Imgproc.findContours(mask, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        mask.release();
+        hierarchy.release();
 
         double rectArea = 0;
         Rect largestRect = null;
@@ -58,18 +61,18 @@ public class ColorPipeline extends OpenCvPipeline {
         int centerY = largestRect.y + largestRect.height /2 ;
 
         int frameCenterX = input.width() /2;
+
         if(centerX < frameCenterX - 200 ){
             location = PieceLocation.RIGHT;// might be right
         }
         else if(centerX > frameCenterX - 200 ){
             location = PieceLocation.LEFT;
         }
-        else{
+        else if(largestRect.area() != 0){
             location = PieceLocation.CENTER;
         }
 
         Imgproc.drawContours(input, contours, -1, new Scalar(0, 255, 0));
-
 
         return input;
     }
