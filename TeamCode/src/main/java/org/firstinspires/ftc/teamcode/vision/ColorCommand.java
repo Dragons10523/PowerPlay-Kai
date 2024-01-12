@@ -14,74 +14,67 @@ public class ColorCommand extends CommandBase {
     Mushu mushu;
     OpenCvCamera camera;
     BooleanSupplier isStopRequested;
+    ColorPipeline colorPipeline;
     public ColorCommand(Mushu mushu, BooleanSupplier isStopRequested) {
         this.mushu = mushu;
         this.isStopRequested = isStopRequested;
     }
-
     public void initialize(){
-
         camera = mushu.camera;
-        ColorPipeline colorPipeline = new ColorPipeline();
+
+        colorPipeline = new ColorPipeline();
         camera.setPipeline(colorPipeline);
 
-        //open Camera
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(1280, 720, OpenCvCameraRotation.SIDEWAYS_RIGHT);
+                camera.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT);
             }
 
             @Override
             public void onError(int errorCode) {
-
-                System.out.println("errorCode:" + errorCode);
+                System.out.println("errorCode: " + errorCode);
             }
 
         });
-        //waits for detection or for 7.5 seconds
-        waitForColorDetection(colorPipeline);
 
+    }
+
+    public void execute(){
         ColorPipeline.PieceLocation location = colorPipeline.getLocation();
-
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         if(location == ColorPipeline.PieceLocation.LEFT){
-            new AutoDrive(mushu, location);
-        }
-        if(location == ColorPipeline.PieceLocation.RIGHT){
-            new AutoDrive(mushu, location);
-        }
-        if(location == ColorPipeline.PieceLocation.CENTER){
-            new AutoDrive(mushu, location);
-        }
-        else{
             mushu.mecanum.driveWithMotorPowers(.5,.5,.5,.5);
         }
+        if(location == ColorPipeline.PieceLocation.CENTER){
+            mushu.mecanum.driveWithMotorPowers(-.5,-.5, -.5, -.5);
+        }
+        if(location == ColorPipeline.PieceLocation.RIGHT){
+            mushu.mecanum.driveWithMotorPowers(-.5, .5, -.5, .5);
+        }
+        if(location == null){
+            mushu.intakeMotor.set(1);
+        }
 
-        end(true);
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
 
-    }
-
-    public boolean isFinished(){
-
-        return isStopRequested.getAsBoolean();
-    }
-    public void end(boolean Interrupted){
         mushu.mecanum.stop();
-        camera.closeCameraDevice();
+        mushu.intakeMotor.set(0);
         this.cancel();
 
     }
-    public void waitForColorDetection(ColorPipeline colorPipeline){
-        int loopcounter = 0;
-        while(loopcounter > 150 || colorPipeline.getLocation() == null){
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            loopcounter++;
-        }
-    }
 
+    public void end(boolean interrupted){
+        camera.closeCameraDevice();
+
+    }
 }

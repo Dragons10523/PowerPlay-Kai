@@ -40,7 +40,7 @@ public class ColorPipeline extends OpenCvPipeline {
         Mat hierarchy = new Mat();
         List<MatOfPoint> contours = new ArrayList<>();
         Imgproc.findContours(mask, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-        mask.release();
+
         hierarchy.release();
 
         double rectArea = 0;
@@ -55,17 +55,17 @@ public class ColorPipeline extends OpenCvPipeline {
             }
         }
         if(largestRect == null){
-            return input;
+            return mask;
         }
         int centerX = largestRect.x + largestRect.width /2;
         int centerY = largestRect.y + largestRect.height /2 ;
 
         int frameCenterX = input.width() /2;
 
-        if(centerX < frameCenterX - 200 ){
+        if(centerX < frameCenterX - 400 ){
             location = PieceLocation.RIGHT;// might be right
         }
-        else if(centerX > frameCenterX - 200 ){
+        else if(centerX > frameCenterX - 400 ){
             location = PieceLocation.LEFT;
         }
         else if(largestRect.area() != 0){

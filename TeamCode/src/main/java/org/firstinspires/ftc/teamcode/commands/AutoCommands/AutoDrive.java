@@ -12,6 +12,7 @@ public class AutoDrive extends CommandBase {
         RED
     }
     TeamColor color;
+    Boolean isFinished = false;
 
 
     ColorPipeline.PieceLocation location;
@@ -19,7 +20,7 @@ public class AutoDrive extends CommandBase {
         this.mushu = mushu;
         this.location = location;
     }
-    public void initialize(){
+    public void execute(){
         if(location == ColorPipeline.PieceLocation.LEFT){
             mushu.mecanum.driveWithMotorPowers(.5,.5,.5,.5);
         }
@@ -27,7 +28,10 @@ public class AutoDrive extends CommandBase {
             mushu.mecanum.driveWithMotorPowers(-.5,-.5, -.5, -.5);
         }
         if(location == ColorPipeline.PieceLocation.RIGHT){
-            mushu .mecanum.driveWithMotorPowers(-.5, .5, -.5, .5);
+            mushu.mecanum.driveWithMotorPowers(-.5, .5, -.5, .5);
+        }
+        if(location == null){
+            mushu.intakeMotor.set(1);
         }
 
         try {
@@ -38,13 +42,17 @@ public class AutoDrive extends CommandBase {
 
 
         mushu.mecanum.stop();
-        end(true);
+        mushu.intakeMotor.set(0);
+        this.cancel();
 
     }
     @Override
     public void end(boolean interrupted){
-        mushu.mecanum.driveWithMotorPowers(0,0,0,0);
         mushu.mecanum.stop();
+    }
+    @Override
+    public boolean isFinished(){
+        return isFinished;
     }
 
 }
