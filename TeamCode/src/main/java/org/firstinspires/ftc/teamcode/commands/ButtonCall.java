@@ -1,14 +1,11 @@
 package org.firstinspires.ftc.teamcode.commands;
 
-import android.speech.RecognitionService;
-
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.Subsystems.DroneSub;
 import org.firstinspires.ftc.teamcode.Subsystems.InExtakeSub;
@@ -20,12 +17,13 @@ import org.firstinspires.ftc.teamcode.commands.InExtakeCommands.RetractServo;
 
 public class ButtonCall extends CommandBase {
     Mushu mushu;
-    Button Dpad_DOWN_Tool, Dpad_DOWN_Drive;
-    Button Dpad_UP_Tool, Dpad_UP_Drive;
+    Button Dpad_DOWN_Tool, A;
+    Button Dpad_UP_Tool, Y;
     Button Left_Bumper;
     Button Right_Bumper;
     Button BACK;
-    Button A;
+    Button X;
+    Button B;
 
     InExtakeSub m_InExtakeSub;
     ToolSubsystem m_toolSub;
@@ -55,14 +53,17 @@ public class ButtonCall extends CommandBase {
         BACK = new GamepadButton(
                 mushu.driverGamepad, GamepadKeys.Button.BACK
         );
-        Dpad_UP_Drive = new GamepadButton(
-                mushu.driverGamepad, GamepadKeys.Button.DPAD_UP
-        );
-        Dpad_DOWN_Drive = new GamepadButton(
-                mushu.driverGamepad, GamepadKeys.Button.DPAD_DOWN
+        Y = new GamepadButton(
+                mushu.toolGamepad, GamepadKeys.Button.Y
         );
         A = new GamepadButton(
                 mushu.toolGamepad, GamepadKeys.Button.A
+        );
+        X = new GamepadButton(
+                mushu.toolGamepad, GamepadKeys.Button.X
+        );
+        B = new GamepadButton(
+                mushu.toolGamepad, GamepadKeys.Button.B
         );
 
         Dpad_DOWN_Tool.whenPressed(new FlipServo(m_InExtakeSub));
@@ -73,9 +74,10 @@ public class ButtonCall extends CommandBase {
 
         BACK.whenPressed(new InstantCommand(m_driveSub::resetIMU));
 
-        Dpad_DOWN_Drive.whileHeld(new HangCommand(m_toolSub, -1)).whenReleased(new HangCommand(m_toolSub, 0));
-        Dpad_UP_Drive.whileHeld(new HangCommand(m_toolSub, 1)).whenReleased(new HangCommand(m_toolSub, 0));
-        A.whenPressed(new InstantCommand(droneSub::flipDrone));
+
+        Y.whileHeld(new HangCommand(m_toolSub, -1)).whenReleased(new HangCommand(m_toolSub, 0));
+        A.whileHeld(new HangCommand(m_toolSub, 1)).whenReleased(new HangCommand(m_toolSub, 0));
+        B.whenPressed(new InstantCommand(droneSub::flipDrone));
 
     }
 

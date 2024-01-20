@@ -41,7 +41,7 @@ public class Mushu extends Robot {
     public WebcamName webcamName;
     public AprilTagProcessor aprilTagProcessor;
     public VisionPortal visionPortal;
-    public OpenCvCamera camera;
+
     public byte[] byteData;
     Orientation Theta;
     public static Mushu GetInstance(CommandOpMode opMode) {
@@ -56,9 +56,7 @@ public class Mushu extends Robot {
     public Mushu(CommandOpMode opMode) {
         HardwareMap hardwareMap = opMode.hardwareMap;
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier
-                ("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
+
 
         byteData = AprilTagPipeline.APRIL_TAG_INIT_DATA;
 

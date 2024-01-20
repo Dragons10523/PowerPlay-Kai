@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.vision;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.ColorEnum;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -13,11 +14,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ColorPipeline extends OpenCvPipeline {
+
+    //HSV_FULL colorspace
     Scalar lowerRed = new Scalar(0, 100, 100);
     Scalar upperRed = new Scalar(10, 255, 255);
 
     Scalar lowerBlue = new Scalar(90, 100, 100);
     Scalar upperBlue = new Scalar(130, 255, 255);
+    Telemetry telemetry;
+    public ColorPipeline(Telemetry telemetry){
+        this.telemetry = telemetry;
+    }
 
     PieceLocation location = null;
 
@@ -32,14 +39,15 @@ public class ColorPipeline extends OpenCvPipeline {
     @Override
     public Mat processFrame(Mat input) {
         Mat hsv = new Mat();
-        Imgproc.cvtColor(input, hsv, Imgproc.COLOR_BGR2HSV);
-        hsv.release();
+        Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV_FULL);
 
-        Mat mask = getMask(input);
+        Mat mask = getMask(hsv);
 
         Mat hierarchy = new Mat();
+        telemetry.update();
+
         List<MatOfPoint> contours = new ArrayList<>();
-        Imgproc.findContours(mask, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(mask, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 
         hierarchy.release();
 
@@ -51,7 +59,9 @@ public class ColorPipeline extends OpenCvPipeline {
 
             if(rect.area() > rectArea){
                 largestRect = rect;
-                rectArea = rect.area();
+                rectArea = largestRect.area();
+                telemetry.addData("largestRectArea",largestRect.area() );
+
             }
         }
         if(largestRect == null){
@@ -72,9 +82,9 @@ public class ColorPipeline extends OpenCvPipeline {
             location = PieceLocation.CENTER;
         }
 
-        Imgproc.drawContours(input, contours, -1, new Scalar(0, 255, 0));
+        Imgproc.drawContours(input, contours, -1, new Scalar(30, 127, 255));
 
-        return input;
+        return mask;
     }
     public PieceLocation getLocation(){
         return location;

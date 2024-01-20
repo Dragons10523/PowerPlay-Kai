@@ -30,21 +30,20 @@ public class AprilTagCommand extends CommandBase {
     ColorPipeline colorPipeline;
     ColorPipeline.PieceLocation initialLocation;
     static final double FEET_PER_METER = 3.28084;
-
-    public AprilTagCommand(Mushu mushu, Telemetry telemetry, BooleanSupplier isStopRequested, AprilTags april_sub) {
+    public AprilTagCommand(Mushu mushu, Telemetry telemetry, BooleanSupplier isStopRequested, AprilTags april_sub, OpenCvCamera camera) {
         this.mushu = mushu;
         this.telemetry = telemetry;
         this.isStopRequested = isStopRequested;
         sub = april_sub;
+        this.camera = camera;
 
 
     }
 
     @Override
     public void initialize() {
-        camera = mushu.camera;
         aprilTagDetectionPipeline = new AprilTagPipeline(0.166, 0, 0, 0, 0);
-        colorPipeline = new ColorPipeline();
+        colorPipeline = new ColorPipeline(telemetry);
         initialLocation = colorPipeline.getLocation();
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
