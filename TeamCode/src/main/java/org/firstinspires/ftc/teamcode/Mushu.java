@@ -13,16 +13,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.vision.AprilTagPipeline;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
+
+
 
 
 public class Mushu extends Robot {
@@ -38,9 +36,9 @@ public class Mushu extends Robot {
     public Motor hangMotor, intakeMotor;
     public CRServo omniServo, extakeServo;
     public ServoEx gateServo, droneServo;
-    public WebcamName webcamName;
-    public AprilTagProcessor aprilTagProcessor;
-    public VisionPortal visionPortal;
+    //public WebcamName webcamName;
+    //public AprilTagProcessor aprilTagProcessor;
+    //public VisionPortal visionPortal;
 
     public byte[] byteData;
     Orientation Theta;
@@ -135,6 +133,13 @@ public class Mushu extends Robot {
        intakeMotor.stopMotor();
        extakeServo.stop();
        omniServo.stop();
+   }
+   public void drivetrainMode(Motor.RunMode runmode){
+        frontLeft.setRunMode(runmode);
+        frontRight.setRunMode(runmode);
+        backLeft.setRunMode(runmode);
+        backRight.setRunMode(runmode);
+
    }
 
 
