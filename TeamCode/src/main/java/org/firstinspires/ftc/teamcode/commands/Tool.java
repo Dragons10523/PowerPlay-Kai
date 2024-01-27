@@ -42,11 +42,11 @@ public class Tool extends CommandBase {
     @Override
     public void execute(){
         if(intakeStartPos >= mushu.intakeArm.getCurrentPosition() + 5){
-            toolSubsystem.manualIntake(Math.max(0, -toolGamepad.getLeftY()));
+            toolSubsystem.manualIntake(Math.max(0, toolGamepad.getLeftY()));
             isLimitingIn = true;
         }
         else {
-            toolSubsystem.manualIntake(-toolGamepad.getLeftY());
+            toolSubsystem.manualIntake(toolGamepad.getLeftY());
             isLimitingIn = false;
         }
         if(extakeStartPos >= mushu.extakeArm.getCurrentPosition() + 5){

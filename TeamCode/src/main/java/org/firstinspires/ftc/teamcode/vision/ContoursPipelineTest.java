@@ -3,23 +3,23 @@ package org.firstinspires.ftc.teamcode.vision;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.ColorEnum;
 import org.firstinspires.ftc.teamcode.Mushu;
+import org.firstinspires.ftc.teamcode.commands.AutoCommands.AutoDrive;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
-
-import java.util.function.BooleanSupplier;
 
 public class ContoursPipelineTest extends CommandBase {
     Mushu mushu;
     OpenCvCamera camera;
-    BooleanSupplier isOpModeActive;
     Telemetry telemetry;
-    public ContoursPipelineTest(Mushu mushu, OpenCvCamera camera, BooleanSupplier isOpModeActive, Telemetry telemetry){
+
+    public ContoursPipelineTest(Mushu mushu, OpenCvCamera camera, Telemetry telemetry){
         this.mushu = mushu;
         this.camera = camera;
-        this.isOpModeActive = isOpModeActive;
         this.telemetry = telemetry;
     }
+    @Override
     public void initialize(){
         camera.setPipeline(new ColorPipeline(telemetry));
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
@@ -34,14 +34,26 @@ public class ContoursPipelineTest extends CommandBase {
             }
         });
     }
+    @Override
     public void execute(){
-        while(isOpModeActive.getAsBoolean()){
+        telemetry.addData("PieceLocation", ColorPipeline.location);
+        telemetry.addData("ColorEnum", ColorEnum.color);
+        telemetry.update();
 
-        }
-        this.cancel();
     }
-    public void end(Boolean Interrupted){
+    @Override
+    public void end(boolean interrupted) {
         camera.stopStreaming();
         camera.closeCameraDevice();
+    }
+    @Override
+    public boolean isFinished(){
+        ColorPipeline colorPipeline = new ColorPipeline();
+
+        try {
+            return colorPipeline.confidence() < 40;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

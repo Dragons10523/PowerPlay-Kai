@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.vision.AprilTagCommand;
 import org.firstinspires.ftc.teamcode.vision.AprilTagPipeline;
 import org.firstinspires.ftc.teamcode.vision.AprilTags;
+import org.firstinspires.ftc.teamcode.vision.ContoursPipelineTest;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 
@@ -31,7 +32,10 @@ public class AutoRedTop extends CommandOpMode {
         mushu = Mushu.GetInstance(this);
         aprilTagsSub = new AprilTags(mushu, aprilTagPipeline);
 
-        schedule(new AprilTagCommand(mushu, telemetry, this::isStopRequested, aprilTagsSub, camera));
+
+        //schedule(new AprilTagCommand(mushu, telemetry, this::isStopRequested, aprilTagsSub));
+
+        schedule(new ContoursPipelineTest(mushu, camera, telemetry));
         //schedule(new SequentialCommandGroup(new AutoDrive(mushu)));
     }
 

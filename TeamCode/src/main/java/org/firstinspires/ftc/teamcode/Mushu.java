@@ -85,6 +85,9 @@ public class Mushu extends Robot {
                 )
         );
 
+        hangMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+
         // Initialize IMU directly
         imu.initialize(
                 new IMU.Parameters(

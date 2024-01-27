@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.vision;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.ColorEnum;
 import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.commands.AutoCommands.AutoDrive;
 import org.openftc.easyopencv.OpenCvCamera;

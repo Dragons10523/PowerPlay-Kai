@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opModes;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.checkerframework.checker.units.qual.C;
@@ -31,15 +32,16 @@ public class AutoBlueBot extends CommandOpMode {
                 ("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
 
-        ColorEnum color = new ColorEnum(ColorEnum.Color.RED_UP);
+        ColorEnum color = new ColorEnum(ColorEnum.Color.BLUE_DOWN);
+
         mushu = Mushu.GetInstance(this);
         aprilTagsSub = new AprilTags(mushu, aprilTagPipeline);
 
 
         //schedule(new AprilTagCommand(mushu, telemetry, this::isStopRequested, aprilTagsSub));
-        //schedule( new ColorCommand(mushu, this::isStopRequested, telemetry, camera));
-        schedule(new ContoursPipelineTest(mushu, camera, this::opModeIsActive, telemetry));
-        //schedule(new SequentialCommandGroup(new AutoDrive(mushu)));
+
+        schedule(new SequentialCommandGroup(new ContoursPipelineTest(mushu, camera, telemetry)), new AutoDrive(mushu));
+        //ContoursPieplineTest is ending immediately i believe and then running AutoDrive is a location that is null
     }
 
 }

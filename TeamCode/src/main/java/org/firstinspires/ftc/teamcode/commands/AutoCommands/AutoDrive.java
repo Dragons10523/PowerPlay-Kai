@@ -15,40 +15,26 @@ public class AutoDrive extends CommandBase {
     Boolean isFinished = false;
 
 
-    ColorPipeline.PieceLocation location;
-    public AutoDrive(Mushu mushu, ColorPipeline.PieceLocation location){
+    ColorPipeline.PieceLocation location = ColorPipeline.location;
+    public AutoDrive(Mushu mushu){
         this.mushu = mushu;
-        this.location = location;
+
     }
     public void execute(){
-        if(location == ColorPipeline.PieceLocation.LEFT){
-            mushu.mecanum.driveWithMotorPowers(.5,.5,.5,.5);
-        }
-        if(location == ColorPipeline.PieceLocation.CENTER){
-            mushu.mecanum.driveWithMotorPowers(-.5,-.5, -.5, -.5);
-        }
-        if(location == ColorPipeline.PieceLocation.RIGHT){
-            mushu.mecanum.driveWithMotorPowers(-.5, .5, -.5, .5);
-        }
-        if(location == null){
-            mushu.intakeMotor.set(1);
-        }
 
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
 
 
         mushu.mecanum.stop();
         mushu.intakeMotor.set(0);
+
         this.cancel();
 
     }
     @Override
     public void end(boolean interrupted){
         mushu.mecanum.stop();
+        mushu.intakeMotor.set(0);
+
     }
     @Override
     public boolean isFinished(){

@@ -44,7 +44,7 @@ public class AprilTagCommand extends CommandBase {
     public void initialize() {
         aprilTagDetectionPipeline = new AprilTagPipeline(0.166, 0, 0, 0, 0);
         colorPipeline = new ColorPipeline(telemetry);
-        initialLocation = colorPipeline.getLocation();
+
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
