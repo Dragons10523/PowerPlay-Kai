@@ -29,7 +29,7 @@ public class Mushu extends Robot {
     public GamepadEx driverGamepad;
     public GamepadEx toolGamepad;
     //public BHI260IMU imu;
-    public IMU imu;
+    //public IMU imu;
     public MecanumDrive mecanum;
     public Motor frontLeft, frontRight, backLeft, backRight;
     public Motor extakeArm, intakeArm;
@@ -74,30 +74,30 @@ public class Mushu extends Robot {
         gateServo = new SimpleServo(hardwareMap,"gateServo", 0, 360, AngleUnit.DEGREES);
         droneServo = new SimpleServo(hardwareMap, "droneServo", 0, 180, AngleUnit.DEGREES);
 
-        imu = hardwareMap.get(IMU.class, "imu");
-        IMU.Parameters param;
-        param = new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                        RevHubOrientationOnRobot.UsbFacingDirection.UP
-                )
-        );
+//        imu = hardwareMap.get(IMU.class, "imu");
+//        IMU.Parameters param;
+//        param = new IMU.Parameters(
+//                new RevHubOrientationOnRobot(
+//                        RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+//                        RevHubOrientationOnRobot.UsbFacingDirection.UP
+//                )
+//        );
 
         hangMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         intakeMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
         // Initialize IMU directly
-        imu.initialize(
-                new IMU.Parameters(
-                        new RevHubOrientationOnRobot(
-                                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                                RevHubOrientationOnRobot.UsbFacingDirection.UP
-                        )
-                )
-        );
+//        imu.initialize(
+//                new IMU.Parameters(
+//                        new RevHubOrientationOnRobot(
+//                                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+//                                RevHubOrientationOnRobot.UsbFacingDirection.UP
+//                        )
+//                )
+//        );
 
 // Initialize IMU using Parameters
-        imu.initialize(param);
+        //imu.initialize(param);
        // resetIMU();
     
 
@@ -110,18 +110,18 @@ public class Mushu extends Robot {
         driverGamepad = new GamepadEx(opMode.gamepad1);
         toolGamepad = new GamepadEx(opMode.gamepad2);
     }
-    public double getHeading(){
-        Theta = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-        return Theta.thirdAngle;
+//    public double getHeading(){
+////        Theta = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+////        return Theta.thirdAngle;
        // first angle PITCH facing towards the front set by gravity
        // second angle ROLL facing towards the front set by gravity
        // third angle YAW facing towards the front
         //https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fpepijndevos.nl%2Fimages%2F638px-Yaw_Axis_Corrected.svg.png&f=1&nofb=1&ipt=de4a93d65083eb716c740d6eae10504fbe1af10cdde294d327fca79cd27a8953&ipo=images
-    }
-   public void resetIMU(){
-
-        imu.resetYaw();
-    }
+ //   }
+//   public void resetIMU(){
+//
+//        imu.resetYaw();
+//    }
    public void stopMotors() {
        frontLeft.stopMotor();
        frontRight.stopMotor();

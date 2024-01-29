@@ -34,8 +34,8 @@ public class MecanumDriveWithSticks extends CommandBase {
         forward = -mushu.driverGamepad.getLeftY();
         strafe = -mushu.driverGamepad.getLeftX();
         turn = mushu.driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - mushu.driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
-        heading = mushu.getHeading();
-        telemetry.addData("Theta", mushu.getHeading());
+        heading = 0; //mushu.getHeading();
+        telemetry.addData("Theta", "disabled");// mushu.getHeading());
         telemetry.update();
 
     }

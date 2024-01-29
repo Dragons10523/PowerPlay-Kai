@@ -21,9 +21,8 @@ android {
         targetCompatibility JavaVersion.VERSION_16
     }
     namespace = 'com.qualcomm.ftcrobotcontroller'
-    buildToolsVersion '33.0.1'
     ndkVersion '21.3.6528147'
-
+    buildToolsVersion '34.0.0'
 
 
 }

@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.commands.AutoCommands.AutoTurn;
 import org.firstinspires.ftc.teamcode.commands.AutoCommands.TurnToGameElement;
 import org.firstinspires.ftc.teamcode.commands.AutoCommands.UnloadPixel;
 
+import org.firstinspires.ftc.teamcode.commands.AutoCommands.WiggleClawDown;
 import org.firstinspires.ftc.teamcode.vision.AprilTagPipeline;
 import org.firstinspires.ftc.teamcode.vision.AprilTags;
 import org.firstinspires.ftc.teamcode.vision.ContoursPipelineTest;
@@ -37,21 +38,22 @@ public class AutoRedTop extends CommandOpMode {
                 ("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
 
-        new ColorEnum(ColorEnum.Color.RED_UP);
+        ColorEnum color = new ColorEnum(ColorEnum.Color.RED_UP);
         mushu = Mushu.GetInstance(this);
         aprilTagsSub = new AprilTags(mushu, aprilTagPipeline);
 
         MecanumDriveSubsystems m_DriveSubsystem = new MecanumDriveSubsystems(mushu);
         InExtakeSub m_ExtakeSub = new InExtakeSub(mushu);
 
-        new AutoDrive(m_DriveSubsystem, mushu);
-        new AutoTurn(m_DriveSubsystem, mushu);
-
 
         //schedule(new AprilTagCommand(mushu, telemetry, this::isStopRequested, aprilTagsSub));
 
-        schedule(new SequentialCommandGroup(new ContoursPipelineTest(mushu, camera, telemetry)), new AutoDrive(1, 24, 0),
-                new TurnToGameElement(mushu, command), new UnloadPixel(mushu, m_ExtakeSub));
+        schedule(new SequentialCommandGroup(new ContoursPipelineTest(mushu, camera, telemetry, color),
+                new WiggleClawDown(mushu, command, m_DriveSubsystem),
+                new AutoDrive(.5, 20, 0, m_DriveSubsystem, mushu),
+                new TurnToGameElement(mushu, command, m_DriveSubsystem),
+                new UnloadPixel(mushu, m_ExtakeSub)).interruptOn(this::isStopRequested)
+        );
     }
 
 }

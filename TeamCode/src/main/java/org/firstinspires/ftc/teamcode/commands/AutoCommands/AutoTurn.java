@@ -14,21 +14,16 @@ public class AutoTurn extends CommandBase {
 
     boolean isFinished = false;
 
-    public AutoTurn(int angle){
+    public AutoTurn(int angle, MecanumDriveSubsystems sub, Mushu mushu){
 
         this.angle = angle;
-
-    }
-    public AutoTurn(MecanumDriveSubsystems sub, Mushu mushu){
         this.mushu = mushu;
         this.sub = sub;
-    }
-    public void initialize(){
 
     }
     public void execute(){
         double angularDistance;
-        double initialAngle = mushu.getHeading();
+        double initialAngle =0; //mushu.getHeading();
 
 
         do{
@@ -36,8 +31,8 @@ public class AutoTurn extends CommandBase {
 
             if(angle - initialAngle < 0) turnVal = -1;
 
-            angularDistance = Math.abs(angle = (int) initialAngle);
-            if(angularDistance > 180){
+            angularDistance = Math.abs(angle - initialAngle);
+            if(angularDistance > 180){ // dealing with edge case
                 turnVal *= -1;
                 angularDistance = 360 - angularDistance;
             }
@@ -55,6 +50,11 @@ public class AutoTurn extends CommandBase {
     }
     public boolean isFinished(){
         return isFinished;
+    }
+
+    public void end(boolean interrupted){
+        mushu.mecanum.stop();
+        mushu.stopMotors();
     }
 
 }

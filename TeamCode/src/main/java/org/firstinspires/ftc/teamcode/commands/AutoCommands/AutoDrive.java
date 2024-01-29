@@ -11,9 +11,9 @@ public class AutoDrive extends CommandBase {
     Mushu mushu;
 
     Boolean isFinished = false;
-    public static final int WHEEL_DIAMETER_INCH = 3;
+    public static final int WHEEL_RADIUS_INCH = 2;
     public static final int CPR_OUTPUT_SHAFT_20TO1 = 560;
-    public static final double WHEEL_CIRCUMFERENCE_INCH = 9.421478;
+    public static final double WHEEL_CIRCUMFERENCE_INCH = 2 * Math.PI * WHEEL_RADIUS_INCH;
     public static final double TICKS_PER_INCH = CPR_OUTPUT_SHAFT_20TO1 /  WHEEL_CIRCUMFERENCE_INCH;
 
     int targetDistance;
@@ -22,15 +22,13 @@ public class AutoDrive extends CommandBase {
     MecanumDriveSubsystems sub;
 
 
-    public AutoDrive(int power, int targetDistance, int theta){
+    public AutoDrive(double power, int targetDistance, int theta, MecanumDriveSubsystems sub, Mushu mushu){
         this.targetDistance =  targetDistance;
         this.power = power;
         this.theta = theta;
-
-    }
-    public AutoDrive(MecanumDriveSubsystems sub, Mushu mushu){
         this.sub = sub;
         this.mushu = mushu;
+
     }
     public void execute(){
 
@@ -46,18 +44,18 @@ public class AutoDrive extends CommandBase {
 
         strafe = Math.cos(theta) - Math.sin(theta);
         drive = Math.sin(theta) + Math.cos(theta);
-        double[] speeds = {
-                (drive + strafe),
-                (drive - strafe),
-                (drive - strafe),
-                (drive + strafe)};
+//        double[] speeds = {
+//                (drive + strafe),
+//                (drive - strafe),
+//                (drive - strafe),
+//                (drive + strafe)};
 
         targetDistance = (int) (targetDistance * TICKS_PER_INCH);
 
         setTargetPosition(targetDistance, targetDistance, targetDistance, targetDistance); // might MIGHT be able to multiply by speeds 0-3
 
         while(!isAtTarget()){
-            sub.manualDrive(power, power, power, power);
+            sub.manualDrive(-power, -power, -power, -power);
         }
         mushu.mecanum.stop();
 
@@ -67,8 +65,7 @@ public class AutoDrive extends CommandBase {
     @Override
     public void end(boolean interrupted){
         mushu.mecanum.stop();
-
-
+        mushu.stopMotors();
     }
     @Override
     public boolean isFinished(){

@@ -5,7 +5,6 @@ import com.arcrobotics.ftclib.command.CommandBase;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.ColorEnum;
 import org.firstinspires.ftc.teamcode.Mushu;
-import org.firstinspires.ftc.teamcode.commands.AutoCommands.AutoDrive;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
@@ -13,11 +12,14 @@ public class ContoursPipelineTest extends CommandBase {
     Mushu mushu;
     OpenCvCamera camera;
     Telemetry telemetry;
+    ColorPipeline.PieceLocation locationAtBeginning;
+    ColorEnum color;
 
-    public ContoursPipelineTest(Mushu mushu, OpenCvCamera camera, Telemetry telemetry){
+    public ContoursPipelineTest(Mushu mushu, OpenCvCamera camera, Telemetry telemetry, ColorEnum color){
         this.mushu = mushu;
         this.camera = camera;
         this.telemetry = telemetry;
+        this.color = color;
     }
     @Override
     public void initialize(){
@@ -36,13 +38,12 @@ public class ContoursPipelineTest extends CommandBase {
     }
     @Override
     public void execute(){
-        telemetry.addData("PieceLocation", ColorPipeline.location);
-        telemetry.addData("ColorEnum", ColorEnum.color);
-        telemetry.update();
 
     }
     @Override
     public void end(boolean interrupted) {
+        locationAtBeginning = ColorPipeline.location;
+
         camera.stopStreaming();
         camera.closeCameraDevice();
     }
@@ -56,4 +57,5 @@ public class ContoursPipelineTest extends CommandBase {
             throw new RuntimeException(e);
         }
     }
+
 }

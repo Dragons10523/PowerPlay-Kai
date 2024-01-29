@@ -29,7 +29,7 @@ public class ColorPipeline extends OpenCvPipeline {
     Scalar lowerRed = new Scalar(0, 10, 10);
     Scalar upperRed = new Scalar(15, 255, 255);
 
-    Scalar lowerBlue = new Scalar(140, 10, 10);
+    Scalar lowerBlue = new Scalar(140, 50, 50);
     Scalar upperBlue = new Scalar(180, 255, 255);
     Telemetry telemetry;
 
@@ -118,6 +118,10 @@ public class ColorPipeline extends OpenCvPipeline {
 
 
         Imgproc.drawContours(input, contours, -1, new Scalar(30, 127, 255));
+        telemetry.addData("PieceLocation", ColorPipeline.location);
+        telemetry.addData("ColorEnum", ColorEnum.color);
+        telemetry.update();
+
         return mask;
     }
     public PieceLocation getLocation(){
@@ -141,5 +145,6 @@ public class ColorPipeline extends OpenCvPipeline {
         loops++;
         return loops;
     }
+
 
 }
