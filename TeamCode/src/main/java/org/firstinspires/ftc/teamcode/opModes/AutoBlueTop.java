@@ -49,9 +49,10 @@ public class AutoBlueTop extends CommandOpMode {
 
         //schedule(new AprilTagCommand(mushu, telemetry, this::isStopRequested, aprilTagsSub));
 
-        schedule(new SequentialCommandGroup(new ContoursPipelineTest(mushu, camera, telemetry, color),
-                new WiggleClawDown(mushu, command, m_DriveSubsystem),
-                new AutoDrive(.5, 20, 0, m_DriveSubsystem, mushu),
+        schedule(new SequentialCommandGroup(
+                new ContoursPipelineTest(mushu, camera, telemetry, color),
+                new WiggleClawDown(mushu, m_DriveSubsystem, telemetry),
+                new AutoDrive(.5, 20, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
                 new TurnToGameElement(mushu, command, m_DriveSubsystem),
                 new UnloadPixel(mushu, m_ExtakeSub)).interruptOn(this::isStopRequested)
         );

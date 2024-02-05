@@ -26,10 +26,10 @@ import java.util.Locale;
 public class ColorPipeline extends OpenCvPipeline {
 
     //HSV_FULL colorspace
-    Scalar lowerRed = new Scalar(0, 10, 10);
+    Scalar lowerRed = new Scalar(0, 0, 0);
     Scalar upperRed = new Scalar(15, 255, 255);
 
-    Scalar lowerBlue = new Scalar(140, 50, 50);
+    Scalar lowerBlue = new Scalar(140, 80, 80);
     Scalar upperBlue = new Scalar(180, 255, 255);
     Telemetry telemetry;
 
@@ -56,9 +56,9 @@ public class ColorPipeline extends OpenCvPipeline {
         Mat hsv = new Mat();
         Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV_FULL);
 
-        //Mat mask = getMask(hsv);
-        Mat mask = new Mat();
-        Core.inRange(hsv, lowerBlue, upperBlue, mask);
+        Mat mask = getMask(hsv);
+       // Mat mask = new Mat();
+        //Core.inRange(hsv, lowerBlue, upperBlue, mask);
 
         hsv.release();
 
@@ -88,6 +88,7 @@ public class ColorPipeline extends OpenCvPipeline {
                 largestRectWidth = rect.width;
 
             }
+            Imgproc.drawContours(input, contours, -1, new Scalar(30, 127, 255));
         }
 
 
@@ -117,7 +118,7 @@ public class ColorPipeline extends OpenCvPipeline {
         }
 
 
-        Imgproc.drawContours(input, contours, -1, new Scalar(30, 127, 255));
+
         telemetry.addData("PieceLocation", ColorPipeline.location);
         telemetry.addData("ColorEnum", ColorEnum.color);
         telemetry.update();
@@ -145,6 +146,7 @@ public class ColorPipeline extends OpenCvPipeline {
         loops++;
         return loops;
     }
+
 
 
 }

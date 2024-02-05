@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveSubsystems;
 import org.firstinspires.ftc.teamcode.vision.ColorPipeline;
+import org.firstinspires.ftc.teamcode.vision.ContoursPipelineTest;
 
 public class TurnToGameElement extends CommandBase
 {
@@ -22,7 +23,7 @@ public class TurnToGameElement extends CommandBase
 
     }
     public void initialize(){
-        location = ColorPipeline.location;
+        location = ContoursPipelineTest.locationAtBeginning;
     }
     public void execute(){
         if(location == ColorPipeline.PieceLocation.LEFT){
@@ -32,6 +33,10 @@ public class TurnToGameElement extends CommandBase
             command.schedule(new AutoTurn(-90, sub, mushu));
         }
         this.cancel();
+    }
+    public void end(boolean interrupted) {
+        mushu.mecanum.stop();
+
     }
 
 

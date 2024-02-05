@@ -28,7 +28,7 @@ public class ParkRed extends CommandOpMode {
 
 
         schedule(new SequentialCommandGroup(new AutoTurn(90, m_DriveSubsystem, mushu),
-                 new AutoDrive(.5,24,0, m_DriveSubsystem, mushu))
+                 new AutoDrive(.5,24,0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested))
                  .interruptOn(this::isStopRequested));
     }
 

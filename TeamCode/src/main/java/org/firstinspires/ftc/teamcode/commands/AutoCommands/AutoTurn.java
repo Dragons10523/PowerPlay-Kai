@@ -23,7 +23,7 @@ public class AutoTurn extends CommandBase {
     }
     public void execute(){
         double angularDistance;
-        double initialAngle =0; //mushu.getHeading();
+        double initialAngle = mushu.getHeading();
 
 
         do{
@@ -47,6 +47,7 @@ public class AutoTurn extends CommandBase {
         while(angularDistance > 3);
 
         isFinished = true;
+        this.cancel();
     }
     public boolean isFinished(){
         return isFinished;
