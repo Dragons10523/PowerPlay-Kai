@@ -11,7 +11,7 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -39,6 +39,7 @@ public class Mushu extends Robot {
     //public WebcamName webcamName;
     //public AprilTagProcessor aprilTagProcessor;
     //public VisionPortal visionPortal;
+    HardwareMap hardwareMap;
 
     public byte[] byteData;
     Orientation Theta;
@@ -52,7 +53,7 @@ public class Mushu extends Robot {
     }
 
     public Mushu(CommandOpMode opMode) {
-        HardwareMap hardwareMap = opMode.hardwareMap;
+        hardwareMap = opMode.hardwareMap;
 
 
 
@@ -141,6 +142,16 @@ public class Mushu extends Robot {
         backRight.setRunMode(runmode);
 
    }
+    public double getBatteryVoltage() {
+        double result = Double.POSITIVE_INFINITY;
+        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+            double voltage = sensor.getVoltage();
+            if (voltage > 0) {
+                result = Math.min(result, voltage);
+            }
+        }
+        return result;
+    }
 
 
 }

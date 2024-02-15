@@ -12,6 +12,7 @@ public class WiggleClawDown extends CommandBase {
 
     MecanumDriveSubsystems sub;
     Telemetry telemetry;
+    boolean isFinished = false;
     public WiggleClawDown(Mushu mushu, MecanumDriveSubsystems sub, Telemetry telemetry){
         this.mushu = mushu;
         this.sub = sub;
@@ -19,7 +20,7 @@ public class WiggleClawDown extends CommandBase {
 
     }
     public void execute(){
-        sub.manualDrive(1,1,1,1);
+        sub.manualDrive(1,-1,1,-1);
         mushu.intakeArm.set(1);
 
         try {
@@ -27,7 +28,7 @@ public class WiggleClawDown extends CommandBase {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        sub.manualDrive(-1,-1,-1,-1);
+        sub.manualDrive(-1,1,-1,1);
         mushu.intakeArm.set(-1);
         try {
             Thread.sleep(300);
@@ -38,9 +39,13 @@ public class WiggleClawDown extends CommandBase {
         sub.manualDrive(0,0,0,0);
 
         this.cancel();
+        isFinished = true;
     }
     public void end(boolean interrupted){
         mushu.mecanum.stop();
         mushu.intakeArm.set(0);
+    }
+    public boolean isFinished(){
+        return isFinished;
     }
 }

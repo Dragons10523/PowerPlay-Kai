@@ -12,23 +12,30 @@ public class UnloadPixel extends CommandBase {
     Mushu mushu;
     InExtakeSub sub;
 
+
     public UnloadPixel(Mushu mushu, InExtakeSub sub){
         this.mushu = mushu;
         this.sub = sub;
     }
 
     public void execute(){
-        sub.runIN(1);
+        sub.runIN(.75);
         this.cancel();
+
+
     }
     public void end(boolean interrupted){
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         sub.runIN(0);
+
     }
 
-
+    @Override
+    public boolean isFinished() {
+        return true;
+    }
 }

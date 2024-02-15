@@ -29,8 +29,8 @@ public class ColorPipeline extends OpenCvPipeline {
     Scalar lowerRed = new Scalar(0, 0, 0);
     Scalar upperRed = new Scalar(15, 255, 255);
 
-    Scalar lowerBlue = new Scalar(140, 80, 80);
-    Scalar upperBlue = new Scalar(180, 255, 255);
+    Scalar lowerBlue = new Scalar(135, 75, 80);
+    Scalar upperBlue = new Scalar(185, 255, 255);
     Telemetry telemetry;
 
     int loops = 0;
@@ -103,15 +103,16 @@ public class ColorPipeline extends OpenCvPipeline {
         Point leftLineStop = new Point(largestRectW.x, 0);
         Point rightLineStart = new Point(largestRectW.x + largestRectWidth, input.height());
         Point rightLineStop = new Point(largestRectW.x + largestRectWidth, 0);
-        Imgproc.line(mask, leftLineStart, leftLineStop, new Scalar(255,255,255), 4);
-        Imgproc.line(mask, rightLineStart, rightLineStop, new Scalar(255,255,255), 4);
+        Imgproc.line(mask, leftLineStart, leftLineStop, new Scalar(125,255,255), 4);
+        Imgproc.line(mask, rightLineStart, rightLineStop, new Scalar(125,255,255), 4);
         int frameCenterX = input.width() /2;
-
-        if(centerX < largestRectW.x){
-            location = PieceLocation.LEFT;
-        }
-        else if(centerX > largestRectW.x && centerX < largestRectW.x + largestRectWidth){
-            location = PieceLocation.CENTER;
+        if(largestRectArea < 500){
+            if(centerX < largestRectW.x){
+                location = PieceLocation.LEFT;
+            }
+            else if(centerX > largestRectW.x && centerX < largestRectW.x + largestRectWidth){
+                location = PieceLocation.CENTER;
+            }
         }
         else{
             location = PieceLocation.RIGHT;
@@ -121,6 +122,7 @@ public class ColorPipeline extends OpenCvPipeline {
 
         telemetry.addData("PieceLocation", ColorPipeline.location);
         telemetry.addData("ColorEnum", ColorEnum.color);
+        telemetry.addData("largetRectArea", largestRectArea);
         telemetry.update();
 
         return mask;
@@ -142,7 +144,6 @@ public class ColorPipeline extends OpenCvPipeline {
     }
 
     public int confidence() throws InterruptedException {
-        Thread.sleep(50);
         loops++;
         return loops;
     }

@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Mushu;
@@ -15,7 +16,7 @@ public class MecanumDriveWithSticks extends CommandBase {
     Mushu mushu;
     MecanumDriveSubsystems m_driveSubsystem;
 
-    double forward;
+    double backward;
     double strafe;
     double turn;
     double heading;
@@ -26,16 +27,19 @@ public class MecanumDriveWithSticks extends CommandBase {
         this.mushu = mushu;
         this.telemetry = telemetry;
     }
-
+    public void initialize(){
+        mushu.drivetrainMode(Motor.RunMode.RawPower);
+    }
     @Override
     public void execute(){
 
-        m_driveSubsystem.driveFieldCentric(forward, strafe, turn, heading);
-        forward = -mushu.driverGamepad.getLeftY();
+        m_driveSubsystem.driveFieldCentric(backward, strafe, turn, heading);
+        backward = mushu.driverGamepad.getLeftY();
         strafe = -mushu.driverGamepad.getLeftX();
-        turn = mushu.driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - mushu.driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
-        heading = 0; mushu.getHeading();
-        telemetry.addData("Theta", "disabled", mushu.getHeading());
+        turn = -mushu.driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - -mushu.driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);
+        heading =  mushu.getHeading();
+        telemetry.addData("Theta",  mushu.getHeading());
+        telemetry.addData("battery Voltage", mushu.getBatteryVoltage());
         telemetry.update();
 
     }

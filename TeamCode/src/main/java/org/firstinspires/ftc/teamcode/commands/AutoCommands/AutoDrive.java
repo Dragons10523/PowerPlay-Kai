@@ -44,87 +44,71 @@ public class AutoDrive extends CommandBase {
         mushu.frontLeft.stopAndResetEncoder();
         mushu.backRight.stopAndResetEncoder();
         mushu.backLeft.stopAndResetEncoder();
+        isFinished = false;
+
     }
 
     public void execute(){
+        mushu.frontRight.stopAndResetEncoder();
+        mushu.frontLeft.stopAndResetEncoder();
+        mushu.backRight.stopAndResetEncoder();
+        mushu.backLeft.stopAndResetEncoder();
 
+        isStopRequested.getAsBoolean();
 
+        mushu.drivetrainMode(Motor.RunMode.PositionControl);
 
-        mushu.drivetrainMode(Motor.RunMode.VelocityControl);
-
-
-        PIDFController pidf = new PIDFController(.2,.1,.05,17);
-
-        double kP = pidf.getP();
-        double kI = pidf.getI();
-        double kD = pidf.getD();
-        double kF = pidf.getF();
-
-        pidf.setPIDF(kP,kI,kD,kF);
-
-
-//        mushu.frontLeft.setPositionTolerance(5 * TICKS_PER_INCH);
-//        mushu.frontRight.setPositionTolerance(5 * TICKS_PER_INCH);
-//        mushu.backLeft.setPositionTolerance(5 * TICKS_PER_INCH);
-//        mushu.backRight.setPositionTolerance(5 * TICKS_PER_INCH);
-//
-//        double strafe;
-//        double drive;
-//
-//        strafe = Math.cos(theta) - Math.sin(theta);
-//        drive = Math.sin(theta) + Math.cos(theta);
-//        double[] speeds = {
-//                (drive + strafe),
-//                (drive - strafe),
-//                (drive - strafe),
-//                (drive + strafe)};
+        mushu.frontLeft.setPositionCoefficient(.01);
+        mushu.frontRight.setPositionCoefficient(.01);
+        mushu.backLeft.setPositionCoefficient(.01);
+        mushu.backRight.setPositionCoefficient(.01);
 
         targetDistance = (int) (targetDistance * (TICKS_PER_INCH));
 
-        double output = pidf.calculate( mushu.frontLeft.getCurrentPosition(), targetDistance);
 
-        pidf.setSetPoint(output);
-
-       // setTargetPosition(targetDistance, targetDistance, targetDistance, targetDistance); // might MIGHT be able to multiply by speeds 0-3
-
-        if(targetDistance < 0){
-            power *= -1;
-        }
-
-        while(!pidf.atSetPoint() && !isStopRequested.getAsBoolean()){
-            double outputFLM = pidf.calculate(
-                    mushu.frontLeft.getCurrentPosition()
-            );
-            double outputFRM = pidf.calculate(
-                    mushu.frontRight.getCurrentPosition()
-            );
-            double outputBLM = pidf.calculate(
-                    mushu.backLeft.getCurrentPosition()
-            );
-            double outputBRM = pidf.calculate(
-                    mushu.backRight.getCurrentPosition()
-            );
+        setTargetPosition(targetDistance, targetDistance, targetDistance, targetDistance); // might MIGHT be able to multiply by speeds 0-3
 
 
-            setMotorPower(outputFRM, outputFLM, outputBRM, outputBLM);
+        mushu.frontLeft.setPositionTolerance(.5 * TICKS_PER_INCH);
+        mushu.frontRight.setPositionTolerance(.5 * TICKS_PER_INCH);
+        mushu.backLeft.setPositionTolerance(.5 * TICKS_PER_INCH);
+        mushu.backRight.setPositionTolerance(.5 * TICKS_PER_INCH);
+
+        do{
+
+
+            setMotorPower(power, power, power, power);
             
             telemetry.addData("targetDistance", targetDistance);
             telemetry.addData("FLM", mushu.frontLeft.getCurrentPosition());
             telemetry.addData("FRM", mushu.frontRight.getCurrentPosition());
             telemetry.addData("BLM", mushu.backLeft.getCurrentPosition());
             telemetry.addData("BRM", mushu.backRight.getCurrentPosition());
-            telemetry.addData("output", outputFLM);
+            telemetry.addData("power", mushu.frontLeft.get());
+            //telemetry.addData()
 
             telemetry.update();
         }
+        while(!mushu.frontLeft.atTargetPosition() && !mushu.frontRight.atTargetPosition() && !isStopRequested.getAsBoolean());
         mushu.mecanum.stop();
 
-        isFinished = true;
+        this.cancel();
 
+        isFinished = true;
     }
     @Override
     public void end(boolean interrupted){
         mushu.mecanum.stop();
+        mushu.frontRight.stopAndResetEncoder();
+        mushu.frontLeft.stopAndResetEncoder();
+        mushu.backRight.stopAndResetEncoder();
+        mushu.backLeft.stopAndResetEncoder();
+
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
     }
     @Override
@@ -132,17 +116,31 @@ public class AutoDrive extends CommandBase {
         return isStopRequested.getAsBoolean() || isAtTarget();
     }
     public boolean isAtTarget(){
-        return mushu.frontLeft.atTargetPosition() || mushu.frontRight.atTargetPosition() || mushu.backRight.atTargetPosition() || mushu.backLeft.atTargetPosition();
+        return isFinished;
     }
     void setMotorPower(double FRM, double FLM, double BRM, double BLM){
-        mushu.frontRight.set(FRM);
-        mushu.frontLeft.set(FLM);
-        mushu.backRight.set(BRM);
-        mushu.backLeft.set(BLM);
+        double powerReduce = (targetDistance - (double) mushu.frontLeft.getCurrentPosition()) / (8 * TICKS_PER_INCH);
+
+        telemetry.addData("powerReduce", powerReduce);
+        telemetry.addData("power", constrainPower((FLM * powerReduce)));
+
+        mushu.frontRight.set(constrainPower((FRM * powerReduce)));
+        mushu.frontLeft.set(constrainPower((FLM * powerReduce)));
+        mushu.backRight.set(constrainPower((BRM * powerReduce)));
+        mushu.backLeft.set(constrainPower((BLM * powerReduce)));
     }
     double encoderTicksToInches(double ticks) {
         return WHEEL_RADIUS * 2 * Math.PI *  ticks / 560;
 
+    }
+    void setTargetPosition(int FLM, int FRM, int BLM, int BRM){
+        mushu.frontLeft.setTargetPosition(FLM);
+        mushu.frontRight.setTargetPosition(FRM);
+        mushu.backLeft.setTargetPosition(BLM);
+        mushu.backRight.setTargetPosition(BRM);
+    }
+    double constrainPower(double input){
+        return Math.max(Math.min(input, .75)  ,.2);
     }
 
 

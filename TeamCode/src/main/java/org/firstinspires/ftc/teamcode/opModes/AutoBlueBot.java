@@ -47,6 +47,10 @@ public class AutoBlueBot extends CommandOpMode {
         InExtakeSub m_ExtakeSub = new InExtakeSub(mushu);
 
 
+        mushu.frontRight.setInverted(true);
+        mushu.backRight.setInverted(true);
+
+
 
 
 
@@ -54,9 +58,12 @@ public class AutoBlueBot extends CommandOpMode {
 
         schedule(new SequentialCommandGroup(new ContoursPipelineTest(mushu, camera, telemetry, color),
                                             new WiggleClawDown(mushu, m_DriveSubsystem, telemetry),
+                                            new AutoTurn(0, m_DriveSubsystem,mushu, telemetry),
                                             new AutoDrive(.5, 20, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
-                                            new TurnToGameElement(mushu, command, m_DriveSubsystem),
-                                            new UnloadPixel(mushu, m_ExtakeSub)).interruptOn(this::isStopRequested)
+                                            new TurnToGameElement(mushu, command, m_DriveSubsystem, telemetry).interruptOn(AutoTurn::atTarget),
+                                            new UnloadPixel(mushu, m_ExtakeSub),
+                                            new AutoDrive(.5, -10, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested))
+
                                             );
 
 

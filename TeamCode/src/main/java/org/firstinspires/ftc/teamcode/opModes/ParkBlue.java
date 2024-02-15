@@ -28,7 +28,7 @@ public class ParkBlue extends CommandOpMode {
         InExtakeSub m_ExtakeSub = new InExtakeSub(mushu);
 
         schedule(new SequentialCommandGroup(
-                 new AutoTurn(-90, m_DriveSubsystem, mushu),
+                 new AutoTurn(-90, m_DriveSubsystem, mushu, telemetry),
                  new AutoDrive(.5,24,0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested))
                 .interruptOn(this::isStopRequested));
     }

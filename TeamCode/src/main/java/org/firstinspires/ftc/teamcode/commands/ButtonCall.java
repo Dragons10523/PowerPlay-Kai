@@ -23,7 +23,7 @@ public class ButtonCall extends CommandBase {
     Button Left_Bumper;
     Button Right_Bumper;
     Button BACK;
-    Button X;
+    Button X, Y_Driver;
     Button B;
 
     InExtakeSub m_InExtakeSub;
@@ -66,9 +66,14 @@ public class ButtonCall extends CommandBase {
         B = new GamepadButton(
                 mushu.toolGamepad, GamepadKeys.Button.B
         );
+        Y_Driver = new GamepadButton(
+                mushu.driverGamepad, GamepadKeys.Button.Y
+        );
 
-        mushu.hangMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        mushu.intakeMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+//        mushu.hangMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
+//        mushu.intakeMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE); disabled for power issues
+
+
 
         Dpad_UP_Tool.whenPressed(new FlipServo(m_InExtakeSub));
         Dpad_DOWN_Tool.whenPressed(new RetractServo(m_InExtakeSub));

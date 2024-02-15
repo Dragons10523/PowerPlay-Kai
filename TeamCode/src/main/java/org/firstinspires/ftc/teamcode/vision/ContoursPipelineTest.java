@@ -50,13 +50,7 @@ public class ContoursPipelineTest extends CommandBase {
     }
     @Override
     public boolean isFinished(){
-        ColorPipeline colorPipeline = new ColorPipeline();
-
-        try {
-            return colorPipeline.confidence() > 40;
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        return true;
     }
 
 

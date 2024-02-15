@@ -43,8 +43,6 @@ public class AutoRedBot extends CommandOpMode {
         aprilTagsSub = new AprilTags(mushu, aprilTagPipeline);
         MecanumDriveSubsystems m_DriveSubsystem = new MecanumDriveSubsystems(mushu);
         InExtakeSub m_ExtakeSub = new InExtakeSub(mushu);
-        mushu.backRight.setInverted(true);
-        mushu.frontRight.setInverted(true);
 
         //schedule(new AprilTagCommand(mushu, telemetry, this::isStopRequested, aprilTagsSub));
 
@@ -55,7 +53,11 @@ public class AutoRedBot extends CommandOpMode {
 //                new TurnToGameElement(mushu, command, m_DriveSubsystem),
 //                new UnloadPixel(mushu, m_ExtakeSub)).interruptOn(this::isStopRequested)
 //        );
-        schedule(new AutoDrive(.4,10,0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested).interruptOn(this::isStopRequested));
+
+        mushu.frontRight.setInverted(true);
+        mushu.backRight.setInverted(true);
+
+        schedule( new AutoTurn(90,m_DriveSubsystem,mushu, telemetry).interruptOn(this::isStopRequested));
     }
 
 }

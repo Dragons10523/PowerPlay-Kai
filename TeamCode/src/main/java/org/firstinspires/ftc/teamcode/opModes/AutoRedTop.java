@@ -44,6 +44,10 @@ public class AutoRedTop extends CommandOpMode {
 
         MecanumDriveSubsystems m_DriveSubsystem = new MecanumDriveSubsystems(mushu);
         InExtakeSub m_ExtakeSub = new InExtakeSub(mushu);
+        mushu.frontRight.setInverted(true);
+        mushu.frontLeft.setInverted(true);
+        mushu.backLeft.setInverted(true);
+        mushu.backRight.setInverted(true);
 
 
         //schedule(new AprilTagCommand(mushu, telemetry, this::isStopRequested, aprilTagsSub));
@@ -51,7 +55,7 @@ public class AutoRedTop extends CommandOpMode {
         schedule(new SequentialCommandGroup(new ContoursPipelineTest(mushu, camera, telemetry, color),
                 new WiggleClawDown(mushu, m_DriveSubsystem, telemetry),
                 new AutoDrive(.5, 20, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
-                new TurnToGameElement(mushu, command, m_DriveSubsystem),
+                new TurnToGameElement(mushu, command, m_DriveSubsystem, telemetry),
                 new UnloadPixel(mushu, m_ExtakeSub)).interruptOn(this::isStopRequested)
         );
     }
