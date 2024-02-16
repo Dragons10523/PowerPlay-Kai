@@ -39,25 +39,29 @@ public class AutoRedBot extends CommandOpMode {
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
 
         ColorEnum color = new ColorEnum(ColorEnum.Color.RED_DOWN);
+
         mushu = Mushu.GetInstance(this);
         aprilTagsSub = new AprilTags(mushu, aprilTagPipeline);
         MecanumDriveSubsystems m_DriveSubsystem = new MecanumDriveSubsystems(mushu);
         InExtakeSub m_ExtakeSub = new InExtakeSub(mushu);
 
-        //schedule(new AprilTagCommand(mushu, telemetry, this::isStopRequested, aprilTagsSub));
-
-//        schedule(new SequentialCommandGroup(
-//                new ContoursPipelineTest(mushu, camera, telemetry, color),
-//                new WiggleClawDown(mushu, m_DriveSubsystem),
-//                new AutoDrive(.5, 20, 0, m_DriveSubsystem, mushu),
-//                new TurnToGameElement(mushu, command, m_DriveSubsystem),
-//                new UnloadPixel(mushu, m_ExtakeSub)).interruptOn(this::isStopRequested)
-//        );
 
         mushu.frontRight.setInverted(true);
         mushu.backRight.setInverted(true);
 
-        schedule( new AutoTurn(90,m_DriveSubsystem,mushu, telemetry).interruptOn(this::isStopRequested));
+
+        //schedule(new AprilTagCommand(mushu, telemetry, this::isStopRequested, aprilTagsSub));
+
+        schedule(new SequentialCommandGroup(new ContoursPipelineTest(mushu, camera, telemetry, color),
+                //new WiggleClawDown(mushu, m_DriveSubsystem, telemetry),
+                new AutoTurn(0, m_DriveSubsystem,mushu, telemetry),
+                new AutoDrive(.5, 18, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
+                new TurnToGameElement(mushu, command, m_DriveSubsystem, telemetry).interruptOn(AutoTurn::atTarget),
+                new AutoDrive(.5, 6, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
+                new AutoDrive(.5, -6, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
+                new UnloadPixel(mushu, m_ExtakeSub)));
+
+
     }
 
 }

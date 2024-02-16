@@ -21,21 +21,19 @@ public class WiggleClawDown extends CommandBase {
     }
     public void execute(){
         sub.manualDrive(1,-1,1,-1);
-        mushu.intakeArm.set(1);
 
         try {
-            Thread.sleep(300);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         sub.manualDrive(-1,1,-1,1);
-        mushu.intakeArm.set(-1);
+
         try {
-            Thread.sleep(300);
+            Thread.sleep(200);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        mushu.intakeArm.set(0);
         sub.manualDrive(0,0,0,0);
 
         this.cancel();

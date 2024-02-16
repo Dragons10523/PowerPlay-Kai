@@ -4,7 +4,6 @@ import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Mushu;
-import org.firstinspires.ftc.teamcode.commands.AutoCommands.AutoDrive;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
@@ -14,7 +13,7 @@ public class ColorCommand extends CommandBase {
     Mushu mushu;
 
     BooleanSupplier isStopRequested;
-    ColorPipeline colorPipeline;
+    ColorPipelineBlue colorPipeline;
     boolean isOpened;
     Telemetry telemetry;
     OpenCvCamera camera;
@@ -26,7 +25,7 @@ public class ColorCommand extends CommandBase {
     }
     public void initialize(){
 
-        colorPipeline = new ColorPipeline(telemetry);
+        colorPipeline = new ColorPipelineBlue(telemetry);
         camera.setPipeline(colorPipeline);
         telemetry.addData("isCameraOpened", isOpened);
 
@@ -50,7 +49,7 @@ public class ColorCommand extends CommandBase {
     }
 
     public void execute(){
-        ColorPipeline.PieceLocation location = colorPipeline.getLocation();
+        ColorPipelineBlue.PieceLocation location = colorPipeline.getLocation();
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -58,15 +57,15 @@ public class ColorCommand extends CommandBase {
         }
 
         telemetry.update();
-        if(location == ColorPipeline.PieceLocation.LEFT){
+        if(location == ColorPipelineBlue.PieceLocation.LEFT){
             mushu.mecanum.driveWithMotorPowers(.5,.5,.5,.5);
             telemetry.update();
         }
-        if(location == ColorPipeline.PieceLocation.CENTER){
+        if(location == ColorPipelineBlue.PieceLocation.CENTER){
             mushu.mecanum.driveWithMotorPowers(-.5,-.5, -.5, -.5);
             telemetry.update();
         }
-        if(location == ColorPipeline.PieceLocation.RIGHT){
+        if(location == ColorPipelineBlue.PieceLocation.RIGHT){
             mushu.mecanum.driveWithMotorPowers(-.5, .5, -.5, .5);
             telemetry.update();
         }

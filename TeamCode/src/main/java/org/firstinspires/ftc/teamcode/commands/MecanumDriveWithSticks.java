@@ -33,7 +33,7 @@ public class MecanumDriveWithSticks extends CommandBase {
     @Override
     public void execute(){
 
-        m_driveSubsystem.driveFieldCentric(backward, strafe, turn, heading);
+        m_driveSubsystem.driveFieldCentric(backward, strafe, turn, -heading);
         backward = mushu.driverGamepad.getLeftY();
         strafe = -mushu.driverGamepad.getLeftX();
         turn = -mushu.driverGamepad.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) - -mushu.driverGamepad.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER);

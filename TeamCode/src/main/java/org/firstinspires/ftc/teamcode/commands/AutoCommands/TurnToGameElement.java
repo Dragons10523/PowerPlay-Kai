@@ -6,16 +6,14 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveSubsystems;
-import org.firstinspires.ftc.teamcode.vision.ColorPipeline;
+import org.firstinspires.ftc.teamcode.vision.ColorPipelineBlue;
 import org.firstinspires.ftc.teamcode.vision.ContoursPipelineTest;
-
-import java.util.function.BooleanSupplier;
 
 public class TurnToGameElement extends CommandBase
 {
     Mushu mushu;
     //ColorPipeline colorPipeline;
-    ColorPipeline.PieceLocation location;
+    ColorPipelineBlue.PieceLocation location;
     CommandScheduler command;
     MecanumDriveSubsystems sub;
     Telemetry telemetry;
@@ -31,11 +29,11 @@ public class TurnToGameElement extends CommandBase
 
         location = ContoursPipelineTest.locationAtBeginning;
 
-        if(location == ColorPipeline.PieceLocation.LEFT){
+        if(location == ColorPipelineBlue.PieceLocation.LEFT){
             command.schedule(new AutoTurn(90, sub, mushu, telemetry));
 
         }
-        if(location == ColorPipeline.PieceLocation.RIGHT){
+        if(location == ColorPipelineBlue.PieceLocation.RIGHT){
             command.schedule(new AutoTurn(270, sub, mushu, telemetry));
         }
 

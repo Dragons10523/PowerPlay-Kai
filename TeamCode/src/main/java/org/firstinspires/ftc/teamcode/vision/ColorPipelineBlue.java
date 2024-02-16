@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode.vision;
 
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.ColorEnum;
 import org.opencv.core.Core;
@@ -15,15 +11,11 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-import java.sql.Time;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 
-public class ColorPipeline extends OpenCvPipeline {
+public class ColorPipelineBlue extends OpenCvPipeline {
 
     //HSV_FULL colorspace
     Scalar lowerRed = new Scalar(0, 0, 0);
@@ -36,10 +28,10 @@ public class ColorPipeline extends OpenCvPipeline {
     int loops = 0;
 
     double spikeBoundaries;
-    public ColorPipeline(Telemetry telemetry){
+    public ColorPipelineBlue(Telemetry telemetry){
         this.telemetry = telemetry;
     }
-    public ColorPipeline(){}
+    public ColorPipelineBlue(){}
 
     public static PieceLocation location = null;
 
@@ -56,9 +48,8 @@ public class ColorPipeline extends OpenCvPipeline {
         Mat hsv = new Mat();
         Imgproc.cvtColor(input, hsv, Imgproc.COLOR_RGB2HSV_FULL);
 
-        Mat mask = getMask(hsv);
-       // Mat mask = new Mat();
-        //Core.inRange(hsv, lowerBlue, upperBlue, mask);
+        Mat mask = new Mat();
+        Core.inRange(hsv, lowerBlue, upperBlue, mask);
 
         hsv.release();
 
@@ -106,7 +97,8 @@ public class ColorPipeline extends OpenCvPipeline {
         Imgproc.line(mask, leftLineStart, leftLineStop, new Scalar(125,255,255), 4);
         Imgproc.line(mask, rightLineStart, rightLineStop, new Scalar(125,255,255), 4);
         int frameCenterX = input.width() /2;
-        if(largestRectArea < 500){
+        if(largestRectArea > 40000){
+
             if(centerX < largestRectW.x){
                 location = PieceLocation.LEFT;
             }
@@ -120,7 +112,7 @@ public class ColorPipeline extends OpenCvPipeline {
 
 
 
-        telemetry.addData("PieceLocation", ColorPipeline.location);
+        telemetry.addData("PieceLocation", ColorPipelineBlue.location);
         telemetry.addData("ColorEnum", ColorEnum.color);
         telemetry.addData("largetRectArea", largestRectArea);
         telemetry.update();

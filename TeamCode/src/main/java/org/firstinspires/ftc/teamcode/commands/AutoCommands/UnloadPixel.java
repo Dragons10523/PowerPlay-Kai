@@ -19,14 +19,21 @@ public class UnloadPixel extends CommandBase {
     }
 
     public void execute(){
-        sub.runIN(.75);
+        sub.flipGate();
+        sub.runIN(-1);
+       /* try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        sub.runIN(1);*/
         this.cancel();
 
 
     }
     public void end(boolean interrupted){
         try {
-            Thread.sleep(1500);
+            Thread.sleep(3500);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

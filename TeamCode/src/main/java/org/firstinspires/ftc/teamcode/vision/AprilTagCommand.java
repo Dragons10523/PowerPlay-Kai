@@ -27,8 +27,8 @@ public class AprilTagCommand extends CommandBase {
     final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
     final int THRESHOLD_NUM_FRAMES_NO_DETECTIONS_BEFORE_LOW_DECIMATION = 4;
     AprilTagPipeline aprilTagDetectionPipeline;
-    ColorPipeline colorPipeline;
-    ColorPipeline.PieceLocation initialLocation;
+    ColorPipelineBlue colorPipeline;
+    ColorPipelineBlue.PieceLocation initialLocation;
     static final double FEET_PER_METER = 3.28084;
     public AprilTagCommand(Mushu mushu, Telemetry telemetry, BooleanSupplier isStopRequested, AprilTags april_sub, OpenCvCamera camera) {
         this.mushu = mushu;
@@ -43,7 +43,7 @@ public class AprilTagCommand extends CommandBase {
     @Override
     public void initialize() {
         aprilTagDetectionPipeline = new AprilTagPipeline(0.166, 0, 0, 0, 0);
-        colorPipeline = new ColorPipeline(telemetry);
+        colorPipeline = new ColorPipelineBlue(telemetry);
 
 
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {

@@ -39,27 +39,29 @@ public class AutoBlueTop extends CommandOpMode {
         camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam"), cameraMonitorViewId);
 
         ColorEnum color = new ColorEnum(ColorEnum.Color.BLUE_UP);
+
         mushu = Mushu.GetInstance(this);
         aprilTagsSub = new AprilTags(mushu, aprilTagPipeline);
         MecanumDriveSubsystems m_DriveSubsystem = new MecanumDriveSubsystems(mushu);
         InExtakeSub m_ExtakeSub = new InExtakeSub(mushu);
+
+
         mushu.frontRight.setInverted(true);
-        mushu.frontLeft.setInverted(true);
-        mushu.backLeft.setInverted(true);
         mushu.backRight.setInverted(true);
-
-
 
 
         //schedule(new AprilTagCommand(mushu, telemetry, this::isStopRequested, aprilTagsSub));
 
-        schedule(new SequentialCommandGroup(
-                new ContoursPipelineTest(mushu, camera, telemetry, color),
-                new WiggleClawDown(mushu, m_DriveSubsystem, telemetry),
-                new AutoDrive(.5, 20, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
-                new TurnToGameElement(mushu, command, m_DriveSubsystem, telemetry),
-                new UnloadPixel(mushu, m_ExtakeSub)).interruptOn(this::isStopRequested)
-        );
+        schedule(new SequentialCommandGroup(new ContoursPipelineTest(mushu, camera, telemetry, color),
+                //new WiggleClawDown(mushu, m_DriveSubsystem, telemetry),
+                new AutoTurn(0, m_DriveSubsystem,mushu, telemetry),
+                new AutoDrive(.5, 18, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
+                new TurnToGameElement(mushu, command, m_DriveSubsystem, telemetry).interruptOn(AutoTurn::atTarget),
+                new AutoDrive(.5, 6, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
+                new AutoDrive(.5, -6, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
+                new UnloadPixel(mushu, m_ExtakeSub)));
+
+
     }
     
 }

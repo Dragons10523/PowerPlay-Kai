@@ -1,13 +1,11 @@
 package org.firstinspires.ftc.teamcode.commands.AutoCommands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import com.arcrobotics.ftclib.controller.PIDFController;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Mushu;
 import org.firstinspires.ftc.teamcode.Subsystems.MecanumDriveSubsystems;
-import org.firstinspires.ftc.teamcode.vision.ColorPipeline;
 
 import java.util.function.BooleanSupplier;
 
@@ -140,7 +138,7 @@ public class AutoDrive extends CommandBase {
         mushu.backRight.setTargetPosition(BRM);
     }
     double constrainPower(double input){
-        return Math.max(Math.min(input, .75)  ,.2);
+        return Math.max(Math.min(input, .75)  ,.25);
     }
 
 

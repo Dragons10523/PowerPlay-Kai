@@ -16,11 +16,9 @@ import org.firstinspires.ftc.teamcode.commands.AutoCommands.AutoTurn;
 import org.firstinspires.ftc.teamcode.commands.AutoCommands.TurnToGameElement;
 import org.firstinspires.ftc.teamcode.commands.AutoCommands.UnloadPixel;
 
-import org.firstinspires.ftc.teamcode.commands.AutoCommands.WiggleClawDown;
 import org.firstinspires.ftc.teamcode.vision.AprilTagPipeline;
 import org.firstinspires.ftc.teamcode.vision.AprilTags;
 
-import org.firstinspires.ftc.teamcode.vision.ColorPipeline;
 import org.firstinspires.ftc.teamcode.vision.ContoursPipelineTest;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
@@ -51,20 +49,16 @@ public class AutoBlueBot extends CommandOpMode {
         mushu.backRight.setInverted(true);
 
 
-
-
-
         //schedule(new AprilTagCommand(mushu, telemetry, this::isStopRequested, aprilTagsSub));
 
         schedule(new SequentialCommandGroup(new ContoursPipelineTest(mushu, camera, telemetry, color),
-                                            new WiggleClawDown(mushu, m_DriveSubsystem, telemetry),
+                                            //new WiggleClawDown(mushu, m_DriveSubsystem, telemetry),
                                             new AutoTurn(0, m_DriveSubsystem,mushu, telemetry),
-                                            new AutoDrive(.5, 20, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
+                                            new AutoDrive(.5, 18, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
                                             new TurnToGameElement(mushu, command, m_DriveSubsystem, telemetry).interruptOn(AutoTurn::atTarget),
-                                            new UnloadPixel(mushu, m_ExtakeSub),
-                                            new AutoDrive(.5, -10, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested))
-
-                                            );
+                                            new AutoDrive(.5, 6, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
+                                            new AutoDrive(.5, -6, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
+                                            new UnloadPixel(mushu, m_ExtakeSub)));
 
 
     }

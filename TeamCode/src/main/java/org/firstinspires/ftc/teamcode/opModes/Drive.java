@@ -32,6 +32,9 @@ public class Drive extends CommandOpMode {
         //get instance makes sure there is only ever ONE object of mushu around
         mushu = Mushu.GetInstance(this);
 
+        /*mushu.frontRight.setInverted(true);
+        mushu.backRight.setInverted(true);*/
+
         m_driveSub = new MecanumDriveSubsystems(mushu);
         m_toolSub = new ToolSubsystem(mushu.toolGamepad, mushu);
         m_inExtake = new InExtakeSub(mushu);

@@ -12,7 +12,7 @@ public class ContoursPipelineTest extends CommandBase {
     Mushu mushu;
     OpenCvCamera camera;
     Telemetry telemetry;
-    public static ColorPipeline.PieceLocation  locationAtBeginning;
+    public static ColorPipelineBlue.PieceLocation  locationAtBeginning;
     ColorEnum color;
 
     public ContoursPipelineTest(Mushu mushu, OpenCvCamera camera, Telemetry telemetry, ColorEnum color){
@@ -23,7 +23,13 @@ public class ContoursPipelineTest extends CommandBase {
     }
     @Override
     public void initialize(){
-        camera.setPipeline(new ColorPipeline(telemetry));
+        if(ColorEnum.color == ColorEnum.Color.RED_UP || ColorEnum.color == ColorEnum.Color.RED_DOWN){
+            camera.setPipeline(new ColorPipelineRed(telemetry));
+        }
+        else{
+            camera.setPipeline(new ColorPipelineBlue(telemetry));
+        }
+
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
@@ -42,7 +48,7 @@ public class ContoursPipelineTest extends CommandBase {
     }
     @Override
     public void end(boolean interrupted) {
-        locationAtBeginning = ColorPipeline.location;
+        locationAtBeginning = ColorPipelineBlue.location;
 
         camera.stopStreaming();
         camera.closeCameraDevice();
