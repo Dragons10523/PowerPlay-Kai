@@ -55,12 +55,19 @@ public class AutoRedTop extends CommandOpMode {
         schedule(new SequentialCommandGroup(new ContoursPipelineTest(mushu, camera, telemetry, color),
                 //new WiggleClawDown(mushu, m_DriveSubsystem, telemetry),
                 new AutoTurn(0, m_DriveSubsystem,mushu, telemetry),
-                new AutoDrive(.5, 18, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
-                new TurnToGameElement(mushu, command, m_DriveSubsystem, telemetry).interruptOn(AutoTurn::atTarget),
-                new AutoDrive(.5, 6, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
-                new AutoDrive(.5, -6, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
-                new UnloadPixel(mushu, m_ExtakeSub)));
+                new AutoDrive(.5,  35,0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
+                new AutoTurn(0, m_DriveSubsystem,mushu, telemetry),
+                new AutoDrive(.5,  -8,0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
+                new TurnToGameElement(mushu, command, m_DriveSubsystem, telemetry, this::isStopRequested).interruptOn(AutoDrive::isAtTarget),
+//                new AutoTurn(0, m_DriveSubsystem,mushu, telemetry),
 
+//                new AutoDrive(.25, 6, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
+//                new AutoDrive(.25, -4, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
+                new UnloadPixel(mushu, m_ExtakeSub),
+                new AutoDrive(.25, 4, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested),
+                new AutoDrive(.25, -10, 0, m_DriveSubsystem, mushu, telemetry, this::isStopRequested)
+
+        ));
 
     }
 

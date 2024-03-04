@@ -19,7 +19,7 @@ public class ColorPipelineRed extends OpenCvPipeline {
 
     //HSV_FULL colorspace
     Scalar lowerRed = new Scalar(0, 10, 10);
-    Scalar upperRed = new Scalar(15, 255, 255);
+    Scalar upperRed = new Scalar(20, 255, 255);
 
     Scalar lowerBlue = new Scalar(135, 75, 80);
     Scalar upperBlue = new Scalar(185, 255, 255);
@@ -35,8 +35,6 @@ public class ColorPipelineRed extends OpenCvPipeline {
 
     public ColorPipelineRed() {
     }
-
-    public static PieceLocation location = null;
 
     public enum PieceLocation {
         LEFT,
@@ -67,8 +65,10 @@ public class ColorPipelineRed extends OpenCvPipeline {
 
         double largestRectArea = 0;
         double largestRectWidth = 0;
+        double largestRectHeight = 0;
         Rect largestRectA = null;
         Rect largestRectW = null;
+        Rect largestRectH = null;
 
         for (MatOfPoint contour : contours) {
             Rect rect = Imgproc.boundingRect(contour);
@@ -82,6 +82,10 @@ public class ColorPipelineRed extends OpenCvPipeline {
                 largestRectW = rect;
                 largestRectWidth = rect.width;
 
+            }
+            if(rect.height > largestRectHeight){
+                largestRectH = rect;
+                largestRectHeight = rect.height;
             }
             Imgproc.drawContours(input, contours, -1, new Scalar(30, 127, 255));
         }
@@ -101,28 +105,29 @@ public class ColorPipelineRed extends OpenCvPipeline {
         Imgproc.line(mask, leftLineStart, leftLineStop, new Scalar(125, 255, 255), 4);
         Imgproc.line(mask, rightLineStart, rightLineStop, new Scalar(125, 255, 255), 4);
         int frameCenterX = input.width() / 2;
-        if (largestRectArea > 40000) {
+        if (largestRectArea > 50000) {
 
             if (centerX < largestRectW.x) {
-                location = PieceLocation.LEFT;
+                ColorPipelineBlue.location = ColorPipelineBlue.PieceLocation.LEFT;
             } else if (centerX > largestRectW.x && centerX < largestRectW.x + largestRectWidth) {
-                location = PieceLocation.CENTER;
+                ColorPipelineBlue.location = ColorPipelineBlue.PieceLocation.CENTER;
+            } else if ( centerX > largestRectW.x + largestRectWidth){
+                ColorPipelineBlue.location = ColorPipelineBlue.PieceLocation.RIGHT;
             }
-        } else {
-            location = PieceLocation.RIGHT;
+        }
+        else {
+            ColorPipelineBlue.location = ColorPipelineBlue.PieceLocation.RIGHT;
         }
 
 
         telemetry.addData("PieceLocation", ColorPipelineBlue.location);
         telemetry.addData("ColorEnum", ColorEnum.color);
         telemetry.addData("largetRectArea", largestRectArea);
+        telemetry.addData("center of Gamepiece", centerX);
+        telemetry.addData("largetRectW", largestRectW.x);
         telemetry.update();
 
         return mask;
-    }
-
-    public PieceLocation getLocation() {
-        return location;
     }
 
     public Mat getMask(Mat input) {

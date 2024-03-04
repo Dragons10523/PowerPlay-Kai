@@ -20,7 +20,7 @@ public class UnloadPixel extends CommandBase {
 
     public void execute(){
         sub.flipGate();
-        sub.runIN(-1);
+        sub.runEX(.75);
        /* try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
@@ -33,11 +33,11 @@ public class UnloadPixel extends CommandBase {
     }
     public void end(boolean interrupted){
         try {
-            Thread.sleep(3500);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        sub.runIN(0);
+        sub.runEX(0);
 
     }
 

@@ -12,7 +12,7 @@ import java.util.function.BooleanSupplier;
 public class AutoDrive extends CommandBase {
     Mushu mushu;
 
-    Boolean isFinished = false;
+    static Boolean isFinished = false;
     BooleanSupplier isStopRequested;
     public static final int WHEEL_RADIUS = 2;
     public static final int CPR_OUTPUT_SHAFT_20TO1 = 560;
@@ -56,10 +56,10 @@ public class AutoDrive extends CommandBase {
 
         mushu.drivetrainMode(Motor.RunMode.PositionControl);
 
-        mushu.frontLeft.setPositionCoefficient(.01);
-        mushu.frontRight.setPositionCoefficient(.01);
-        mushu.backLeft.setPositionCoefficient(.01);
-        mushu.backRight.setPositionCoefficient(.01);
+        mushu.frontLeft.setPositionCoefficient(.1);
+        mushu.frontRight.setPositionCoefficient(.1);
+        mushu.backLeft.setPositionCoefficient(.1);
+        mushu.backRight.setPositionCoefficient(.1);
 
         targetDistance = (int) (targetDistance * (TICKS_PER_INCH));
 
@@ -113,7 +113,7 @@ public class AutoDrive extends CommandBase {
     public boolean isFinished(){
         return isStopRequested.getAsBoolean() || isAtTarget();
     }
-    public boolean isAtTarget(){
+    public static boolean isAtTarget(){
         return isFinished;
     }
     void setMotorPower(double FRM, double FLM, double BRM, double BLM){
@@ -122,10 +122,10 @@ public class AutoDrive extends CommandBase {
         telemetry.addData("powerReduce", powerReduce);
         telemetry.addData("power", constrainPower((FLM * powerReduce)));
 
-        mushu.frontRight.set(constrainPower((FRM * powerReduce)));
-        mushu.frontLeft.set(constrainPower((FLM * powerReduce)));
-        mushu.backRight.set(constrainPower((BRM * powerReduce)));
-        mushu.backLeft.set(constrainPower((BLM * powerReduce)));
+        mushu.frontRight.set(Math.max((constrainPower((FRM * powerReduce))), 0.15));
+        mushu.frontLeft.set(Math.max((constrainPower((FLM * powerReduce))), 0.15));
+        mushu.backRight.set(Math.max((constrainPower((BRM * powerReduce))), 0.15));
+        mushu.backLeft.set(Math.max((constrainPower((BLM * powerReduce))), 0.15));
     }
     double encoderTicksToInches(double ticks) {
         return WHEEL_RADIUS * 2 * Math.PI *  ticks / 560;
@@ -138,7 +138,7 @@ public class AutoDrive extends CommandBase {
         mushu.backRight.setTargetPosition(BRM);
     }
     double constrainPower(double input){
-        return Math.max(Math.min(input, .75)  ,.25);
+        return Math.max(Math.min(input, .5)  ,.2);
     }
 
 
