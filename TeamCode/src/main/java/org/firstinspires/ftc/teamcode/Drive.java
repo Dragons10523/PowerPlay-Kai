@@ -26,6 +26,11 @@ public class Drive extends OpMode {
         double leftTargetPower = -gamepad1.left_stick_y;
         double rightTargetPower = -gamepad1.right_stick_y;
 
+        if(gamepad1.a){
+            warbotron.spatula.setPosition(1);
+            warbotron.spatula.setPosition(-1);
+        }
+
         if(gamepad1.right_bumper) {
             leftPower += (leftTargetPower - leftPower) * deltaTime.seconds() / SNEAK_ACCEL;
             rightPower += (rightTargetPower - rightPower) * deltaTime.seconds() / SNEAK_ACCEL;
@@ -34,6 +39,7 @@ public class Drive extends OpMode {
             rightPower = rightTargetPower;
         }
 
+
         deltaTime.reset();
 
         warbotron.frontLeft.setPower(leftPower);
@@ -41,8 +47,7 @@ public class Drive extends OpMode {
         warbotron.backLeft.setPower(leftPower);
         warbotron.backRight.setPower(rightPower);
 
-        warbotron.hammer1.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
-        warbotron.hammer2.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
+        warbotron.flyWheel.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
 
         telemetry.addData("Left", leftPower);
         telemetry.addData("Right", rightPower);

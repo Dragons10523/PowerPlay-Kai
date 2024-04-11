@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.rev.RevSPARKMini;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class Warbotron {
     public DcMotor frontLeft;
@@ -11,6 +14,8 @@ public class Warbotron {
     public DcMotor backRight;
     public DcMotor hammer1;
     public DcMotor hammer2;
+    public CRServo flyWheel;
+    public Servo spatula;
 
     public Warbotron(HardwareMap hwmap){
         frontLeft = hwmap.get(DcMotor.class, "FrontLeft");
@@ -19,6 +24,8 @@ public class Warbotron {
         backRight = hwmap.get(DcMotor.class, "BackRight");
         hammer1 = hwmap.get(DcMotor.class, "Hammer1");
         hammer2 = hwmap.get(DcMotor.class, "Hammer2");
+        flyWheel = hwmap.get(CRServo.class, "flyWheel");
+        spatula = hwmap.get(Servo.class, "spatula");
 
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
