@@ -17,12 +17,13 @@ import java.util.function.BooleanSupplier;
 public class AutoControl extends OpMode{
     public RobotClass robot;
     AprilTagPipeline aprilTagPipeline;
-    boolean stop = false;
+    private static boolean stop = false;
+    public static BooleanSupplier isStopRequested = () -> stop;
     AutoUtils autoUtils;
     @Override
     public void init(){
         robot = new RobotClass(hardwareMap);
-        autoUtils = new AutoUtils(robot);
+        autoUtils = new AutoUtils(robot, telemetry);
         robot.stopAndReset();
         robot.setDirection();
         try {
@@ -30,19 +31,21 @@ public class AutoControl extends OpMode{
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        //aprilTagPipeline = new AprilTagPipeline(robot.webcamName, telemetry);
-        //opticalSensor = new OpticalSensor(drive);
+        aprilTagPipeline = new AprilTagPipeline(robot.webcamName, telemetry);
+
     }
 
     @Override
     public void start(){
-        autoUtils.AutoTurn(30, telemetry);
+
+
+        autoUtils.AutoTurn(30);
         autoUtils.AutoDrive(20,90);
-        autoUtils.AutoTurn(150, telemetry);
+        autoUtils.AutoTurn(150);
         autoUtils.AutoDrive(20,90);
-        autoUtils.AutoTurn(270, telemetry);
+        autoUtils.AutoTurn(270);
         autoUtils.AutoDrive(20,90);
-        autoUtils.AutoTurn(0, telemetry);
+        autoUtils.AutoTurn(0);
 
 
         stop();
@@ -55,8 +58,9 @@ public class AutoControl extends OpMode{
 
     @Override
     public void stop(){
-        boolean stop = true;
+
         if(robot == null) return; // ensures that stop() is not called before initialization
+        stop = true;
         robot.driveMotors.get(RobotClass.MOTORS.FRONT_LEFT).setPower(0.0);
         robot.driveMotors.get(RobotClass.MOTORS.FRONT_RIGHT).setPower(0.0);
         robot.driveMotors.get(RobotClass.MOTORS.BACK_LEFT).setPower(0.0);
