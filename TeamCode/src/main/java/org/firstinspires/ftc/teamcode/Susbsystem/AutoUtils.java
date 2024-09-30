@@ -7,12 +7,16 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.AutoControl;
+import org.firstinspires.ftc.teamcode.Camera.AprilTagPipeline;
+import org.firstinspires.ftc.teamcode.OpModes.AutoControl;
 import org.firstinspires.ftc.teamcode.RobotClass;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
+import org.openftc.apriltag.AprilTagPose;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BooleanSupplier;
 
 public class AutoUtils {
     RobotClass robot;
@@ -22,17 +26,35 @@ public class AutoUtils {
     public static final double WHEEL_CIRCUMFERENCE_INCH = 2 * Math.PI * WHEEL_RADIUS;
     public static final double TICKS_PER_INCH = CPR_OUTPUT_SHAFT_20TO1 / WHEEL_CIRCUMFERENCE_INCH;
     Telemetry telemetry;
+    AprilTagPipeline aprilTagPipeline;
 
     public AutoUtils(RobotClass robot, Telemetry telemetry) {
         this.robot = robot;
         opticalSensor = robot.opticalSensor;
         this.telemetry = telemetry;
+        aprilTagPipeline = new AprilTagPipeline(robot.webcamName, telemetry);
     }
 
     Map<RobotClass.MOTORS, Double> wheelSpeeds = new HashMap<>();
 
     public void moveToPosition(double x, double y) {
 
+    }
+
+    public void updateOpticalSensorToCameraDetections() {
+        if (!aprilTagPipeline.getDetections().isEmpty()) {
+
+            SparkFunOTOS.Pose2D updatedPosition = new SparkFunOTOS.Pose2D(closestAprilTagLocation[0], closestAprilTagLocation[1], opticalSensor.getPosition().h);
+            opticalSensor.setPosition(updatedPosition);
+        } else {
+            telemetry.addLine("NO DETECTIONS");
+            telemetry.update();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private final double kD = .01;
@@ -212,4 +234,27 @@ public class AutoUtils {
         val = Math.min(val, upperBound);
         return val;
     }
+
+    public AprilTagPoseFtc getClosestAprilTagLocation() {
+        ArrayList<AprilTagDetection> detections = aprilTagPipeline.getDetections();
+        if (detections.isEmpty()) {
+            return null;
+        }
+        double closestTagRange = 100;
+        int closestTagID = -1;
+        for (AprilTagDetection detection : detections) {
+            double tagRange = detection.ftcPose.range;
+            if (tagRange < closestTagRange) {
+                closestTagRange = tagRange;
+                closestTagID = detection.id;
+            }
+        }
+        if(closestTagID == -1){
+            return null;
+        }
+        else{
+            return detections.get(closestTagID).ftcPose;
+        }
+    }
+
 }

@@ -4,7 +4,7 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.AutoControl;
+import org.firstinspires.ftc.teamcode.OpModes.AutoControl;
 import org.firstinspires.ftc.teamcode.RobotClass;
 
 public class OpticalSensor extends AutoControl {

@@ -28,7 +28,11 @@ public class AprilTagPipeline {
         telemetryAprilTag();
         telemetry.update();
         //TODO: DO THE STUFF
-        //Make sure to add sleep function to "share the CPU"
+        try {
+            Thread.sleep(20);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
     private void initAprilTag(){
         aprilTag = new AprilTagProcessor.Builder().setDrawAxes(true).setDrawCubeProjection(true).build();
