@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.ArrayList;
@@ -71,5 +72,44 @@ public class AprilTagPipeline {
     public ArrayList<AprilTagDetection> getDetections(){
         return aprilTag.getDetections();
     }
-
+    public AprilTagPoseFtc getClosestAprilTagLocation() {
+        ArrayList<AprilTagDetection> detections = aprilTag.getDetections();
+        if (detections.isEmpty()) {
+            return null;
+        }
+        double closestTagRange = 100;
+        int closestTagID = -1;
+        for (AprilTagDetection detection : detections) {
+            double tagRange = detection.ftcPose.range;
+            if (tagRange < closestTagRange) {
+                closestTagRange = tagRange;
+                closestTagID = detection.id;
+            }
+        }
+        if(closestTagID == -1){
+            return null;
+        }
+        else{
+            return detections.get(closestTagID).ftcPose;
+        }
+    }
+    public int getClosestAprilTagID(){
+        ArrayList<AprilTagDetection> detections = aprilTag.getDetections();
+        if (detections.isEmpty()) {
+            return -1;
+        }
+        double closestTagRange = 100;
+        int closestTagID = -1;
+        for (AprilTagDetection detection : detections) {
+            double tagRange = detection.ftcPose.range;
+            if (tagRange < closestTagRange) {
+                closestTagRange = tagRange;
+                closestTagID = detection.id;
+            }
+        }
+        return closestTagID;
+    }
+    public double[] getTagLocationRelativeToOrigin(int id){
+        return null;
+    }
 }

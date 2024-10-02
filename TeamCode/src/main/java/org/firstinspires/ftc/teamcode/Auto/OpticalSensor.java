@@ -4,21 +4,17 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.OpModes.AutoControl;
+import org.firstinspires.ftc.teamcode.Control;
+import org.firstinspires.ftc.teamcode.OpModes.AutoControlBlueLeft;
 import org.firstinspires.ftc.teamcode.RobotClass;
 
-public class OpticalSensor extends AutoControl {
+public class OpticalSensor extends AutoControlBlueLeft {
     RobotClass robot;
     SparkFunOTOS opticalSensor;
-    public OpticalSensor(RobotClass robot){
+    public OpticalSensor(RobotClass robot, Control.FieldSide fieldSide){
         this.robot = robot;
         opticalSensor = robot.opticalSensor;
         configureOtos();
-    }
-
-    public SparkFunOTOS.Pose2D getPos(){
-        return opticalSensor.getPosition();
-
     }
     private void configureOtos(){
         opticalSensor.setLinearUnit(DistanceUnit.INCH);
@@ -40,5 +36,9 @@ public class OpticalSensor extends AutoControl {
         opticalSensor.getVersionInfo(hwVersion, fwVersion);
 
     }
-    
+    private double[] fieldSidePosition(){
+
+
+        return null;
+    }
 }

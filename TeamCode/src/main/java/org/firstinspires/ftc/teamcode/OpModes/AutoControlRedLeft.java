@@ -1,23 +1,18 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
-import android.annotation.SuppressLint;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.Auto.OpticalSensor;
-import org.firstinspires.ftc.teamcode.Camera.AprilTagPipeline;
+import org.firstinspires.ftc.teamcode.Control;
 import org.firstinspires.ftc.teamcode.RobotClass;
 import org.firstinspires.ftc.teamcode.Susbsystem.AutoUtils;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.BooleanSupplier;
 
-@Autonomous(name = "Auto")
-public class AutoControl extends OpMode {
+@Autonomous(name = "Auto_Red_Left")
+public class AutoControlRedLeft extends OpMode {
     public RobotClass robot;
-
+    private final Control.FieldSide fieldSide = Control.FieldSide.RED_LEFT;
     private static boolean stop = false;
     public static BooleanSupplier isStopRequested = () -> stop;
     AutoUtils autoUtils;
@@ -37,14 +32,7 @@ public class AutoControl extends OpMode {
 
     @Override
     public void start() {
-        autoUtils.AutoTurn(30);
-        autoUtils.AutoDrive(20, 90);
-        autoUtils.AutoTurn(150);
-        autoUtils.AutoDrive(20, 90);
-        autoUtils.AutoTurn(270);
-        autoUtils.AutoDrive(20, 90);
-        autoUtils.AutoTurn(0);
-        stop();
+        autoUtils.moveToPosition(10,10,90);
     }
 
     @Override

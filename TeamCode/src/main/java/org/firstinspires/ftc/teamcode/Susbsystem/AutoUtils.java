@@ -8,13 +8,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Camera.AprilTagPipeline;
-import org.firstinspires.ftc.teamcode.OpModes.AutoControl;
+import org.firstinspires.ftc.teamcode.OpModes.AutoControlBlueLeft;
 import org.firstinspires.ftc.teamcode.RobotClass;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
-import org.openftc.apriltag.AprilTagPose;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +22,8 @@ public class AutoUtils {
     public static final int CPR_OUTPUT_SHAFT_20TO1 = 560;
     public static final double WHEEL_CIRCUMFERENCE_INCH = 2 * Math.PI * WHEEL_RADIUS;
     public static final double TICKS_PER_INCH = CPR_OUTPUT_SHAFT_20TO1 / WHEEL_CIRCUMFERENCE_INCH;
+    public static final int CAMERA_OFFSET_X = 0;
+    public static final int CAMERA_OFFSET_Y = 0;
     Telemetry telemetry;
     AprilTagPipeline aprilTagPipeline;
 
@@ -37,84 +36,111 @@ public class AutoUtils {
 
     Map<RobotClass.MOTORS, Double> wheelSpeeds = new HashMap<>();
 
-    public void moveToPosition(double x, double y) {
-
+    public void moveToPosition(double x, double y, double h) {
+        double targetDistance_INCH = Math.sqrt((Math.pow(x, 2) + Math.pow(y, 2)));
+        double theta = Math.atan(y / x);
+        AutoDrive(targetDistance_INCH, theta);
+        AutoTurn(h);
     }
 
-    public void updateOpticalSensorToCameraDetections() {
+    public void updateOpticalSensorToCameraDetection(int goalTagID) {
         if (!aprilTagPipeline.getDetections().isEmpty()) {
+            int closestID = aprilTagPipeline.getClosestAprilTagID();
+            if (closestID == goalTagID) {
+                //TODO: set origin based on aprilTag, ensure that aprilTag is placed accurately
+                AprilTagPoseFtc poseFtc = aprilTagPipeline.getClosestAprilTagLocation();
+                SparkFunOTOS.Pose2D updatedPosition = new SparkFunOTOS.Pose2D(poseFtc.x + CAMERA_OFFSET_X, poseFtc.y + CAMERA_OFFSET_Y, opticalSensor.getPosition().h);
+                opticalSensor.setPosition(updatedPosition);
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
-            SparkFunOTOS.Pose2D updatedPosition = new SparkFunOTOS.Pose2D(closestAprilTagLocation[0], closestAprilTagLocation[1], opticalSensor.getPosition().h);
-            opticalSensor.setPosition(updatedPosition);
         } else {
             telemetry.addLine("NO DETECTIONS");
             telemetry.update();
             try {
-                Thread.sleep(500);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
-    private final double kD = .01;
-
     @SuppressLint("DefaultLocale")
-    public void AutoDrive(double targetDistance_INCH, double angle) {
+    public void AutoDrive(double targetDistance_INCH_X, double targetDistance_INCH_Y) {
         ElapsedTime timer = new ElapsedTime();
 
-        angle = Math.toRadians(angle);
-        double maxErrorAllowed = .1 * TICKS_PER_INCH;
-        double kP = 0.01;
-        double kI = 0.01;
-        double kD = 0.01;
-        double integral = 0;
-        double maxIntegral = 2.0;
-
-        double targetDistance = targetDistance_INCH * TICKS_PER_INCH;
+        double angle = -Math.atan(targetDistance_INCH_Y/targetDistance_INCH_X);
+        double maxErrorAllowed = .1;
+        double kP = 0.1;
+        double kI = 0.15;
+        double kD = 0.1;
+        double integralX = 0;
+        double integralY = 0;
+        double maxIntegral = .75;
         double previousTime = 0;
-        double previousError = 0;
-        while (!AutoControl.isStopRequested.getAsBoolean()) {
-            double currentTime = timer.milliseconds();
-            SparkFunOTOS.Pose2D Pose2D = robot.opticalSensor.getPosition();
+        double previousErrorX = 0;
+        double previousErrorY = 0;
+        while (!AutoControlBlueLeft.isStopRequested.getAsBoolean()) {
+            double currentTime = timer.seconds();
+            SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
 
-            double error = (targetDistance - Math.sqrt(Math.pow((targetDistance * Math.cos(angle) - Pose2D.x), 2)
-                    + (Math.pow((targetDistance * Math.sin(angle)) - Pose2D.y, 2))));
+            double errorX = targetDistance_INCH_X - (-pose2D.x);
+            double errorY = targetDistance_INCH_Y - (-pose2D.y);
 
-            double proportional = kP * error;
+            double proportionalX = kP * errorX;
+            double proportionalY = kP * errorY;
+
             //calculate power to the motor based on error
-            integral += kI * (error * (currentTime - previousTime));
-            integral = constrainDouble(0, maxIntegral, integral);
+            integralX += kI * (errorX * (currentTime - previousTime));
+            integralY += kI * (errorY * (currentTime - previousTime));
+
+            integralX = constrainDouble(-maxIntegral, maxIntegral, integralX);
+            integralY = constrainDouble(-maxIntegral, maxIntegral, integralY);
             // calculate power to the motor based on error over time and constrain
             // the value to maxIntegral
-            double derivative = kD * (error - previousError) / (timer.milliseconds() - previousTime);
+            double derivativeX = kD * (errorX - previousErrorX) / (timer.seconds() - previousTime);
+            double derivativeY = kD * (errorY - previousErrorY) / (timer.seconds() - previousTime);
             // reduces power to the motor based on how quickly the robot approached the desired target
-            double output = proportional + integral + derivative;
+            double outputX = proportionalX + integralX + derivativeX;
+            double outputY = proportionalY + integralY + derivativeY;
 
             double x = Math.cos(angle);
             double y = Math.sin(angle);
             //calculates the direction the robot must travel in a unit circle (x, y)
-            double rotY = y * output;
-            double rotX = x * output;
             //multiplies desired direction by corrected output value
 
-            double denominator = Math.max(Math.abs(rotX) + Math.abs(rotY), 1.0);
+            double denominator = Math.max(Math.abs(outputX) + Math.abs(outputY), 1.0);
             // calculates the absolute value of the maximum motor power
 
-            wheelSpeeds.put(RobotClass.MOTORS.FRONT_LEFT, (rotY + rotX) / denominator);
-            wheelSpeeds.put(RobotClass.MOTORS.FRONT_RIGHT, (rotY - rotX) / denominator);
-            wheelSpeeds.put(RobotClass.MOTORS.BACK_LEFT, (rotY - rotX) / denominator);
-            wheelSpeeds.put(RobotClass.MOTORS.BACK_RIGHT, (rotY + rotX) / denominator);
+            wheelSpeeds.put(RobotClass.MOTORS.FRONT_LEFT, (outputY + outputX) / denominator);
+            wheelSpeeds.put(RobotClass.MOTORS.FRONT_RIGHT, (outputY - outputX) / denominator);
+            wheelSpeeds.put(RobotClass.MOTORS.BACK_LEFT, (outputY - outputX) / denominator);
+            wheelSpeeds.put(RobotClass.MOTORS.BACK_RIGHT, (outputY + outputX) / denominator);
             //sets motor power and normalizes ranges based on the maximum motor power
-            telemetry.addData("proportional", proportional);
-            telemetry.addData("integral", integral);
-            telemetry.addData("derivative", derivative);
+            telemetry.addData("errorX", errorX);
+            telemetry.addData("errorY", errorY);
+            telemetry.addData("outputX", outputX);
+            telemetry.addData("outputY", outputY);
+            telemetry.addData("currentTime", currentTime);
+            telemetry.addData("previousTime", previousTime);
+            telemetry.addData("proportionalX", proportionalX);
+            telemetry.addData("proportionalY", proportionalY);
+            telemetry.addData("integralX", integralX);
+            telemetry.addData("integralY", integralY);
+            telemetry.addData("derivativeX", derivativeX);
+            telemetry.addData("derivativeY", derivativeY);
             telemetry.update();
-            if (Math.abs(error) < maxErrorAllowed) {
+            if (Math.abs(errorX) < maxErrorAllowed && Math.abs(errorY) < maxErrorAllowed) {
                 break;
             }
-            previousTime = timer.milliseconds();
-            previousError = error;
+            previousTime = timer.seconds();
+            previousErrorX = errorX;
+            previousErrorY = errorY;
+
             UpdateWheelPowers();
         }
         stopMotors();
@@ -167,7 +193,7 @@ public class AutoUtils {
 
             if (angularDistance < 0.5) atTarget = true;
         }
-        while (!atTarget && !AutoControl.isStopRequested.getAsBoolean());
+        while (!atTarget && !AutoControlBlueLeft.isStopRequested.getAsBoolean());
         stopMotors();
     }
 
@@ -200,14 +226,6 @@ public class AutoUtils {
         }
     }
 
-    private double getDerivative(double error, double targetDistance, double angle) {
-        double previousError = error;
-        SparkFunOTOS.Pose2D Pose2D = robot.opticalSensor.getPosition();
-        error = (targetDistance - Math.sqrt(Math.pow((targetDistance * Math.cos(angle) - Pose2D.x), 2)
-                + (Math.pow((targetDistance * Math.sin(angle)) - Pose2D.y, 2))));
-        return (error - previousError) / (previousError + 0.01);
-    }
-
     public void UpdateWheelPowers() {
         robot.driveMotors.get(RobotClass.MOTORS.FRONT_LEFT).setPower(wheelSpeeds.get(RobotClass.MOTORS.FRONT_LEFT));
         robot.driveMotors.get(RobotClass.MOTORS.FRONT_RIGHT).setPower(wheelSpeeds.get(RobotClass.MOTORS.FRONT_RIGHT));
@@ -234,27 +252,4 @@ public class AutoUtils {
         val = Math.min(val, upperBound);
         return val;
     }
-
-    public AprilTagPoseFtc getClosestAprilTagLocation() {
-        ArrayList<AprilTagDetection> detections = aprilTagPipeline.getDetections();
-        if (detections.isEmpty()) {
-            return null;
-        }
-        double closestTagRange = 100;
-        int closestTagID = -1;
-        for (AprilTagDetection detection : detections) {
-            double tagRange = detection.ftcPose.range;
-            if (tagRange < closestTagRange) {
-                closestTagRange = tagRange;
-                closestTagID = detection.id;
-            }
-        }
-        if(closestTagID == -1){
-            return null;
-        }
-        else{
-            return detections.get(closestTagID).ftcPose;
-        }
-    }
-
 }

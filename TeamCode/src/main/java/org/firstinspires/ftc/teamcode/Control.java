@@ -26,7 +26,7 @@ public class Control extends OpMode {
 
     public DriveMode driveMode = DriveMode.GLOBAL;
 
-    public enum FieldSide {
+    public static enum FieldSide {
         BLUE_LEFT,
         BLUE_RIGHT,
         RED_LEFT,
