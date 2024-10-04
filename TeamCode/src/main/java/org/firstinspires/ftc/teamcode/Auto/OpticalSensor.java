@@ -21,7 +21,7 @@ public class OpticalSensor extends AutoControlBlueLeft {
         opticalSensor.setAngularUnit(AngleUnit.DEGREES);
 
         //set offset from center of robot IF sensor is not centered
-        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0,0,0);
+        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0,0,-2.50);
         opticalSensor.setOffset(offset);
 
         SparkFunOTOS.Pose2D startingPos = new SparkFunOTOS.Pose2D(0,0,0);

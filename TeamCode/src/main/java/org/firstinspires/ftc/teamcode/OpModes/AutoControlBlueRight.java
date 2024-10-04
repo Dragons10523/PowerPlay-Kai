@@ -32,7 +32,32 @@ public class AutoControlBlueRight extends OpMode {
 
     @Override
     public void start() {
-        autoUtils.moveToPosition(10,10,90);
+//        autoUtils.AutoDrive(0,20);
+//        autoUtils.AutoDrive(0,-20);
+//        autoUtils.AutoDrive(0,20);
+//        autoUtils.AutoDrive(0,-20);
+//        autoUtils.AutoDrive(0,20);
+//        autoUtils.AutoDrive(0,-20);
+//        autoUtils.AutoDrive(0,20);
+//        autoUtils.AutoDrive(0,-20);
+//        autoUtils.AutoDrive(0,20);
+//        autoUtils.AutoDrive(0,-20);
+//        autoUtils.AutoDrive(0,20);
+//        autoUtils.AutoDrive(0,-20);
+//        autoUtils.AutoTurn(0);
+//        autoUtils.AutoDrive(0,20);
+//        autoUtils.AutoDrive(0,-20);
+//        autoUtils.AutoDrive(0,20);
+//        autoUtils.AutoDrive(0,-20);
+//        autoUtils.AutoDrive(0,20);
+//        autoUtils.AutoDrive(0,-20);
+//        autoUtils.AutoDrive(0,20);
+//        autoUtils.AutoDrive(0,-20);
+//        autoUtils.AutoDrive(0,20);
+//        autoUtils.AutoDrive(0,-20);
+//        autoUtils.AutoDrive(0,20);
+//        autoUtils.AutoDrive(0,-20);
+//        autoUtils.AutoTurn(0);
     }
 
     @Override

@@ -38,8 +38,8 @@ public class AutoControlBlueLeft extends OpMode {
 
     @Override
     public void start() {
-        autoUtils.AutoDrive(10,10);
-        autoUtils.AutoTurn(0);
+//        autoUtils.AutoDrive(10,10);
+//        autoUtils.AutoTurn(0);
 
     }
 

@@ -73,11 +73,11 @@ public class AutoUtils {
     public void AutoDrive(double targetDistance_INCH_X, double targetDistance_INCH_Y) {
         ElapsedTime timer = new ElapsedTime();
 
-        double angle = -Math.atan(targetDistance_INCH_Y/targetDistance_INCH_X);
+
         double maxErrorAllowed = .1;
-        double kP = 0.1;
-        double kI = 0.15;
-        double kD = 0.1;
+        double kP = 0.06;
+        double kI = 0.1;
+        double kD = 0.05;
         double integralX = 0;
         double integralY = 0;
         double maxIntegral = .75;
@@ -108,9 +108,6 @@ public class AutoUtils {
             double outputX = proportionalX + integralX + derivativeX;
             double outputY = proportionalY + integralY + derivativeY;
 
-            double x = Math.cos(angle);
-            double y = Math.sin(angle);
-            //calculates the direction the robot must travel in a unit circle (x, y)
             //multiplies desired direction by corrected output value
 
             double denominator = Math.max(Math.abs(outputX) + Math.abs(outputY), 1.0);
