@@ -23,7 +23,7 @@ public class AutoControl extends LinearOpMode {
         OpticalSensor.configureOtos(robot);
         robot.opticalSensor.calibrateImu();
         //^^^^ fixes inertial odometry  drift
-        robot.setDirection();
+        robot.initMotors();
     }
 
 }

@@ -2,9 +2,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.Auto.OpticalSensor;
 import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.Control;
 import org.firstinspires.ftc.teamcode.RobotClass;
@@ -35,10 +33,10 @@ public class AutoControlRedLeft extends AutoControl {
             telemetry.addLine(String.format("XYH %6.2f %6.2f %6.2f", pose2D.x, pose2D.y, pose2D.h));
             telemetry.update();
         }
-        robot.driveMotors.get(RobotClass.MOTORS.FRONT_LEFT).setPower(0.0);
-        robot.driveMotors.get(RobotClass.MOTORS.FRONT_RIGHT).setPower(0.0);
-        robot.driveMotors.get(RobotClass.MOTORS.BACK_LEFT).setPower(0.0);
-        robot.driveMotors.get(RobotClass.MOTORS.BACK_RIGHT).setPower(0.0);
+        robot.Motors.get(RobotClass.MOTORS.FRONT_LEFT).setPower(0.0);
+        robot.Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setPower(0.0);
+        robot.Motors.get(RobotClass.MOTORS.BACK_LEFT).setPower(0.0);
+        robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT).setPower(0.0);
     }
 
 }
