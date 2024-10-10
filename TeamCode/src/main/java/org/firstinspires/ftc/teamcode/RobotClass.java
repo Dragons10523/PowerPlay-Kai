@@ -58,8 +58,8 @@ public class RobotClass {
         webcamName = hwmap.get(WebcamName.class, "Webcam 1");
         camera1 = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP);
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD);
 
         imu.initialize(new IMU.Parameters(orientationOnRobot));
     }

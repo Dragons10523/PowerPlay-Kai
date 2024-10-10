@@ -8,37 +8,33 @@ import org.firstinspires.ftc.teamcode.Control;
 import org.firstinspires.ftc.teamcode.OpModes.AutoControlBlueLeft;
 import org.firstinspires.ftc.teamcode.RobotClass;
 
-public class OpticalSensor extends AutoControlBlueLeft {
-    RobotClass robot;
-    SparkFunOTOS opticalSensor;
-    public OpticalSensor(RobotClass robot, Control.FieldSide fieldSide){
-        this.robot = robot;
-        opticalSensor = robot.opticalSensor;
-        configureOtos();
-    }
-    private void configureOtos(){
-        opticalSensor.setLinearUnit(DistanceUnit.INCH);
-        opticalSensor.setAngularUnit(AngleUnit.DEGREES);
+public class OpticalSensor {
+
+    public static void configureOtos(RobotClass robot){
+        robot.opticalSensor.setLinearUnit(DistanceUnit.INCH);
+        robot.opticalSensor.setAngularUnit(AngleUnit.DEGREES);
 
         //set offset from center of robot IF sensor is not centered
         SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0,0,-2.50);
-        opticalSensor.setOffset(offset);
+        robot.opticalSensor.setOffset(offset);
 
         SparkFunOTOS.Pose2D startingPos = new SparkFunOTOS.Pose2D(0,0,0);
-        opticalSensor.setPosition(startingPos);
+        robot.opticalSensor.setPosition(startingPos);
 
         SparkFunOTOS.Version hwVersion = new SparkFunOTOS.Version();
         SparkFunOTOS.Version fwVersion = new SparkFunOTOS.Version();
+        //actual value 3600 reported value 3598
 
-        opticalSensor.setAngularScalar(1.0);
-        opticalSensor.setLinearScalar(1.0);
-
-        opticalSensor.getVersionInfo(hwVersion, fwVersion);
+        robot.opticalSensor.setAngularScalar(1.0);
+        robot.opticalSensor.setLinearScalar(1.0);
+        //33 1/8
+        //0.62
+        //actual value 331.25 read value 331.87
+        //sensor reports error 0.001%
+        robot.opticalSensor.getVersionInfo(hwVersion, fwVersion);
 
     }
     private double[] fieldSidePosition(){
-
-
         return null;
     }
 }

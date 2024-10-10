@@ -7,8 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.Camera.AprilTagPipeline;
-import org.firstinspires.ftc.teamcode.OpModes.AutoControlBlueLeft;
 import org.firstinspires.ftc.teamcode.RobotClass;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
@@ -26,22 +26,18 @@ public class AutoUtils {
     public static final int CAMERA_OFFSET_Y = 0;
     Telemetry telemetry;
     AprilTagPipeline aprilTagPipeline;
+    AutoControl autoControl;
 
     public AutoUtils(RobotClass robot, Telemetry telemetry) {
         this.robot = robot;
         opticalSensor = robot.opticalSensor;
         this.telemetry = telemetry;
         aprilTagPipeline = new AprilTagPipeline(robot.webcamName, telemetry);
+        autoControl = new AutoControl();
     }
 
     Map<RobotClass.MOTORS, Double> wheelSpeeds = new HashMap<>();
 
-    public void moveToPosition(double x, double y, double h) {
-        double targetDistance_INCH = Math.sqrt((Math.pow(x, 2) + Math.pow(y, 2)));
-        double theta = Math.atan(y / x);
-        AutoDrive(targetDistance_INCH, theta);
-        AutoTurn(h);
-    }
 
     public void updateOpticalSensorToCameraDetection(int goalTagID) {
         if (!aprilTagPipeline.getDetections().isEmpty()) {
@@ -74,17 +70,17 @@ public class AutoUtils {
         ElapsedTime timer = new ElapsedTime();
 
 
-        double maxErrorAllowed = .1;
-        double kP = 0.06;
-        double kI = 0.1;
-        double kD = 0.05;
+        double maxErrorAllowed = .2;
+        double kP = 0.05;
+        double kI = 0.15;
+        double kD = 0.02;
         double integralX = 0;
         double integralY = 0;
         double maxIntegral = .75;
         double previousTime = 0;
         double previousErrorX = 0;
         double previousErrorY = 0;
-        while (!AutoControlBlueLeft.isStopRequested.getAsBoolean()) {
+        while (!autoControl.getStopRequested()) {
             double currentTime = timer.seconds();
             SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
 
@@ -190,7 +186,7 @@ public class AutoUtils {
 
             if (angularDistance < 0.5) atTarget = true;
         }
-        while (!atTarget && !AutoControlBlueLeft.isStopRequested.getAsBoolean());
+        while (!atTarget);
         stopMotors();
     }
 
@@ -212,14 +208,14 @@ public class AutoUtils {
         setStopWheelBehavior();
         try {
             Thread.sleep(50);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        } catch (InterruptedException ignored) {
+
         }
         setCoastWheelBehavior();
         try {
             Thread.sleep(50);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        } catch (InterruptedException ignored) {
+
         }
     }
 
