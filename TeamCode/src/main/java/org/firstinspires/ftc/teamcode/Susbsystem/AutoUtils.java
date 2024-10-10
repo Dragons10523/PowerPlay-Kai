@@ -32,7 +32,7 @@ public class AutoUtils {
         this.robot = robot;
         opticalSensor = robot.opticalSensor;
         this.telemetry = telemetry;
-        aprilTagPipeline = new AprilTagPipeline(robot.webcamName, telemetry);
+        //aprilTagPipeline = new AprilTagPipeline(robot.webcamName, telemetry);
         autoControl = new AutoControl();
     }
 

@@ -69,13 +69,13 @@ public class RobotClass {
         Motors.put(MOTORS.BACK_LEFT, hwmap.get(DcMotor.class, "backLeft"));
         Motors.put(MOTORS.BACK_RIGHT, hwmap.get(DcMotor.class, "backRight"));
 
-        Motors.put(MOTORS.LIFT_LEFT, hwmap.get(DcMotor.class, "liftLeft"));
-        Motors.put(MOTORS.LIFT_RIGHT, hwmap.get(DcMotor.class,"liftRight"));
+        //Motors.put(MOTORS.LIFT_LEFT, hwmap.get(DcMotor.class, "liftLeft"));
+        //Motors.put(MOTORS.LIFT_RIGHT, hwmap.get(DcMotor.class,"liftRight"));
         //Motors.put(MOTORS.ARM_FLIP, hwmap.get(DcMotor.class, "armFlip"));
         //port 1, 2, 3 expansion hub
 
-        Servos.put(SERVOS.ARM_LEFT, hwmap.get(Servo.class, "armLeft"));
-        Servos.put(SERVOS.ARM_RIGHT, hwmap.get(Servo.class, "armRight"));
+        //Servos.put(SERVOS.ARM_LEFT, hwmap.get(Servo.class, "armLeft"));
+        //Servos.put(SERVOS.ARM_RIGHT, hwmap.get(Servo.class, "armRight"));
         //port 1, 2 expansion hub
 
         //CR_Servos.put(CR_SERVOS.INTAKE, hwmap.get(CRServo.class, "intake"));
@@ -88,8 +88,8 @@ public class RobotClass {
         //webcamName = hwmap.get(WebcamName.class, "Webcam 1");
         //camera1 = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP);
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD);
 
         imu.initialize(new IMU.Parameters(orientationOnRobot));
     }
@@ -105,22 +105,22 @@ public class RobotClass {
         imu.resetYaw();
     }
     public void initMotors() {
-//        Motors.get(MOTORS.FRONT_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
-//        Motors.get(MOTORS.BACK_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
-//        Motors.get(MOTORS.FRONT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
-//        Motors.get(MOTORS.BACK_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
-        //Proto-Bot
-
         Motors.get(MOTORS.FRONT_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
         Motors.get(MOTORS.BACK_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
         Motors.get(MOTORS.FRONT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
-        Motors.get(MOTORS.BACK_RIGHT).setDirection(DcMotorSimple.Direction.REVERSE);
+        Motors.get(MOTORS.BACK_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
+        //Proto-Bot
+
+//        Motors.get(MOTORS.FRONT_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
+//        Motors.get(MOTORS.BACK_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
+//        Motors.get(MOTORS.FRONT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
+//        Motors.get(MOTORS.BACK_RIGHT).setDirection(DcMotorSimple.Direction.REVERSE);
         //Comp-Bot
 
-        Motors.get(MOTORS.LIFT_LEFT).setDirection(DcMotorSimple.Direction.FORWARD);
-        Motors.get(MOTORS.LIFT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
-        Motors.get(MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Motors.get(MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        Motors.get(MOTORS.LIFT_LEFT).setDirection(DcMotorSimple.Direction.FORWARD);
+//        Motors.get(MOTORS.LIFT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
+//        Motors.get(MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        Motors.get(MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
 }
