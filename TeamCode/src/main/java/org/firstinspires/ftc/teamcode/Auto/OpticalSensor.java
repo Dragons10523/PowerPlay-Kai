@@ -12,10 +12,10 @@ public class OpticalSensor {
 
     public static void configureOtos(RobotClass robot){
         robot.opticalSensor.setLinearUnit(DistanceUnit.INCH);
-        robot.opticalSensor.setAngularUnit(AngleUnit.DEGREES);
+        robot.opticalSensor.setAngularUnit(AngleUnit.RADIANS);
 
         //set offset from center of robot IF sensor is not centered
-        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0,0,-2.50);
+        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0,0,0);
         robot.opticalSensor.setOffset(offset);
 
         SparkFunOTOS.Pose2D startingPos = new SparkFunOTOS.Pose2D(0,0,0);
@@ -33,6 +33,7 @@ public class OpticalSensor {
         //sensor reports error 0.001%
         robot.opticalSensor.getVersionInfo(hwVersion, fwVersion);
 
+        robot.opticalSensor.calibrateImu();
     }
     private double[] fieldSidePosition(){
         return null;

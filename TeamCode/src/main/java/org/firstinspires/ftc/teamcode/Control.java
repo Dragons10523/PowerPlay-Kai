@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.Auto.OpticalSensor;
+
 public class Control extends OpMode {
     //TODO: Limiting switch on screw lift
     public RobotClass robot;
@@ -35,24 +38,25 @@ public class Control extends OpMode {
         GLOBAL,
         LOCAL
     }
-
-    public DriveMode driveMode = DriveMode.GLOBAL;
-    public LiftMode liftMode = LiftMode.ENCODER_DRIVE;
-    public LiftState liftState = LiftState.GROUND;
-    public ArmState armState = ArmState.UP;
-
     public static enum FieldSide {
         BLUE_LEFT,
         BLUE_RIGHT,
         RED_LEFT,
         RED_RIGHT
     }
+    public DriveMode driveMode = DriveMode.GLOBAL;
+    public LiftMode liftMode = LiftMode.ENCODER_DRIVE;
+    public LiftState liftState = LiftState.GROUND;
+    public ArmState armState = ArmState.UP;
+
+
 
     @Override
     public void init() {
         robot = new RobotClass(hardwareMap);
         robot.initMotors();
-        robot.opticalSensor.calibrateImu();
+        OpticalSensor.configureOtos(robot);
+        robot.opticalSensor.resetTracking();
     }
     @Override
     public void loop() {
@@ -169,6 +173,9 @@ public class Control extends OpMode {
         }
     }
     public void runToLiftPos(){
+        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMotorEnable();
+        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMotorEnable();
+
         switch(liftState){
             case GROUND:
                 robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(0);
@@ -180,8 +187,10 @@ public class Control extends OpMode {
                 robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(200);
                 robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPosition(200);
         }
+
         robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
     }
     public void runToArmState(){
         switch(armState){
@@ -194,7 +203,31 @@ public class Control extends OpMode {
         }
     }
 
-
+    public void disableNonBusyMotors(){
+        if(!robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).isBusy()){
+            robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMotorDisable();
+        }
+        if(!robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).isBusy()){
+            robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMotorDisable();
+        }
+        if(!robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).isBusy()){
+            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMotorDisable();
+        }
+    }
+    public double getCurrentDrawDriveTrain(CurrentUnit currentUnit){
+        if(currentUnit == CurrentUnit.MILLIAMPS){
+            return robot.Motors.get(RobotClass.MOTORS.FRONT_LEFT).getCurrent(CurrentUnit.MILLIAMPS)
+                    + robot.Motors.get(RobotClass.MOTORS.FRONT_RIGHT).getCurrent(CurrentUnit.MILLIAMPS)
+                    + robot.Motors.get(RobotClass.MOTORS.BACK_LEFT).getCurrent(CurrentUnit.MILLIAMPS)
+                    + robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT).getCurrent(CurrentUnit.MILLIAMPS);
+        }
+        else{
+            return robot.Motors.get(RobotClass.MOTORS.FRONT_LEFT).getCurrent(CurrentUnit.AMPS)
+                    + robot.Motors.get(RobotClass.MOTORS.FRONT_RIGHT).getCurrent(CurrentUnit.AMPS)
+                    + robot.Motors.get(RobotClass.MOTORS.BACK_LEFT).getCurrent(CurrentUnit.AMPS)
+                    + robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT).getCurrent(CurrentUnit.AMPS);
+        }
+    }
 
     @Override
     public void stop() {
