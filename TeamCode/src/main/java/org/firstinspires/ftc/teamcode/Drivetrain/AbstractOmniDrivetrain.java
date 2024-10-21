@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode.Drivetrain;
 import android.annotation.SuppressLint;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.RobotClass;
 
 import java.util.Map;
@@ -13,9 +15,9 @@ public abstract class AbstractOmniDrivetrain {
 
     double impulseRotation;
     RobotClass robotClass;
-    Map<RobotClass.MOTORS, DcMotor> Motors;
+    Map<RobotClass.MOTORS, DcMotorEx> Motors;
 
-    public AbstractOmniDrivetrain(Map<RobotClass.MOTORS, DcMotor> Motors, double impulseRotation, RobotClass robotClass) {
+    public AbstractOmniDrivetrain(Map<RobotClass.MOTORS, DcMotorEx> Motors, double impulseRotation, RobotClass robotClass) {
 
         this.robotClass = robotClass;
         this.impulseRotation = impulseRotation;
@@ -39,12 +41,10 @@ public abstract class AbstractOmniDrivetrain {
         Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setPower((rotY - rotX + turn) / denominator);
         Motors.get(RobotClass.MOTORS.BACK_RIGHT).setPower((rotY + rotX + turn) / denominator);
 
-        telemetry.addData("heading_DEGREES", Math.toDegrees(heading_RADIANS));
-        telemetry.addData("rotX", rotX);
-        telemetry.addData("rotY", rotY);
-        telemetry.addData("turn", turn);
-        telemetry.addData("front right power", (rotY - rotX + turn) / denominator );
-        telemetry.addData("denominator", denominator);
+//        telemetry.addData("heading_DEGREES", Math.toDegrees(heading_RADIANS));
+//        telemetry.addData("rotX", rotX);
+//        telemetry.addData("rotY", rotY);
+//        telemetry.addData("denominator", denominator);
 
         // telemetry.addLine(String.format("wheelSpeeds %6.1f %6.1f %6.1f %6.1f (speed)",  correctedWheelDrift[0], correctedWheelDrift[1], correctedWheelDrift[2], correctedWheelDrift[3]));
         telemetry.update();

@@ -4,10 +4,12 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -26,7 +28,7 @@ import java.util.Map;
 public class RobotClass {
     public AbstractOmniDrivetrain drivetrain;
 
-    public Map<MOTORS, DcMotor> Motors;
+    public Map<MOTORS, DcMotorEx> Motors;
     public Map<SERVOS, Servo> Servos;
     public Map<CR_SERVOS, CRServo> CR_Servos;
 
@@ -34,8 +36,10 @@ public class RobotClass {
     public final IMU imu;
     public OpenCvWebcam camera1;
     public WebcamName webcamName;
+    public Utils utils;
 
     public SparkFunOTOS opticalSensor;
+    public VoltageSensor voltageSensor;
     HardwareMap hwmap;
     public static enum SERVOS{
         ARM_LEFT,
@@ -45,8 +49,6 @@ public class RobotClass {
     public static enum CR_SERVOS{
         INTAKE,
     }
-
-
     public static enum MOTORS {
         FRONT_LEFT,
         FRONT_RIGHT,
@@ -64,10 +66,12 @@ public class RobotClass {
         Motors = new HashMap<>();
         Servos = new HashMap<>();
         CR_Servos = new HashMap<>();
-        Motors.put(MOTORS.FRONT_LEFT, hwmap.get(DcMotor.class, "frontLeft"));
-        Motors.put(MOTORS.FRONT_RIGHT, hwmap.get(DcMotor.class, "frontRight"));
-        Motors.put(MOTORS.BACK_LEFT, hwmap.get(DcMotor.class, "backLeft"));
-        Motors.put(MOTORS.BACK_RIGHT, hwmap.get(DcMotor.class, "backRight"));
+        Motors.put(MOTORS.FRONT_LEFT, hwmap.get(DcMotorEx.class, "frontLeft"));
+        Motors.put(MOTORS.FRONT_RIGHT, hwmap.get(DcMotorEx.class, "frontRight"));
+        Motors.put(MOTORS.BACK_LEFT, hwmap.get(DcMotorEx.class, "backLeft"));
+        Motors.put(MOTORS.BACK_RIGHT, hwmap.get(DcMotorEx.class, "backRight"));
+        voltageSensor = hwmap.get(VoltageSensor.class, "Control Hub");
+
 
 
         Motors.put(MOTORS.LIFT_LEFT, hwmap.get(DcMotor.class, "liftLeft"));
@@ -82,8 +86,7 @@ public class RobotClass {
 
         CR_Servos.put(CR_SERVOS.INTAKE, hwmap.get(CRServo.class, "intake"));
         //port 5 expansion hub
-
-
+        Utils utils = new Utils(this);
         drivetrain = new MecanumDrive(Motors, this);
 
         opticalSensor = hwmap.get(SparkFunOTOS.class, "opticalSensor");
