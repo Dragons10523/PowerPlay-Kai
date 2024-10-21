@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.Control;
 import org.firstinspires.ftc.teamcode.RobotClass;
+import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.DriveConstants;
 
 @Autonomous(name = "Auto_Blue_Left")
 public class AutoControlBlueLeft extends AutoControl {
@@ -26,6 +28,7 @@ public class AutoControlBlueLeft extends AutoControl {
             SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
             telemetry.addLine(String.format("XYH %6.2f %6.2f %6.2f", pose2D.x, pose2D.y, pose2D.h));
             telemetry.update();
+
         }
         robot.Motors.get(RobotClass.MOTORS.FRONT_LEFT).setPower(0.0);
         robot.Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setPower(0.0);

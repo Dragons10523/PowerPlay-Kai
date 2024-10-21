@@ -139,7 +139,6 @@ public class SampleMecanumDrive extends MecanumDrive {
         List<Integer> lastTrackingEncVels = new ArrayList<>();
 
         setLocalizer(new Localizer() {
-
             @NonNull
             @Override
             public Pose2d getPoseEstimate() {
@@ -156,7 +155,8 @@ public class SampleMecanumDrive extends MecanumDrive {
             @Override
             public Pose2d getPoseVelocity() {
                 SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getVelocity();
-                return new Pose2d(-pose2D.x, -pose2D.y, pose2D.h);
+                return new Pose2d(-pose2D.y, -pose2D.x, pose2D.h);
+                //x and y reversed
             }
 
             @Override

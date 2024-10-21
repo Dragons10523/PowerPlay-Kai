@@ -31,8 +31,6 @@ public class RobotClass {
     public Map<MOTORS, DcMotorEx> Motors;
     public Map<SERVOS, Servo> Servos;
     public Map<CR_SERVOS, CRServo> CR_Servos;
-
-
     public final IMU imu;
     public OpenCvWebcam camera1;
     public WebcamName webcamName;
@@ -74,17 +72,17 @@ public class RobotClass {
 
 
 
-        Motors.put(MOTORS.LIFT_LEFT, hwmap.get(DcMotor.class, "liftLeft"));
-        Motors.put(MOTORS.LIFT_RIGHT, hwmap.get(DcMotor.class,"liftRight"));
-        Motors.put(MOTORS.ARM_FLIP, hwmap.get(DcMotor.class, "armFlip"));
-        //port 1, 2, 3 expansion hub
-
-        Servos.put(SERVOS.ARM_LEFT, hwmap.get(Servo.class, "armLeft"));
-        Servos.put(SERVOS.ARM_RIGHT, hwmap.get(Servo.class, "armRight"));
-        Servos.put(SERVOS.BUCKET, hwmap.get(Servo.class, "bucket"));
-        //port 1, 2 expansion hub
-
-        CR_Servos.put(CR_SERVOS.INTAKE, hwmap.get(CRServo.class, "intake"));
+//        Motors.put(MOTORS.LIFT_LEFT, hwmap.get(DcMotorEx.class, "liftLeft"));
+//        Motors.put(MOTORS.LIFT_RIGHT, hwmap.get(DcMotorEx.class,"liftRight"));
+//        Motors.put(MOTORS.ARM_FLIP, hwmap.get(DcMotorEx.class, "armFlip"));
+//        //port 1, 2, 3 expansion hub
+//
+//        Servos.put(SERVOS.ARM_LEFT, hwmap.get(Servo.class, "armLeft"));
+//        Servos.put(SERVOS.ARM_RIGHT, hwmap.get(Servo.class, "armRight"));
+//        Servos.put(SERVOS.BUCKET, hwmap.get(Servo.class, "bucket"));
+//        //port 1, 2 expansion hub
+//
+//        CR_Servos.put(CR_SERVOS.INTAKE, hwmap.get(CRServo.class, "intake"));
         //port 5 expansion hub
         Utils utils = new Utils(this);
         drivetrain = new MecanumDrive(Motors, this);
@@ -99,15 +97,10 @@ public class RobotClass {
         imu.initialize(new IMU.Parameters(orientationOnRobot));
     }
     public double getHeading() {
-        Orientation Theta = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS);
-        return Theta.thirdAngle;
-    }
-    public double getRotationRate() {
-        AngularVelocity velocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES);
-        return velocity.zRotationRate;
+        return opticalSensor.getPosition().h;
     }
     public void resetIMU() {
-        imu.resetYaw();
+        opticalSensor.calibrateImu(100, true);
     }
     public void initMotorsProto() {
         Motors.get(MOTORS.FRONT_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
@@ -118,14 +111,21 @@ public class RobotClass {
     }
     public void initMotorsComp(){
         Motors.get(MOTORS.FRONT_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
-        Motors.get(MOTORS.BACK_LEFT).setDirection(DcMotorSimple.Direction.FORWARD);
+        Motors.get(MOTORS.BACK_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
         Motors.get(MOTORS.FRONT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
-        Motors.get(MOTORS.BACK_RIGHT).setDirection(DcMotorSimple.Direction.REVERSE);
+        Motors.get(MOTORS.BACK_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
+
+        Motors.get(MOTORS.FRONT_RIGHT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        Motors.get(MOTORS.FRONT_LEFT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        Motors.get(MOTORS.BACK_LEFT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        Motors.get(MOTORS.BACK_RIGHT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         Motors.get(MOTORS.LIFT_LEFT).setDirection(DcMotorSimple.Direction.FORWARD);
         Motors.get(MOTORS.LIFT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
-        Motors.get(MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Motors.get(MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Motors.get(MOTORS.LIFT_LEFT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        Motors.get(MOTORS.LIFT_RIGHT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+
     }
 
 
