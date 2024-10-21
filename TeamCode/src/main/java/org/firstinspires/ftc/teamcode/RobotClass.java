@@ -40,10 +40,10 @@ public class RobotClass {
     public static enum SERVOS{
         ARM_LEFT,
         ARM_RIGHT,
+        BUCKET,
     }
     public static enum CR_SERVOS{
         INTAKE,
-        ARM_FLIP
     }
 
 
@@ -69,16 +69,18 @@ public class RobotClass {
         Motors.put(MOTORS.BACK_LEFT, hwmap.get(DcMotor.class, "backLeft"));
         Motors.put(MOTORS.BACK_RIGHT, hwmap.get(DcMotor.class, "backRight"));
 
-        //Motors.put(MOTORS.LIFT_LEFT, hwmap.get(DcMotor.class, "liftLeft"));
-        //Motors.put(MOTORS.LIFT_RIGHT, hwmap.get(DcMotor.class,"liftRight"));
-        //Motors.put(MOTORS.ARM_FLIP, hwmap.get(DcMotor.class, "armFlip"));
+
+        Motors.put(MOTORS.LIFT_LEFT, hwmap.get(DcMotor.class, "liftLeft"));
+        Motors.put(MOTORS.LIFT_RIGHT, hwmap.get(DcMotor.class,"liftRight"));
+        Motors.put(MOTORS.ARM_FLIP, hwmap.get(DcMotor.class, "armFlip"));
         //port 1, 2, 3 expansion hub
 
-        //Servos.put(SERVOS.ARM_LEFT, hwmap.get(Servo.class, "armLeft"));
-        //Servos.put(SERVOS.ARM_RIGHT, hwmap.get(Servo.class, "armRight"));
+        Servos.put(SERVOS.ARM_LEFT, hwmap.get(Servo.class, "armLeft"));
+        Servos.put(SERVOS.ARM_RIGHT, hwmap.get(Servo.class, "armRight"));
+        Servos.put(SERVOS.BUCKET, hwmap.get(Servo.class, "bucket"));
         //port 1, 2 expansion hub
 
-        //CR_Servos.put(CR_SERVOS.INTAKE, hwmap.get(CRServo.class, "intake"));
+        CR_Servos.put(CR_SERVOS.INTAKE, hwmap.get(CRServo.class, "intake"));
         //port 5 expansion hub
 
 
@@ -104,23 +106,24 @@ public class RobotClass {
     public void resetIMU() {
         imu.resetYaw();
     }
-    public void initMotors() {
+    public void initMotorsProto() {
         Motors.get(MOTORS.FRONT_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
         Motors.get(MOTORS.BACK_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
         Motors.get(MOTORS.FRONT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
         Motors.get(MOTORS.BACK_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
         //Proto-Bot
-
-//        Motors.get(MOTORS.FRONT_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
-//        Motors.get(MOTORS.BACK_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
-//        Motors.get(MOTORS.FRONT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
-//        Motors.get(MOTORS.BACK_RIGHT).setDirection(DcMotorSimple.Direction.REVERSE);
-        //Comp-Bot
-
-//        Motors.get(MOTORS.LIFT_LEFT).setDirection(DcMotorSimple.Direction.FORWARD);
-//        Motors.get(MOTORS.LIFT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
-//        Motors.get(MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        Motors.get(MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
+    public void initMotorsComp(){
+        Motors.get(MOTORS.FRONT_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
+        Motors.get(MOTORS.BACK_LEFT).setDirection(DcMotorSimple.Direction.FORWARD);
+        Motors.get(MOTORS.FRONT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
+        Motors.get(MOTORS.BACK_RIGHT).setDirection(DcMotorSimple.Direction.REVERSE);
+
+        Motors.get(MOTORS.LIFT_LEFT).setDirection(DcMotorSimple.Direction.FORWARD);
+        Motors.get(MOTORS.LIFT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
+        Motors.get(MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Motors.get(MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
 
 }

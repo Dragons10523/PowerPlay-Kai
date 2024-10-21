@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Control extends OpMode {
     //TODO: Limiting switch on screw lift
@@ -23,8 +24,8 @@ public class Control extends OpMode {
         ENCODER_DRIVE
     }
     public enum ArmState {
-        UP,
-        DOWN,
+        IN,
+        EXTENDED,
     }
     public enum LiftState {
         GROUND,
@@ -39,7 +40,7 @@ public class Control extends OpMode {
     public DriveMode driveMode = DriveMode.GLOBAL;
     public LiftMode liftMode = LiftMode.ENCODER_DRIVE;
     public LiftState liftState = LiftState.GROUND;
-    public ArmState armState = ArmState.UP;
+    public ArmState armState = ArmState.IN;
 
     public static enum FieldSide {
         BLUE_LEFT,
@@ -51,7 +52,8 @@ public class Control extends OpMode {
     @Override
     public void init() {
         robot = new RobotClass(hardwareMap);
-        robot.initMotors();
+        robot.initMotorsComp();
+//        robot.initMotorsProto();
         robot.opticalSensor.calibrateImu();
     }
     @Override
@@ -59,14 +61,12 @@ public class Control extends OpMode {
 
     }
     public void mecanumDrive(double leftX, double leftY, double turn) {
-
         double heading;
         if (driveMode == DriveMode.GLOBAL) {
             heading = robot.getHeading();
         } else {
             heading = 0;
         }
-
         robot.drivetrain.mecanumDrive(leftY, leftX, turn, heading, telemetry);
     }
     boolean firstPressDPAD = true;
@@ -104,18 +104,18 @@ public class Control extends OpMode {
             robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setPower(liftPower);
         }
     }
-    private boolean firstPress_Button_A = true;
+    private boolean firstPress_Button_Gamepad_2_a = true;
     public void flipArm(boolean button_A){
-        if(!button_A) firstPress_Button_A = true;
+        if(!button_A) firstPress_Button_Gamepad_2_a = true;
 
-        if(button_A && firstPress_Button_A){
-            firstPress_Button_A = false;
+        if(button_A && firstPress_Button_Gamepad_2_a){
+            firstPress_Button_Gamepad_2_a = false;
             switch(armState){
-                case UP:
-                    armState = ArmState.DOWN;
+                case IN:
+                    armState = ArmState.EXTENDED;
                     break;
-                case DOWN:
-                    armState = ArmState.UP;
+                case EXTENDED:
+                    armState = ArmState.IN;
                     break;
             }
             runToArmState();
@@ -129,14 +129,14 @@ public class Control extends OpMode {
         robot.resetIMU();
     }
 
-    private boolean firstPress_startButton_Gamepad_1 = true;
+    private boolean firstPress_startButtonGamepad_1 = true;
     public void switchDriveMode(boolean button) {
 
         if (!button) {
-            firstPress_startButton_Gamepad_1 = true;
+            firstPress_startButtonGamepad_1 = true;
         }
-        if (button && firstPress_startButton_Gamepad_1) {
-            firstPress_startButton_Gamepad_1 = false;
+        if (button && firstPress_startButtonGamepad_1) {
+            firstPress_startButtonGamepad_1 = false;
             switch (driveMode) {
                 case GLOBAL:
                     driveMode = DriveMode.LOCAL;
@@ -168,6 +168,9 @@ public class Control extends OpMode {
             }
         }
     }
+    public void manualArmFlip(double power){
+        robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(power);
+    }
     public void runToLiftPos(){
         switch(liftState){
             case GROUND:
@@ -185,17 +188,30 @@ public class Control extends OpMode {
     }
     public void runToArmState(){
         switch(armState){
-            case UP:
+            case IN:
                 robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0);
                 robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0);
-            case DOWN:
-                robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(1);
-                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(2);
+            case EXTENDED:
+                robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(-1);
+                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(-1);
         }
     }
-
-
-
+    ElapsedTime time = new ElapsedTime();
+    double timeAtPress = 0;
+    public void flipBucket(boolean button){
+        if(button){
+            timeAtPress = time.seconds();
+            robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0);
+        }
+        if(time.seconds() - 3 > timeAtPress && timeAtPress != 0){
+            timeAtPress = 0;
+            robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(.6);
+        }
+    }
+    public void intakePower(double intakePower){
+        intakePower = Math.min(.7, Math.max(-.7, intakePower));
+        robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(intakePower);
+    }
     @Override
     public void stop() {
         if (robot == null) return; // ensures that stop() is not called before initialization

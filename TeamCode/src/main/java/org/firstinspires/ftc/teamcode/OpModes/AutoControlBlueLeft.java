@@ -19,7 +19,7 @@ public class AutoControlBlueLeft extends AutoControl {
 
         waitForStart();
 
-        autoUtils.AutoDrive(0,10);
+        //autoUtils.AutoDrive(0,10);
 
         while(!isStopRequested()){
             //aprilTagPipeline.updateAprilTagPipeline();
