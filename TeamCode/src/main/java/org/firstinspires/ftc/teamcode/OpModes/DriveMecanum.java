@@ -7,10 +7,11 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Control;
 import org.firstinspires.ftc.teamcode.RobotClass;
+import org.firstinspires.ftc.teamcode.Utils;
 
 @TeleOp
 public class DriveMecanum extends Control {
-
+    Utils utils = new Utils(robot);
     @Override
     public void loop() {
         super.loop();
@@ -29,7 +30,7 @@ public class DriveMecanum extends Control {
 
         //disableNonBusyMotors();
         //^^ causes stuttering in motors
-        telemetry.addData("driveMode", driveMode);
+        telemetry.addData("driveMode", Utils.driveMode);
 //        telemetry.addData("liftMode", liftMode);
 //        telemetry.addData("liftPos", liftState);
 //        telemetry.addData("LeftLiftEncoder", robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).getCurrentPosition());
@@ -37,16 +38,16 @@ public class DriveMecanum extends Control {
         telemetry.addLine(String.format("XYH %.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h));
 //        telemetry.addData("currentDrawLiftMotors_MILLIAMPS",
 //                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).getCurrent(CurrentUnit.MILLIAMPS) + robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).getCurrent(CurrentUnit.MILLIAMPS));
-        telemetry.addData("currentDrawDriveTrain_MILLIAMPS", getCurrentDrawDriveTrain(CurrentUnit.MILLIAMPS));
+        telemetry.addData("currentDrawDriveTrain_MILLIAMPS", utils.getCurrentDrawDriveTrain(CurrentUnit.MILLIAMPS));
         telemetry.addData("currentVoltage", robot.voltageSensor.getVoltage());
 
-        mecanumDrive(leftY, leftX, turn);
-        resetIMU(gamepad1.back);
-//        liftPower(liftPower);
-        switchDriveMode(gamepad1.start);
-//        switchLiftMode(gamepad2.start);
-//        extendAndRetractArm(A_2);
-//        flipArm(armPower);
-//        flipBucket(B_2);
+        utils.mecanumDrive(leftY, leftX, turn);
+        utils.resetIMU(gamepad1.back);
+        utils.liftPower(liftPower);
+        utils.switchDriveMode(gamepad1.start);
+        utils.switchLiftMode(gamepad2.start);
+        utils.extendAndRetractArm(A_2);
+        utils.flipArm(armPower);
+        utils.flipBucket(B_2);
     }
 }

@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.Camera.AprilTagPipeline;
 import org.firstinspires.ftc.teamcode.RobotClass;
+import org.firstinspires.ftc.teamcode.Utils;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 import java.util.HashMap;
@@ -22,8 +23,6 @@ public class AutoUtils {
     public static final int CPR_OUTPUT_SHAFT_20TO1 = 560;
     public static final double WHEEL_CIRCUMFERENCE_INCH = 2 * Math.PI * WHEEL_RADIUS;
     public static final double TICKS_PER_INCH = CPR_OUTPUT_SHAFT_20TO1 / WHEEL_CIRCUMFERENCE_INCH;
-    public static final int CAMERA_OFFSET_X = 0;
-    public static final int CAMERA_OFFSET_Y = 0;
     Telemetry telemetry;
     AprilTagPipeline aprilTagPipeline;
     AutoControl autoControl;
@@ -38,38 +37,26 @@ public class AutoUtils {
 
     Map<RobotClass.MOTORS, Double> wheelSpeeds = new HashMap<>();
 
-
-    public void updateOpticalSensorToCameraDetection(int goalTagID) {
-        if (!aprilTagPipeline.getDetections().isEmpty()) {
-            int closestID = aprilTagPipeline.getClosestAprilTagID();
-            if (closestID == goalTagID) {
-                //TODO: set origin based on aprilTag, ensure that aprilTag is placed accurately
-                AprilTagPoseFtc poseFtc = aprilTagPipeline.getClosestAprilTagLocation();
-                SparkFunOTOS.Pose2D updatedPosition = new SparkFunOTOS.Pose2D(poseFtc.x + CAMERA_OFFSET_X, poseFtc.y + CAMERA_OFFSET_Y, opticalSensor.getPosition().h);
-                opticalSensor.setPosition(updatedPosition);
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-        } else {
-            telemetry.addLine("NO DETECTIONS");
-            telemetry.update();
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+    public void runToLiftPos(Utils.LiftState liftState){
+        switch(liftState){
+            case GROUND:
+                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(0);
+                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPosition(0);
+            case LOW:
+                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(100);
+                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPosition(100);
+            case HIGH:
+                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(200);
+                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPosition(200);
         }
+
+        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     @SuppressLint("DefaultLocale")
     public void AutoDrive(double targetDistance_INCH_X, double targetDistance_INCH_Y) {
         ElapsedTime timer = new ElapsedTime();
-
-
         double maxErrorAllowed = .2;
         double kP = 0.05;
         double kI = 0.15;
@@ -114,19 +101,6 @@ public class AutoUtils {
             wheelSpeeds.put(RobotClass.MOTORS.BACK_LEFT, (outputY - outputX) / denominator);
             wheelSpeeds.put(RobotClass.MOTORS.BACK_RIGHT, (outputY + outputX) / denominator);
             //sets motor power and normalizes ranges based on the maximum motor power
-            telemetry.addData("errorX", errorX);
-            telemetry.addData("errorY", errorY);
-            telemetry.addData("outputX", outputX);
-            telemetry.addData("outputY", outputY);
-            telemetry.addData("currentTime", currentTime);
-            telemetry.addData("previousTime", previousTime);
-            telemetry.addData("proportionalX", proportionalX);
-            telemetry.addData("proportionalY", proportionalY);
-            telemetry.addData("integralX", integralX);
-            telemetry.addData("integralY", integralY);
-            telemetry.addData("derivativeX", derivativeX);
-            telemetry.addData("derivativeY", derivativeY);
-            telemetry.update();
             if (Math.abs(errorX) < maxErrorAllowed && Math.abs(errorY) < maxErrorAllowed) {
                 break;
             }
@@ -181,9 +155,7 @@ public class AutoUtils {
             wheelSpeeds.put(RobotClass.MOTORS.BACK_LEFT, -turnVal * powerReduce);
             wheelSpeeds.put(RobotClass.MOTORS.BACK_RIGHT, turnVal * powerReduce);
             wheelSpeeds.put(RobotClass.MOTORS.FRONT_RIGHT, turnVal * powerReduce);
-
             UpdateWheelPowers();
-
             if (angularDistance < 0.5) atTarget = true;
         }
         while (!atTarget);

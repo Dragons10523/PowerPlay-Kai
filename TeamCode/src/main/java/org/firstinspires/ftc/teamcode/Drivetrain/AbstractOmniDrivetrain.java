@@ -27,7 +27,7 @@ public abstract class AbstractOmniDrivetrain {
 
 
     @SuppressLint("DefaultLocale")
-    public void mecanumDrive(double leftY, double leftX, double turn, double heading_RADIANS, Telemetry telemetry) {
+    public void mecanumDrive(double leftY, double leftX, double turn, double heading_RADIANS) {
         // drive == y strafe == x
 
         //starting value off by 90 degrees; 270 == -90
@@ -41,13 +41,6 @@ public abstract class AbstractOmniDrivetrain {
         Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setPower((rotY - rotX + turn) / denominator);
         Motors.get(RobotClass.MOTORS.BACK_RIGHT).setPower((rotY + rotX + turn) / denominator);
 
-//        telemetry.addData("heading_DEGREES", Math.toDegrees(heading_RADIANS));
-//        telemetry.addData("rotX", rotX);
-//        telemetry.addData("rotY", rotY);
-//        telemetry.addData("denominator", denominator);
-
-        // telemetry.addLine(String.format("wheelSpeeds %6.1f %6.1f %6.1f %6.1f (speed)",  correctedWheelDrift[0], correctedWheelDrift[1], correctedWheelDrift[2], correctedWheelDrift[3]));
-        telemetry.update();
     }
 
 }

@@ -7,16 +7,14 @@ import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.Control;
 import org.firstinspires.ftc.teamcode.RobotClass;
 import org.firstinspires.ftc.teamcode.Susbsystem.AutoUtils;
+import org.firstinspires.ftc.teamcode.Utils;
 
 import java.util.function.BooleanSupplier;
 
 @Autonomous(name = "Auto_Red_Left")
 public class AutoControlRedLeft extends AutoControl {
-    public RobotClass robot;
-    private final Control.FieldSide fieldSide = Control.FieldSide.RED_LEFT;
-    private static boolean stop = false;
-    public static BooleanSupplier isStopRequested = () -> stop;
-    AutoUtils autoUtils;
+
+    private final Utils.FieldSide fieldSide = Utils.FieldSide.RED_LEFT;
 
     @Override
     public void runOpMode() throws InterruptedException {
