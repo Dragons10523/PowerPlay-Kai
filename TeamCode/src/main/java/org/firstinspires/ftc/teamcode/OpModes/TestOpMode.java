@@ -1,38 +1,76 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.ServoController;
 
-import org.firstinspires.ftc.teamcode.Control;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.RobotClass;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @TeleOp
-public class TestOpMode extends Control {
-    Map<RobotClass.MOTORS, Double> wheelSpeeds = new HashMap<>();
-    boolean atTarget = false;
-    double angularDistance = 0;
-    double targetAngle = -90.0;
-    int turnVal = 1;
-
+public class TestOpMode extends LinearOpMode {
+    RobotClass robot;
     @Override
-    public void start() {
-        super.start();
-    }
-    ElapsedTime time = new ElapsedTime();
-    @Override
-    public void loop() {
-        super.loop();
-        robot.Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setPower(gamepad1.left_trigger - gamepad1.right_trigger);
+    public void runOpMode() throws InterruptedException {
+        robot = new RobotClass(hardwareMap);
+        robot.initMotorsComp();
+
+
+
+        waitForStart();
+        boolean firstPressA = true;
+        boolean firstPressB = true;
+        boolean firstPressY = true;
+        boolean firstPressX = true;
+        double servoPos1 = 0;
+        double servoPos2 = 0;
+        //servoPos1 rest = 0.78 ish
+        //servoPos1 extended = 0 ish
+        robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(servoPos1);
+        robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(servoPos2);
+        while(opModeIsActive()){
+           if(!gamepad1.a){
+               firstPressA = true;
+           }
+           if(gamepad1.a && firstPressA){
+               firstPressA = false;
+               servoPos1 += .01;
+               robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(servoPos1);
+           }
+            if(!gamepad1.b){
+                firstPressB = true;
+            }
+            if(gamepad1.b && firstPressB){
+                firstPressB = false;
+                servoPos1 -= .01;
+                robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(servoPos1);
+            }
+            if(!gamepad1.x){
+                firstPressX = true;
+            }
+            if(gamepad1.x && firstPressX){
+                firstPressX = false;
+                servoPos2 += .01;
+                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(servoPos2);
+            }
+            if(!gamepad1.y){
+                firstPressY = true;
+            }
+            if(gamepad1.y && firstPressY){
+                firstPressY = false;
+                servoPos2 -= .01;
+                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(servoPos2);
+            }
+           telemetry.addData("servoPos1", servoPos1);
+           telemetry.addData("servoPos2", servoPos2);
+           telemetry.update();
+
+        }
     }
 
-    public void UpdateWheelPowers() {
-        robot.Motors.get(RobotClass.MOTORS.FRONT_LEFT).setPower(wheelSpeeds.get(RobotClass.MOTORS.FRONT_LEFT));
-        robot.Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setPower(wheelSpeeds.get(RobotClass.MOTORS.FRONT_RIGHT));
-        robot.Motors.get(RobotClass.MOTORS.BACK_LEFT).setPower(wheelSpeeds.get(RobotClass.MOTORS.BACK_LEFT));
-        robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT).setPower(wheelSpeeds.get(RobotClass.MOTORS.BACK_RIGHT));
-    }
 
 }

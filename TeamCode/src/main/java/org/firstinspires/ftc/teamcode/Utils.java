@@ -62,17 +62,8 @@ public class Utils {
     public void setMotorPower(RobotClass.MOTORS motor, double power){
         robot.Motors.get(motor).setPower(power);
     }
-    private boolean firstPress = true;
-    public boolean singleFunctionCall(boolean button){
-        if(!button){
-            firstPress = true;
-        }
-        if(button && firstPress){
-            firstPress = false;
-            return true;
-        }
-        return false;
-    }
+
+
     public void runToLiftPos(){
         switch(liftState){
             case GROUND:
@@ -96,12 +87,17 @@ public class Utils {
         } else {
             heading = 0;
         }
+
         robot.drivetrain.mecanumDrive(leftY, leftX, turn, heading);
     }
+    boolean firstPressLiftPower = true;
     public void liftPower(double liftPower){
-        boolean firstPress = singleFunctionCall(liftPower == 0);
+        if(liftPower == 0){
+            firstPressLiftPower = true;
+        }
         if(Utils.liftMode == Utils.LiftMode.ENCODER_DRIVE){
-            if(liftPower == 1 && firstPress){
+            if(liftPower == 1 && firstPressLiftPower){
+                firstPressLiftPower = false;
                 switch(Utils.liftState) {
                     case GROUND:
                         Utils.liftState = Utils.LiftState.LOW;
@@ -112,7 +108,8 @@ public class Utils {
                 }
                 runToLiftPos();
             }
-            if(liftPower == -1 && firstPress){
+            if(liftPower == -1 && firstPressLiftPower){
+                firstPressLiftPower = false;
                 switch(Utils.liftState){
                     case HIGH:
                         Utils.liftState = Utils.LiftState.LOW;
@@ -123,23 +120,32 @@ public class Utils {
                 }
                 runToLiftPos();
             }
-        }else{
+        }
+        else{
             robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setPower(liftPower);
             robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setPower(liftPower);
         }
     }
+    boolean firstPressExtendAndRetractArm = true;
     public void extendAndRetractArm(boolean button){
-        boolean firstPress = singleFunctionCall(button);
-        if(firstPress){
+        if(!button){
+            firstPressExtendAndRetractArm = true;
+        }
+        if(button && firstPressExtendAndRetractArm){
+            firstPressExtendAndRetractArm = false;
             switch(Utils.armState){
                 case IN:
                     Utils.armState = Utils.ArmState.EXTENDED;
+                    robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.51);
+                    robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.76);
                     break;
                 case EXTENDED:
                     Utils.armState = Utils.ArmState.IN;
+                    robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.79);
+                    robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.51);
                     break;
             }
-            runToArmState();
+
         }
     }
     public void flipArm(double power){
@@ -147,16 +153,28 @@ public class Utils {
 
         robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(power);
     }
+    public void powerIntake(double power){
+        power = Math.min(.75, Math.max(-.75, power));
+        robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(power);
+    }
+    boolean firstPressResetIMU = true;
     public void resetIMU(boolean button) {
-        boolean firstPress = singleFunctionCall(button);
-        if(firstPress){
+        if(!button){
+            firstPressResetIMU = true;
+        }
+        if(button && firstPressResetIMU){
+            firstPressResetIMU = false;
             robot.resetIMU();
         }
 
     }
+    boolean firstPressSwitchDriveMode = true;
     public void switchDriveMode(boolean button) {
-        boolean firstPress = singleFunctionCall(button);
-        if (firstPress) {
+        if(!button){
+            firstPressSwitchDriveMode = true;
+        }
+        if (button && firstPressSwitchDriveMode) {
+            firstPressSwitchDriveMode = false;
             switch (Utils.driveMode) {
                 case GLOBAL:
                     Utils.driveMode = Utils.DriveMode.LOCAL;
@@ -167,9 +185,13 @@ public class Utils {
             }
         }
     }
+    boolean firstPressFlipBucket = true;
     public void flipBucket(boolean button){
-        boolean firstPress = singleFunctionCall(button);
-        if(firstPress){
+        if(!button){
+            firstPressFlipBucket = true;
+        }
+        if(button && firstPressFlipBucket) {
+            firstPressFlipBucket = false;
             timeWhenPressed = elapsedTime.seconds();
             robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0);
         }
@@ -177,9 +199,13 @@ public class Utils {
             robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(1);
         }
     }
+    boolean firstPressSwitchLiftMode = true;
     public void switchLiftMode(boolean button){
-        boolean firstPress = singleFunctionCall(button);
-        if(firstPress){
+        if(!button){
+            firstPressSwitchLiftMode = true;
+        }
+        if(button && firstPressSwitchLiftMode){
+            firstPressSwitchLiftMode = false;
             switch (Utils.liftMode) {
                 case ENCODER_DRIVE:
                     Utils.liftMode = Utils.LiftMode.RAW_POWER;
@@ -193,16 +219,6 @@ public class Utils {
                     robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     break;
             }
-        }
-    }
-    public void runToArmState(){
-        switch(Utils.armState){
-            case IN:
-                robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0);
-                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0);
-            case EXTENDED:
-                robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(-1);
-                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(-1);
         }
     }
     public double getCurrentDrawDriveTrain(CurrentUnit currentUnit){

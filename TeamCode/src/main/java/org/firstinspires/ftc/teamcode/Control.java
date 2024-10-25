@@ -6,17 +6,21 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Auto.OpticalSensor;
+import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.SampleMecanumDrive;
 
 public class Control extends OpMode {
     public RobotClass robot;
     ElapsedTime elapsedTime = new ElapsedTime();
-
+    public Utils utils;
+    public SampleMecanumDrive drive;
     @Override
     public void init() {
+        OpticalSensor opticalSensorObj = new OpticalSensor();
         robot = new RobotClass(hardwareMap);
-        robot.initMotorsProto();
-        OpticalSensor.configureOtos(robot);
-        robot.opticalSensor.resetTracking();
+        utils = new Utils(robot);
+        robot.initMotorsComp();
+        opticalSensorObj.configureOtos(robot);
+        drive = new SampleMecanumDrive(hardwareMap);
     }
     @Override
     public void loop() {

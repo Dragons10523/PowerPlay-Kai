@@ -31,7 +31,6 @@ public class RobotClass {
     public Map<MOTORS, DcMotorEx> Motors;
     public Map<SERVOS, Servo> Servos;
     public Map<CR_SERVOS, CRServo> CR_Servos;
-    public final IMU imu;
     public OpenCvWebcam camera1;
     public WebcamName webcamName;
     public Utils utils;
@@ -60,7 +59,9 @@ public class RobotClass {
     public RobotClass(HardwareMap hwmap) {
         this.hwmap = hwmap;
 
-        imu = hwmap.get(IMU.class, "imu");
+
+        opticalSensor = hwmap.get(SparkFunOTOS.class, "opticalSensor");
+
         Motors = new HashMap<>();
         Servos = new HashMap<>();
         CR_Servos = new HashMap<>();
@@ -69,32 +70,17 @@ public class RobotClass {
         Motors.put(MOTORS.BACK_LEFT, hwmap.get(DcMotorEx.class, "backLeft"));
         Motors.put(MOTORS.BACK_RIGHT, hwmap.get(DcMotorEx.class, "backRight"));
         voltageSensor = hwmap.get(VoltageSensor.class, "Control Hub");
-
-
-
-//        Motors.put(MOTORS.LIFT_LEFT, hwmap.get(DcMotorEx.class, "liftLeft"));
-//        Motors.put(MOTORS.LIFT_RIGHT, hwmap.get(DcMotorEx.class,"liftRight"));
-//        Motors.put(MOTORS.ARM_FLIP, hwmap.get(DcMotorEx.class, "armFlip"));
-//        //port 1, 2, 3 expansion hub
-//
-//        Servos.put(SERVOS.ARM_LEFT, hwmap.get(Servo.class, "armLeft"));
-//        Servos.put(SERVOS.ARM_RIGHT, hwmap.get(Servo.class, "armRight"));
-//        Servos.put(SERVOS.BUCKET, hwmap.get(Servo.class, "bucket"));
-//        //port 1, 2 expansion hub
-//
-//        CR_Servos.put(CR_SERVOS.INTAKE, hwmap.get(CRServo.class, "intake"));
-        //port 5 expansion hub
-        Utils utils = new Utils(this);
+        initMotorsProto();
+        //initMotorsComp();
+        new Utils(this);
         drivetrain = new MecanumDrive(Motors, this);
 
-        opticalSensor = hwmap.get(SparkFunOTOS.class, "opticalSensor");
+
+
+
+
         //webcamName = hwmap.get(WebcamName.class, "Webcam 1");
         //camera1 = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
-        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD);
-
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
     }
     public double getHeading() {
         return opticalSensor.getPosition().h;
@@ -102,7 +88,7 @@ public class RobotClass {
     public void resetIMU() {
         opticalSensor.calibrateImu(100, true);
     }
-    public void initMotorsProto() {
+    private void initMotorsProto() {
         Motors.get(MOTORS.FRONT_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
         Motors.get(MOTORS.BACK_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
         Motors.get(MOTORS.FRONT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
@@ -111,10 +97,24 @@ public class RobotClass {
         //Proto-Bot
     }
     public void initMotorsComp(){
+        Motors.put(MOTORS.LIFT_LEFT, hwmap.get(DcMotorEx.class, "liftLeft"));
+        Motors.put(MOTORS.LIFT_RIGHT, hwmap.get(DcMotorEx.class,"liftRight"));
+        Motors.put(MOTORS.ARM_FLIP, hwmap.get(DcMotorEx.class, "armFlip"));
+        //port 1, 2, 3 expansion hub
+
+        Servos.put(SERVOS.ARM_LEFT, hwmap.get(Servo.class, "armLeft"));
+        Servos.put(SERVOS.ARM_RIGHT, hwmap.get(Servo.class, "armRight"));
+        Servos.put(SERVOS.BUCKET, hwmap.get(Servo.class, "bucket"));
+        //port 1, 2 expansion hub
+
+        CR_Servos.put(CR_SERVOS.INTAKE, hwmap.get(CRServo.class, "intake"));
+        //port 5 expansion hub
         Motors.get(MOTORS.FRONT_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
         Motors.get(MOTORS.BACK_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
         Motors.get(MOTORS.FRONT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
         Motors.get(MOTORS.BACK_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
+
+        Motors.get(MOTORS.ARM_FLIP).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         Motors.get(MOTORS.FRONT_RIGHT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         Motors.get(MOTORS.FRONT_LEFT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -125,9 +125,5 @@ public class RobotClass {
         Motors.get(MOTORS.LIFT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
         Motors.get(MOTORS.LIFT_LEFT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         Motors.get(MOTORS.LIFT_RIGHT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-
-
     }
-
-
 }

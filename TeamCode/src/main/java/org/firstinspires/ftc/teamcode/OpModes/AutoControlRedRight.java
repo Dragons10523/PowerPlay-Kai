@@ -4,12 +4,9 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.AutoControl;
-import org.firstinspires.ftc.teamcode.Control;
 import org.firstinspires.ftc.teamcode.RobotClass;
-import org.firstinspires.ftc.teamcode.Susbsystem.AutoUtils;
+import org.firstinspires.ftc.teamcode.Auto.AutoUtils;
 import org.firstinspires.ftc.teamcode.Utils;
-
-import java.util.function.BooleanSupplier;
 
 @Autonomous(name = "Auto_Red_Right")
 public class AutoControlRedRight extends AutoControl {

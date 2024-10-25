@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Susbsystem;
+package org.firstinspires.ftc.teamcode.Auto;
 
 import android.annotation.SuppressLint;
 
@@ -18,7 +18,6 @@ import java.util.Map;
 
 public class AutoUtils {
     RobotClass robot;
-    SparkFunOTOS opticalSensor;
     public static final int WHEEL_RADIUS = 2;
     public static final int CPR_OUTPUT_SHAFT_20TO1 = 560;
     public static final double WHEEL_CIRCUMFERENCE_INCH = 2 * Math.PI * WHEEL_RADIUS;
@@ -29,7 +28,6 @@ public class AutoUtils {
 
     public AutoUtils(RobotClass robot, Telemetry telemetry) {
         this.robot = robot;
-        opticalSensor = robot.opticalSensor;
         this.telemetry = telemetry;
         //aprilTagPipeline = new AprilTagPipeline(robot.webcamName, telemetry);
         autoControl = new AutoControl();

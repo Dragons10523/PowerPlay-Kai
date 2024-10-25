@@ -63,10 +63,10 @@ import static org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.DriveCo
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0.5*5, 0.2*5, 0.2);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(4, 1, 0.01);
 
-    public static double LATERAL_MULTIPLIER = 1;
+    public static double LATERAL_MULTIPLIER = (double) 10 /9;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -91,6 +91,7 @@ public class SampleMecanumDrive extends MecanumDrive {
     public SampleMecanumDrive(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
+
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
                 new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
 
@@ -104,9 +105,9 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         RobotClass robot = new RobotClass(hardwareMap);
 
-        OpticalSensor.configureOtos(robot);
+        OpticalSensor opticalSensor = new OpticalSensor();
+        opticalSensor.configureOtos(robot);
 
-        imu = robot.imu;
 
         leftFront = robot.Motors.get(RobotClass.MOTORS.FRONT_LEFT);
         leftRear = robot.Motors.get(RobotClass.MOTORS.BACK_LEFT);
@@ -143,7 +144,7 @@ public class SampleMecanumDrive extends MecanumDrive {
             @Override
             public Pose2d getPoseEstimate() {
                 SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
-                return new Pose2d(-pose2D.x, -pose2D.y, pose2D.h);
+                return new Pose2d(-pose2D.y, pose2D.x, pose2D.h);
             }
 
             @Override
@@ -155,7 +156,7 @@ public class SampleMecanumDrive extends MecanumDrive {
             @Override
             public Pose2d getPoseVelocity() {
                 SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getVelocity();
-                return new Pose2d(-pose2D.y, -pose2D.x, pose2D.h);
+                return new Pose2d(-pose2D.y, pose2D.x, pose2D.h);
                 //x and y reversed
             }
 
