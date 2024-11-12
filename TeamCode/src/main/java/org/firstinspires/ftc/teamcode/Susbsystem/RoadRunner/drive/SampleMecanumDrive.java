@@ -63,7 +63,7 @@ import static org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.DriveCo
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0.5*5, 0.2*5, 0.2);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0.3*5, 0.1*5, 0.2);
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(4, 1, 0.01);
 
     public static double LATERAL_MULTIPLIER = (double) 10 /9;
@@ -105,8 +105,8 @@ public class SampleMecanumDrive extends MecanumDrive {
 
         RobotClass robot = new RobotClass(hardwareMap);
 
-        OpticalSensor opticalSensor = new OpticalSensor();
-        opticalSensor.configureOtos(robot);
+        new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
+
 
 
         leftFront = robot.Motors.get(RobotClass.MOTORS.FRONT_LEFT);
@@ -114,6 +114,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         rightRear = robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT);
         rightFront = robot.Motors.get(RobotClass.MOTORS.FRONT_RIGHT);
 
+        imu = robot.imu;
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
         for (DcMotorEx motor : motors) {
@@ -144,7 +145,7 @@ public class SampleMecanumDrive extends MecanumDrive {
             @Override
             public Pose2d getPoseEstimate() {
                 SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
-                return new Pose2d(-pose2D.y, pose2D.x, pose2D.h);
+                return new Pose2d(pose2D.x, pose2D.y, pose2D.h);
             }
 
             @Override
@@ -156,8 +157,8 @@ public class SampleMecanumDrive extends MecanumDrive {
             @Override
             public Pose2d getPoseVelocity() {
                 SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getVelocity();
-                return new Pose2d(-pose2D.y, pose2D.x, pose2D.h);
-                //x and y reversed
+                return new Pose2d(pose2D.x, pose2D.y, pose2D.h);
+
             }
 
             @Override

@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import android.annotation.SuppressLint;
+
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,68 +12,38 @@ import com.qualcomm.robotcore.hardware.ServoController;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.RobotClass;
+import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.Utils;
 
 
 @TeleOp
-public class TestOpMode extends LinearOpMode {
-    RobotClass robot;
+public class TestOpMode extends AutoControl {
+    private final Utils.FieldSide fieldSide = Utils.FieldSide.BLUE_LEFT;
+
+    @SuppressLint("DefaultLocale")
     @Override
     public void runOpMode() throws InterruptedException {
-        robot = new RobotClass(hardwareMap);
-        robot.initMotorsComp();
+        super.runOpMode();
 
+        super.initialize();
 
-
-        waitForStart();
-        boolean firstPressA = true;
-        boolean firstPressB = true;
-        boolean firstPressY = true;
-        boolean firstPressX = true;
-        double servoPos1 = 0;
-        double servoPos2 = 0;
-        //servoPos1 rest = 0.78 ish
-        //servoPos1 extended = 0 ish
-        robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(servoPos1);
-        robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(servoPos2);
-        while(opModeIsActive()){
-           if(!gamepad1.a){
-               firstPressA = true;
-           }
-           if(gamepad1.a && firstPressA){
-               firstPressA = false;
-               servoPos1 += .01;
-               robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(servoPos1);
-           }
-            if(!gamepad1.b){
-                firstPressB = true;
-            }
-            if(gamepad1.b && firstPressB){
-                firstPressB = false;
-                servoPos1 -= .01;
-                robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(servoPos1);
-            }
-            if(!gamepad1.x){
-                firstPressX = true;
-            }
-            if(gamepad1.x && firstPressX){
-                firstPressX = false;
-                servoPos2 += .01;
-                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(servoPos2);
-            }
-            if(!gamepad1.y){
-                firstPressY = true;
-            }
-            if(gamepad1.y && firstPressY){
-                firstPressY = false;
-                servoPos2 -= .01;
-                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(servoPos2);
-            }
-           telemetry.addData("servoPos1", servoPos1);
-           telemetry.addData("servoPos2", servoPos2);
-           telemetry.update();
-
+        while(!isStarted()){
+            SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
+            telemetry.addLine(String.format("XYH %.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h));
+            telemetry.update();
         }
+        waitForStart();
+
+        autoUtils.verticalSlide(Utils.LiftState.HIGH);
+
+        //drive.followTrajectorySequence(trajSeq);
+//        while(opModeIsActive()){
+//            SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
+//            telemetry.addLine(String.format("XYH %.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h));
+//            telemetry.update();
+//        }
     }
 
 

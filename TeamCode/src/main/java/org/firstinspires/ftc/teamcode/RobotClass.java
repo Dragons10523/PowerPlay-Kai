@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.ImuOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
@@ -27,13 +28,13 @@ import java.util.Map;
 
 public class RobotClass {
     public AbstractOmniDrivetrain drivetrain;
-
     public Map<MOTORS, DcMotorEx> Motors;
     public Map<SERVOS, Servo> Servos;
     public Map<CR_SERVOS, CRServo> CR_Servos;
     public OpenCvWebcam camera1;
     public WebcamName webcamName;
     public Utils utils;
+    public final IMU imu;
 
     public SparkFunOTOS opticalSensor;
     public VoltageSensor voltageSensor;
@@ -59,7 +60,6 @@ public class RobotClass {
     public RobotClass(HardwareMap hwmap) {
         this.hwmap = hwmap;
 
-
         opticalSensor = hwmap.get(SparkFunOTOS.class, "opticalSensor");
 
         Motors = new HashMap<>();
@@ -70,23 +70,28 @@ public class RobotClass {
         Motors.put(MOTORS.BACK_LEFT, hwmap.get(DcMotorEx.class, "backLeft"));
         Motors.put(MOTORS.BACK_RIGHT, hwmap.get(DcMotorEx.class, "backRight"));
         voltageSensor = hwmap.get(VoltageSensor.class, "Control Hub");
-        initMotorsProto();
-        //initMotorsComp();
+        imu = hwmap.get(IMU.class, "imu");
+        //initMotorsProto();
+        initMotorsComp();
         new Utils(this);
         drivetrain = new MecanumDrive(Motors, this);
 
+//        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
+//                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+//                RevHubOrientationOnRobot.UsbFacingDirection.UP);
+//
+//        imu.initialize(new IMU.Parameters(orientationOnRobot));
 
-
-
-
-        //webcamName = hwmap.get(WebcamName.class, "Webcam 1");
-        //camera1 = OpenCvCameraFactory.getInstance().createWebcam(webcamName);
+        //IMU become defective when volts drop too low
     }
     public double getHeading() {
         return opticalSensor.getPosition().h;
     }
     public void resetIMU() {
-        opticalSensor.calibrateImu(100, true);
+        opticalSensor.setOffset(new SparkFunOTOS.Pose2D(
+                opticalSensor.getOffset().x,
+                opticalSensor.getOffset().y,
+                opticalSensor.getOffset().h + opticalSensor.getPosition().h));
     }
     private void initMotorsProto() {
         Motors.get(MOTORS.FRONT_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
@@ -108,22 +113,28 @@ public class RobotClass {
         //port 1, 2 expansion hub
 
         CR_Servos.put(CR_SERVOS.INTAKE, hwmap.get(CRServo.class, "intake"));
+
         //port 5 expansion hub
         Motors.get(MOTORS.FRONT_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
         Motors.get(MOTORS.BACK_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
         Motors.get(MOTORS.FRONT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
         Motors.get(MOTORS.BACK_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
 
+        Motors.get(MOTORS.FRONT_LEFT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        Motors.get(MOTORS.BACK_LEFT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        Motors.get(MOTORS.FRONT_RIGHT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        Motors.get(MOTORS.BACK_RIGHT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        Motors.get(MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Motors.get(MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
         Motors.get(MOTORS.ARM_FLIP).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        Motors.get(MOTORS.FRONT_RIGHT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        Motors.get(MOTORS.FRONT_LEFT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        Motors.get(MOTORS.BACK_LEFT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        Motors.get(MOTORS.BACK_RIGHT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        Motors.get(MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Motors.get(MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        Motors.get(MOTORS.LIFT_LEFT).setDirection(DcMotorSimple.Direction.FORWARD);
-        Motors.get(MOTORS.LIFT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);
-        Motors.get(MOTORS.LIFT_LEFT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        Motors.get(MOTORS.LIFT_RIGHT).setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        Motors.get(MOTORS.LIFT_LEFT).setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        Motors.get(MOTORS.LIFT_RIGHT).setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 }

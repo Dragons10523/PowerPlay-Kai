@@ -25,18 +25,11 @@ public class AutoControl extends LinearOpMode {
     }
 
     public void initialize(){
-        OpticalSensor opticalSensorObj = new OpticalSensor();
         robot = new RobotClass(hardwareMap);
         drive = new SampleMecanumDrive(hardwareMap);
         autoUtils = new AutoUtils(robot, telemetry);
-        opticalSensorObj.configureOtos(robot);
+        new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
         //^^^^ fixes inertial odometry  drift
     }
-    public Pose2d getCurrentAdjustedPosition(){
-        SparkFunOTOS.Pose2D pos = robot.opticalSensor.getPosition();
-        double adjustedX = -pos.y;
-        double adjustedY = pos.x;
 
-        return new Pose2d(adjustedX, adjustedY, pos.h);
-    }
 }

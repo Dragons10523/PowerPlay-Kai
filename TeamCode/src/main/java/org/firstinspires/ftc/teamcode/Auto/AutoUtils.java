@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AutoUtils {
+    ElapsedTime time = new ElapsedTime();
     RobotClass robot;
     public static final int WHEEL_RADIUS = 2;
     public static final int CPR_OUTPUT_SHAFT_20TO1 = 560;
@@ -35,8 +36,8 @@ public class AutoUtils {
 
     Map<RobotClass.MOTORS, Double> wheelSpeeds = new HashMap<>();
 
-    public void runToLiftPos(Utils.LiftState liftState){
-        switch(liftState){
+    public void runToLiftPos(Utils.LiftState liftState) {
+        switch (liftState) {
             case GROUND:
                 robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(0);
                 robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPosition(0);
@@ -160,14 +161,6 @@ public class AutoUtils {
         stopMotors();
     }
 
-    public void simplePower(double power) {
-        wheelSpeeds.put(RobotClass.MOTORS.FRONT_LEFT, power);
-        wheelSpeeds.put(RobotClass.MOTORS.BACK_LEFT, power);
-        wheelSpeeds.put(RobotClass.MOTORS.BACK_RIGHT, power);
-        wheelSpeeds.put(RobotClass.MOTORS.FRONT_RIGHT, power);
-        UpdateWheelPowers();
-    }
-
     public void stopMotors() {
         wheelSpeeds.put(RobotClass.MOTORS.FRONT_LEFT, 0.0);
         wheelSpeeds.put(RobotClass.MOTORS.BACK_LEFT, 0.0);
@@ -208,6 +201,84 @@ public class AutoUtils {
         robot.Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         robot.Motors.get(RobotClass.MOTORS.BACK_LEFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    }
+
+    public void intakeTransition() {
+
+        //move arm in
+        robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.79);
+        robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.51);
+
+        //flip arm up
+        armFlip(Utils.ArmFlipState.UP);
+        //extake pixel into bucket
+        double startTime = time.seconds();
+        while (startTime + 0.7 > time.seconds()) {
+            robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(.75);
+        }
+        //turn off intake
+        robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0);
+
+        armFlip(Utils.ArmFlipState.GROUND);
+
+    }
+
+    public void armFlip(Utils.ArmFlipState state) {
+        double startTime = time.seconds();
+        switch (state) {
+            case GROUND:
+                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(1200);
+
+                while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < 1200 - 10
+                        || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 1200 + 10) {
+                    robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(.8);
+                    if (startTime + 2 < time.seconds()) {
+                        break;
+                    }
+                }
+                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0);
+                break;
+            case UP:
+                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(0);
+
+                while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < -10
+                        || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 10) {
+                    robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(.8);
+                    if (startTime + 2 < time.seconds()) {
+                        break;
+                    }
+                }
+                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0);
+                break;
+        }
+
+    }
+
+    public void verticalSlide(Utils.LiftState liftState) {
+        switch (liftState) {
+            case HIGH:
+                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPosition(4600);
+                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(4600);
+
+                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setPower(1);
+                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setPower(1);
+                break;
+            case GROUND:
+                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPosition(0);
+                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(0);
+
+                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setPower(1);
+                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setPower(1);
+                break;
+        }
     }
 
     public double constrainDouble(double lowerBound, double upperBound, double val) {

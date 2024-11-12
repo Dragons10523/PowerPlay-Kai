@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.RobotClass;
 import org.firstinspires.ftc.teamcode.Auto.AutoUtils;
 import org.firstinspires.ftc.teamcode.Utils;
 
-@Autonomous(name = "Auto_Blue_Right")
+@Autonomous(name = "Auto_Right")
 public class AutoControlBlueRight extends AutoControl {
     public RobotClass robot;
     private final Utils.FieldSide fieldSide = Utils.FieldSide.BLUE_RIGHT;
