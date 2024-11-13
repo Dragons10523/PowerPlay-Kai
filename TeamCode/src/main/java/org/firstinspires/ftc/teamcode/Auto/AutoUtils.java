@@ -15,6 +15,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 public class AutoUtils {
     ElapsedTime time = new ElapsedTime();
@@ -256,29 +257,51 @@ public class AutoUtils {
 
     }
 
+    public static boolean isLiftAtPos = false;
     public void verticalSlide(Utils.LiftState liftState) {
+        //TODO: encoders possibly not synced up, may result in improper results from RUN_TO_POSITION
+        robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPositionTolerance(10);
+        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPositionTolerance(10);
+        isLiftAtPos = false;
+        double startTime = time.seconds();
         switch (liftState) {
             case HIGH:
-                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPosition(4600);
-                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(4600);
-
-                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setPower(1);
-                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setPower(1);
+                setLiftTargetPos(4600);
+                while (robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).getCurrentPosition() < 4600
+                        || robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).getCurrentPosition() > 4650)
+                {
+                    setLiftMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    setLiftPower(.8);
+                }
+                robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0);
+                setLiftPower(0);
+                isLiftAtPos = true;
                 break;
             case GROUND:
-                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPosition(0);
-                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(0);
-
-                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setPower(1);
-                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setPower(1);
+                robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(.5);
+                setLiftTargetPos(0);
+                while (robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).getCurrentPosition() < 10
+                        || robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).getCurrentPosition() > -10)
+                {
+                    setLiftMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    setLiftPower(.8);
+                }
+                setLiftPower(0);
+                isLiftAtPos = true;
                 break;
         }
+    }
+    public void setLiftMode(DcMotor.RunMode runMode){
+        robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(runMode);
+        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMode(runMode);
+    }
+    public void setLiftTargetPos(int targetPos){
+        robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPosition(targetPos);
+        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(targetPos);
+    }
+    public void setLiftPower(double power){
+        robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setPower(power);
+        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setPower(power);
     }
 
     public double constrainDouble(double lowerBound, double upperBound, double val) {
