@@ -19,6 +19,11 @@ public class AutoLeft extends AutoControl {
 
     private final Utils.FieldSide fieldSide = Utils.FieldSide.BLUE_LEFT;
 
+    static enum AutoState{
+        FIRST_SCORE,
+        MOVE_TO_BLOCK,
+
+    }
 
     @SuppressLint("DefaultLocale")
     @Override

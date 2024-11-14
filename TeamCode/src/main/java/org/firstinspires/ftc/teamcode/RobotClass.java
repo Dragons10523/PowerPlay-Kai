@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -32,9 +33,7 @@ public class RobotClass {
     public Map<MOTORS, DcMotorEx> Motors;
     public Map<SERVOS, Servo> Servos;
     public Map<CR_SERVOS, CRServo> CR_Servos;
-    public OpenCvWebcam camera1;
-    public WebcamName webcamName;
-    public Utils utils;
+    public Limelight3A limelight;
     public final IMU imu;
 
     public SparkFunOTOS opticalSensor;
@@ -76,6 +75,7 @@ public class RobotClass {
         initMotorsComp();
         new Utils(this);
         drivetrain = new MecanumDrive(Motors, this);
+        limelight = hwmap.get(Limelight3A.class, "limelight");
 
 //        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
 //                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
