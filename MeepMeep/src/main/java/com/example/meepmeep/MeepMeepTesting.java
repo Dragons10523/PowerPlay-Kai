@@ -19,26 +19,21 @@ public class MeepMeepTesting {
         MeepMeep meepMeep = new MeepMeep(800);
 
         Pose2d scorePosition = new Pose2d(53, 53, Math.toRadians(225));
+        Pose2d AutoRightPos = new Pose2d(-14, 62, 0);
+        Pose2d AutoLeftPos = new Pose2d(33, 62, Math.toRadians(270));
+        Pose2d AutoRightScorePos = new Pose2d(-14,62, Math.toRadians(180));
         double bucketScoreTime = 2;
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(30, 30, Math.toRadians(137.87183), Math.toRadians(90), 5.57)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(32.5, 62, Math.toRadians(270)))
-                        .addTemporalMarker(0, () -> {
-                            //autoUtils.armFlip(Utils.ArmFlipState.GROUND);
-                        })
-                        .splineToLinearHeading(scorePosition, Math.toRadians(225))
-                        .forward(-0.5)
-                        .addTemporalMarker(2,()->{
-                        })//extend vertical slides and score
-                        .waitSeconds(bucketScoreTime)
-                        .addTemporalMarker(0, () -> {
-                        }) //retract vertical slides
-                        .splineToLinearHeading(new Pose2d(36, 39, Math.toRadians(315)), Math.toRadians(315))
-                        .waitSeconds(2)
-                        .forward(2)
-                        .addDisplacementMarker(() -> {
-                        }) //perform intake transition
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(AutoLeftPos)
+
+                        .addTemporalMarker(0, () -> {}) //retract vertical slides
+                        .forward(3)
+                        .splineToLinearHeading(new Pose2d(35.5, 42, Math.toRadians(315)), Math.toRadians(315))
+                        .waitSeconds(1)
+                        .addTemporalMarker(()->{})
+                        .waitSeconds(1)
                         .build());
 
 

@@ -206,16 +206,13 @@ public class AutoUtils {
 
     public void intakeTransition() {
 
-        //move arm in
-        robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.79);
-        robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.51);
 
         //flip arm up
         armFlip(Utils.ArmFlipState.UP);
         //extake pixel into bucket
         double startTime = time.seconds();
-        while (startTime + 0.7 > time.seconds()) {
-            robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(.75);
+        while (startTime + 0.5 > time.seconds()) {
+            robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
         }
         //turn off intake
         robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0);

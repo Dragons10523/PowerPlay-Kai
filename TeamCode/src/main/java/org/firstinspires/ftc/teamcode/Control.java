@@ -18,6 +18,7 @@ public class Control extends OpMode {
         utils = new Utils(robot);
         robot.initMotorsComp();
         drive = new SampleMecanumDrive(hardwareMap);
+        new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
     }
     @Override
     public void loop() {

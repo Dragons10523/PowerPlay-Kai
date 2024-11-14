@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Drivetrain.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Drivetrain.AbstractOmniDrivetrain;
 import org.openftc.easyopencv.OpenCvWebcam;
@@ -88,10 +89,10 @@ public class RobotClass {
         return opticalSensor.getPosition().h;
     }
     public void resetIMU() {
-        opticalSensor.setOffset(new SparkFunOTOS.Pose2D(
-                opticalSensor.getOffset().x,
-                opticalSensor.getOffset().y,
-                opticalSensor.getOffset().h + opticalSensor.getPosition().h));
+        SparkFunOTOS.Pose2D pos = opticalSensor.getPosition();
+        SparkFunOTOS.Pose2D posNew = new SparkFunOTOS.Pose2D(pos.x, pos.y, 0);
+
+        opticalSensor.setPosition(posNew);
     }
     private void initMotorsProto() {
         Motors.get(MOTORS.FRONT_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
@@ -130,11 +131,9 @@ public class RobotClass {
 
 
         Motors.get(MOTORS.ARM_FLIP).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+    }
+    public void initResetLift(){
         Motors.get(MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Motors.get(MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        Motors.get(MOTORS.LIFT_LEFT).setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        Motors.get(MOTORS.LIFT_RIGHT).setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 }
