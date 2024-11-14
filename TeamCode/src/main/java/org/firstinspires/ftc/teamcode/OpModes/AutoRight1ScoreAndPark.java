@@ -28,7 +28,7 @@ public class AutoRight1ScoreAndPark extends AutoControl {
                 .addTemporalMarker(0,()->{
                     Thread t1 = new Thread() {
                         public void run() {
-                            autoUtils.armFlip(Utils.ArmFlipState.GROUND);
+                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 1);
                         }
                     };
                     t1.start();
@@ -47,7 +47,7 @@ public class AutoRight1ScoreAndPark extends AutoControl {
                     Thread t3 = new Thread() {
                         public void run() {
                             autoUtils.verticalSlide(Utils.LiftState.GROUND);
-                            autoUtils.armFlip(Utils.ArmFlipState.UP);
+                            autoUtils.armFlip(Utils.ArmFlipState.UP, .6);
                         }
                     };
                     t3.start();

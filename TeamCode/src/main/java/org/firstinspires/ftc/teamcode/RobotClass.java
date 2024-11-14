@@ -75,7 +75,7 @@ public class RobotClass {
         initMotorsComp();
         new Utils(this);
         drivetrain = new MecanumDrive(Motors, this);
-        limelight = hwmap.get(Limelight3A.class, "limelight");
+        //limelight = hwmap.get(Limelight3A.class, "limelight");
 
 //        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
 //                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,

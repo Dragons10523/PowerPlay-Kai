@@ -33,6 +33,7 @@ public class Utils {
     public enum ArmFlipState {
         UP,
         GROUND,
+        MIDDLE,
     }
     public enum ArmState {
         IN,

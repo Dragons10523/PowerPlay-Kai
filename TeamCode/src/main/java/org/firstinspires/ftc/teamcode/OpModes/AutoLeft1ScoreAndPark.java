@@ -25,7 +25,7 @@ public class AutoLeft1ScoreAndPark extends AutoControl {
 
         SparkFunOTOS.Pose2D pos = new SparkFunOTOS.Pose2D(33, 62, Math.toRadians(270));
 
-        Pose2d scorePosition = new Pose2d(53, 53, Math.toRadians(225));
+        Pose2d scorePosition = new Pose2d(54, 53, Math.toRadians(225));
 
         robot.opticalSensor.setPosition(pos);
 
@@ -33,7 +33,7 @@ public class AutoLeft1ScoreAndPark extends AutoControl {
                 .addTemporalMarker(0, () -> {
                     Thread t1 = new Thread() {
                         public void run() {
-                            autoUtils.armFlip(Utils.ArmFlipState.GROUND);
+                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 1);
                         }
                     };
                     t1.start();
@@ -52,7 +52,7 @@ public class AutoLeft1ScoreAndPark extends AutoControl {
                 .addDisplacementMarker(() -> {
                     Thread t3 = new Thread() {
                         public void run() {
-                            autoUtils.armFlip(Utils.ArmFlipState.UP);
+                            autoUtils.armFlip(Utils.ArmFlipState.UP, .6);
                         }
                     };
                     t3.start();

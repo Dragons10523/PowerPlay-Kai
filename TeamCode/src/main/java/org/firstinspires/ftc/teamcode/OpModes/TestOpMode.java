@@ -36,7 +36,7 @@ public class TestOpMode extends AutoControl {
         }
         waitForStart();
 
-        autoUtils.verticalSlide(Utils.LiftState.HIGH);
+        autoUtils.armFlip(Utils.ArmFlipState.MIDDLE, .8);
 
         //drive.followTrajectorySequence(trajSeq);
 //        while(opModeIsActive()){
