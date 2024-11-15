@@ -34,11 +34,11 @@ public class MeepMeepTesting {
                         .waitSeconds(bucketScoreTime)
 //                        .addTemporalMarker(() -> {}) //retract vertical slides
                         .forward(3)
-                        .splineToLinearHeading(new Pose2d(35.5, 42, Math.toRadians(315)), Math.toRadians(315))
+                        .splineToLinearHeading(new Pose2d(32, 35, Math.toRadians(335)), Math.toRadians(335))
                         .strafeLeft(.5)
 //                        .addDisplacementMarker(() -> {})
                         .forward(1)
-//                        .addTemporalMarkerOffset(.2,() -> {}) //perform intake transition
+                        .addTemporalMarkerOffset(.2,() -> {}) //perform intake transition
                         .waitSeconds(.2)
 //                        .addTemporalMarker(() -> {})
                         .waitSeconds(2)

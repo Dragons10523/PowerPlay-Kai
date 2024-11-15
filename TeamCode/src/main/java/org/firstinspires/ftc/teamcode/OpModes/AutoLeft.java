@@ -43,7 +43,6 @@ public class AutoLeft extends AutoControl {
 
         robot.opticalSensor.setPosition(pos);
 
-
         TrajectorySequence firstScore = drive.trajectorySequenceBuilder(new Pose2d(33, 62, Math.toRadians(270)))
                 .addTemporalMarker(0, () -> {
                     Thread t1 = new Thread() {
@@ -77,13 +76,11 @@ public class AutoLeft extends AutoControl {
         telemetry.update();
         TrajectorySequence moveToFirstPiece = drive.trajectorySequenceBuilder(firstScore.end())
                 .forward(3)
-                .splineToLinearHeading(new Pose2d(35.5, 42, Math.toRadians(315)), Math.toRadians(315))
+                .splineToLinearHeading(new Pose2d(35, 33, Math.toRadians(335)), Math.toRadians(335))
                 .strafeLeft(.5)
                 .addDisplacementMarker(() -> {
                     Thread t2 = new Thread() {
                         public void run() {
-                            robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
-
                             robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.56);
                             robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.64);
                         }
@@ -91,7 +88,10 @@ public class AutoLeft extends AutoControl {
                     t2.start();
                 })
                 .forward(1)
-                .UNSTABLE_addTemporalMarkerOffset(.1,() -> {
+                .UNSTABLE_addTemporalMarkerOffset(.1,()->{
+                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(.2,() -> {
                     Thread t3 = new Thread() {
                         public void run() {
                             robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-0.1);

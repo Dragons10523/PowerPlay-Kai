@@ -106,8 +106,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         RobotClass robot = new RobotClass(hardwareMap);
 
         new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
-
-
+        
 
         leftFront = robot.Motors.get(RobotClass.MOTORS.FRONT_LEFT);
         leftRear = robot.Motors.get(RobotClass.MOTORS.BACK_LEFT);

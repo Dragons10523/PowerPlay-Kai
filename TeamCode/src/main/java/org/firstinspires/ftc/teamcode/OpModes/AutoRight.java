@@ -21,14 +21,12 @@ public class AutoRight extends AutoControl {
 
         super.initialize();
 
-        SparkFunOTOS.Pose2D pos = new SparkFunOTOS.Pose2D(-14, 62, 0);
+        SparkFunOTOS.Pose2D pos = new SparkFunOTOS.Pose2D(-14, 62, Math.toRadians(270));
 
         robot.opticalSensor.setPosition(pos);
 
-        TrajectorySequence traj1 = drive.trajectorySequenceBuilder(new Pose2d(-14, 62, 0))
-                .waitSeconds(10)
-                .splineTo(new Vector2d(35,35), Math.toRadians(270))
-                .splineTo(new Vector2d(25,13), Math.toRadians(180))
+        TrajectorySequence traj1 = drive.trajectorySequenceBuilder(new Pose2d(-14, 62, Math.toRadians(270)))
+                .strafeRight(20)
                 .build();
 
         waitForStart();
