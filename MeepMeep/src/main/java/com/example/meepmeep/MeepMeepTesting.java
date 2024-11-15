@@ -26,13 +26,32 @@ public class MeepMeepTesting {
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(30, 30, Math.toRadians(137.87183), Math.toRadians(90), 5.57)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(scorePosition)
-                        .splineTo(new Vector2d(45, 35), Math.toRadians(270))
-                        .splineTo(new Vector2d(25, 13), Math.toRadians(180))
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(AutoLeftPos)
+//                        .addTemporalMarker(0, () -> {})
+//                        .addTemporalMarker(0.5, () -> {})//extend vertical slides and score
+                        .splineToLinearHeading(scorePosition, Math.toRadians(225))
+                        .strafeLeft(1)
+                        .waitSeconds(bucketScoreTime)
+//                        .addTemporalMarker(() -> {}) //retract vertical slides
+                        .forward(3)
+                        .splineToLinearHeading(new Pose2d(35.5, 42, Math.toRadians(315)), Math.toRadians(315))
+                        .strafeLeft(.5)
+//                        .addDisplacementMarker(() -> {})
+                        .forward(1)
+//                        .addTemporalMarkerOffset(.2,() -> {}) //perform intake transition
+                        .waitSeconds(.2)
+//                        .addTemporalMarker(() -> {})
+                        .waitSeconds(2)
+                        .splineToLinearHeading(scorePosition, Math.toRadians(225))
+                        .back(.5)
+//                        .addTemporalMarkerOffset(0.5,() -> {}) //extend vertical slides
+                        .waitSeconds(bucketScoreTime)
+//                        .addTemporalMarker(() -> {}) //retract vertical slides
+                        .waitSeconds(1.5)
+//                        .addTemporalMarkerOffset(.5,()->{})
+                        .splineToLinearHeading(new Pose2d(40, 33, Math.toRadians(335)), Math.toRadians(335))
+
                         .build());
-
-
-
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTOTHEDEEP_JUICE_DARK)
                 .setDarkMode(true)

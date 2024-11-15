@@ -29,14 +29,14 @@ public class DriveMecanum extends Control {
 
         double liftPower = gamepad2.dpad_down ? -1 : 0;
         liftPower += gamepad2.dpad_up ? 1 : 0;
-        double intakePower = gamepad2.left_stick_y;
         double armPower = gamepad2.left_trigger - gamepad2.right_trigger;
 
         SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
 
         telemetry.addData("driveMode", Utils.driveMode);
         telemetry.addData("liftMode", Utils.liftMode);
-        telemetry.addData("liftPos", Utils.liftState);
+        telemetry.addData("liftState", Utils.liftState);
+        telemetry.addData("liftPos", (robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).getCurrentPosition()));
         telemetry.addData("armState", Utils.armState);
         telemetry.addData("heading", robot.getHeading());
         telemetry.addData("armPos", robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition());
@@ -48,13 +48,14 @@ public class DriveMecanum extends Control {
         else utils.mecanumDrive(leftY, leftX, turn);
 
         utils.resetIMU(gamepad1.back);
-        utils.liftPower(liftPower);
+        utils.liftPower(liftPower, gamepad2.a);
+        utils.resetLift(gamepad2.back);
         utils.switchDriveMode(gamepad1.start);
         utils.switchLiftMode(gamepad2.start);
         utils.extendAndRetractArm(-gamepad2.right_stick_y);
         utils.flipArm(armPower, gamepad2.y);
         utils.flipBucket(gamepad2.b);
-        utils.powerIntake(intakePower);
+        utils.powerIntake(gamepad2.left_stick_y);
         utils.switchSlowMode(gamepad1.a);
         utils.deathWiggle(gamepad1.b);
     }

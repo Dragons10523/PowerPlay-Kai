@@ -19,11 +19,12 @@ public class AutoLeft extends AutoControl {
 
     private final Utils.FieldSide fieldSide = Utils.FieldSide.BLUE_LEFT;
 
-    static enum AutoState{
+    enum AutoState{
         FIRST_SCORE,
         MOVE_TO_BLOCK,
 
     }
+    AutoState autoState = AutoState.FIRST_SCORE;
 
     @SuppressLint("DefaultLocale")
     @Override
@@ -83,19 +84,19 @@ public class AutoLeft extends AutoControl {
                         public void run() {
                             robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
 
-                            robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.54);
+                            robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.56);
                             robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.64);
                         }
                     };
                     t2.start();
                 })
                 .forward(1)
-                .UNSTABLE_addTemporalMarkerOffset(.2,() -> {
+                .UNSTABLE_addTemporalMarkerOffset(.1,() -> {
                     Thread t3 = new Thread() {
                         public void run() {
                             robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-0.1);
 
-                            robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.67);
+                            robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.69);
                             robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.52);
                         }
                     };
@@ -137,69 +138,70 @@ public class AutoLeft extends AutoControl {
                 .build();
         telemetry.addLine("secondScore success");
         telemetry.update();
-//        TrajectorySequence moveToSecondPiece = drive.trajectorySequenceBuilder(secondScore.end())
-//                .forward(3)
-//                .splineTo(new Vector2d(45, 35), 0)
-//                .addDisplacementMarker(() -> {
-//                    Thread t2 = new Thread() {
-//                        public void run() {
-//                            robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
-//
-//                            robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.54);
-//                            robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.64);
-//                        }
-//                    };
-//                    t2.start();
-//                })
-//                .forward(1)
-//                .UNSTABLE_addTemporalMarkerOffset(.2,() -> {
-//                    Thread t3 = new Thread() {
-//                        public void run() {
-//                            robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-0.1);
-//
-//                            robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.67);
-//                            robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.52);
-//                        }
-//                    };
-//                    t3.start();
-//                }) //perform intake transition
-//                .waitSeconds(.2)
-//                .addTemporalMarker(() -> {
-//                    Thread t4 = new Thread() {
-//                        public void run() {
-//                            autoUtils.intakeTransition();
-//                        }
-//                    };
-//                    t4.start();
-//                })
-//                .waitSeconds(2)
-//                .build();
-//
-//        telemetry.addLine("secondPiece success");
-//        telemetry.update();
-//        TrajectorySequence thirdScore = drive.trajectorySequenceBuilder(moveToSecondPiece.end())
-//                .splineToLinearHeading(scorePosition, Math.toRadians(225))
-//                .back(.5)
-//                .addTemporalMarker(0.5,() -> {
-//                    Thread t1 = new Thread() {
-//                        public void run() {
-//                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
-//                        }
-//                    };
-//                    t1.start();
-//                }) //extend vertical slides
-//                .waitSeconds(bucketScoreTime)
-//                .addTemporalMarker(() -> {
-//                    Thread t1 = new Thread() {
-//                        public void run() {
-//                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
-//                        }
-//                    };
-//                    t1.start();
-//                }) //retract vertical slides
-//                .build();
-//        telemetry.addLine("thirdScore success");
-//        telemetry.update();
+        TrajectorySequence moveToSecondPiece = drive.trajectorySequenceBuilder(secondScore.end())
+                .forward(3)
+                .splineToLinearHeading(new Pose2d(40, 34, Math.toRadians(335)), Math.toRadians(335))
+                .strafeLeft(.5)
+                .addDisplacementMarker(() -> {
+                    Thread t2 = new Thread() {
+                        public void run() {
+                            robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+
+                            robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.54);
+                            robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.64);
+                        }
+                    };
+                    t2.start();
+                })
+                .forward(1)
+                .UNSTABLE_addTemporalMarkerOffset(.15,() -> {
+                    Thread t3 = new Thread() {
+                        public void run() {
+                            robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-0.1);
+
+                            robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.67);
+                            robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.52);
+                        }
+                    };
+                    t3.start();
+                }) //perform intake transition
+                .waitSeconds(.2)
+                .addTemporalMarker(() -> {
+                    Thread t4 = new Thread() {
+                        public void run() {
+                            autoUtils.intakeTransition();
+                        }
+                    };
+                    t4.start();
+                })
+                .waitSeconds(2)
+                .build();
+        telemetry.addLine("secondPiece success");
+        telemetry.update();
+        TrajectorySequence thirdScore = drive.trajectorySequenceBuilder(moveToSecondPiece.end())
+                .splineToLinearHeading(scorePosition, Math.toRadians(225))
+                .back(.5)
+                .addTemporalMarker(0.5,() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
+                        }
+                    };
+                    t1.start();
+                }) //extend vertical slides
+                .waitSeconds(bucketScoreTime)
+                .addTemporalMarker(() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
+                        }
+                    };
+                    t1.start();
+                }) //retract vertical slides
+                .back(2)
+                .build();
+        telemetry.addLine("thirdScore success");
+        telemetry.update();
 //        TrajectorySequence moveToThirdPiece = drive.trajectorySequenceBuilder(thirdScore.end())
 //                .addTemporalMarker(0, () -> {
 //                    Thread t1 = new Thread() {
@@ -266,13 +268,14 @@ public class AutoLeft extends AutoControl {
         drive.followTrajectorySequence(firstScore);
         drive.followTrajectorySequence(moveToFirstPiece);
         drive.followTrajectorySequence(secondScore);
-//        drive.followTrajectorySequence(moveToSecondPiece);
-//        drive.followTrajectorySequence(thirdScore);
+        drive.followTrajectorySequence(moveToSecondPiece);
+        drive.followTrajectorySequence(thirdScore);
 //        drive.followTrajectorySequence(moveToThirdPiece);
 //        drive.followTrajectorySequence(fourthScore);
-       drive.followTrajectorySequence(moveToPark);
+//        drive.followTrajectorySequence(moveToPark);
 
         while (opModeIsActive()) {
+
 
             SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
 
