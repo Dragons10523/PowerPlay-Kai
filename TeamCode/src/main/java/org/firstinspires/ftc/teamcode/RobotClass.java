@@ -4,9 +4,11 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.ImuOrientationOnRobot;
@@ -38,6 +40,8 @@ public class RobotClass {
 
     public SparkFunOTOS opticalSensor;
     public VoltageSensor voltageSensor;
+    public ColorSensor colorSensor;
+    public DistanceSensor distanceSensor;
     HardwareMap hwmap;
     public static enum SERVOS{
         ARM_LEFT,
@@ -61,6 +65,7 @@ public class RobotClass {
         this.hwmap = hwmap;
 
         opticalSensor = hwmap.get(SparkFunOTOS.class, "opticalSensor");
+        //colorSensor = hwmap.get(ColorSensor.class, "colorSensor");
 
         Motors = new HashMap<>();
         Servos = new HashMap<>();
@@ -126,7 +131,6 @@ public class RobotClass {
         Motors.get(MOTORS.FRONT_RIGHT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         Motors.get(MOTORS.BACK_RIGHT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        Motors.get(MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Motors.get(MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 

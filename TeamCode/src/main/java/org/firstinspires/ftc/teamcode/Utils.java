@@ -174,7 +174,7 @@ public class Utils {
             robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             int currentArmPos = robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition();
             double armPower = power / 2;
-            if (currentArmPos > 1150) {
+            if (currentArmPos > 1200) {
                 armPower = Math.min(0, armPower);
             }
             if (currentArmPos < 0) {
@@ -188,6 +188,7 @@ public class Utils {
 
     public void powerIntake(double power) {
         power = Math.min(.75, Math.max(-.75, power));
+        power *= .7;
         robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(power);
     }
 

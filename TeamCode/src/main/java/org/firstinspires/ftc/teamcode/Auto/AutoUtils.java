@@ -210,9 +210,10 @@ public class AutoUtils {
         armFlip(Utils.ArmFlipState.UP, .6);
         //extake pixel into bucket
         double startTime = time.seconds();
-        while (startTime + 0.25 > time.seconds()) {
-            robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.5);
+        while (startTime + 0.35 > time.seconds()) {
+            robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
         }
+
         //turn off intake
         robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0);
 
@@ -224,21 +225,18 @@ public class AutoUtils {
         double startTime = time.seconds();
         switch (state) {
             case GROUND:
-                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(1200);
-
-                while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < 1200 - 10
-                        || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 1200 + 10) {
+                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(1210);
+                while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < 1210 - 10
+                        || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 1210 + 10) {
                     robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(power);
                     if (startTime + 2 < time.seconds()) {
                         break;
                     }
                 }
-                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0);
                 break;
             case UP:
                 robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(0);
-
                 while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < -10
                         || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 10) {
                     robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -247,7 +245,6 @@ public class AutoUtils {
                         break;
                     }
                 }
-                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0);
                 break;
             case MIDDLE:
                 robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(400);
@@ -260,10 +257,9 @@ public class AutoUtils {
                         break;
                     }
                 }
-                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0);
                 break;
         }
-
+        robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0);
     }
 
     public static boolean isLiftAtPos = false;
@@ -281,24 +277,23 @@ public class AutoUtils {
                         && startTime + 3 > time.seconds())
                 {
                     setLiftMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    setLiftPower(.8);
+                    setLiftPower(1);
+                }
+                while(startTime + 3 > time.seconds()){
+                    
                 }
                 robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0);
                 break;
             case GROUND:
-                robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(.5);
-                setLiftTargetPos(0);
-                while (robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).getCurrentPosition() < 10
-                        || robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).getCurrentPosition() > -10
-                        && startTime + 3 > time.seconds())
-                {
-                    setLiftMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    setLiftPower(.8);
+                while(startTime + 2 > time.seconds()){
+                    setLiftMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    setLiftPower(-1);
                 }
+                robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.5);
                 break;
         }
-        setLiftPower(0);
         setLiftMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        setLiftPower(0);
         isLiftAtPos = true;
     }
     public void setLiftMode(DcMotor.RunMode runMode){

@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Auto.AutoUtils;
 import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.Utils;
 
-@Autonomous(name = "Auto_Right")
+@Autonomous(name = "Auto_Right_park")
 public class AutoRight extends AutoControl {
     private final Utils.FieldSide fieldSide = Utils.FieldSide.BLUE_RIGHT;
     AutoUtils autoUtils;

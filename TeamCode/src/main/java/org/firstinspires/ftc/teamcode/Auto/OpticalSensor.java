@@ -25,7 +25,7 @@ public class OpticalSensor {
         robot.opticalSensor.setLinearUnit(DistanceUnit.INCH);
         robot.opticalSensor.setAngularUnit(AngleUnit.RADIANS);
 
-        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0,0, Math.toRadians(-2.50) + Math.toRadians(90));
+        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(0,0, Math.toRadians(-2.50) - Math.toRadians(90));
         robot.opticalSensor.setOffset(offset);
 
         robot.opticalSensor.setLinearScalar(1.0);
@@ -33,10 +33,6 @@ public class OpticalSensor {
 
         robot.opticalSensor.calibrateImu();
 
-        robot.opticalSensor.resetTracking();
-
-        SparkFunOTOS.Pose2D currentPosition = new SparkFunOTOS.Pose2D(0,0,0);
-        robot.opticalSensor.setPosition(currentPosition);
 
         SparkFunOTOS.Version hwVersion = new SparkFunOTOS.Version();
         SparkFunOTOS.Version fwVersion = new SparkFunOTOS.Version();

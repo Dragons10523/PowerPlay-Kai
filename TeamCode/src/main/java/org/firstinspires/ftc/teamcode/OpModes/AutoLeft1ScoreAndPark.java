@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.RobotClass;
 import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.Utils;
 
-@Autonomous(name = "Auto_Red_Left")
+@Autonomous(name = "Auto_Left_1Score")
 public class AutoLeft1ScoreAndPark extends AutoControl {
 
     private final Utils.FieldSide fieldSide = Utils.FieldSide.RED_LEFT;

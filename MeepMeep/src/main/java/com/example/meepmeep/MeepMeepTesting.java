@@ -20,7 +20,7 @@ public class MeepMeepTesting {
 
         Pose2d scorePosition = new Pose2d(53, 53, Math.toRadians(225));
         Pose2d AutoRightPos = new Pose2d(-14, 62, 0);
-        Pose2d AutoLeftPos = new Pose2d(33, 62, Math.toRadians(270));
+        Pose2d AutoLeftPos = new Pose2d(34, 62, Math.toRadians(270));
         Pose2d AutoRightScorePos = new Pose2d(-14,62, Math.toRadians(180));
         double bucketScoreTime = 2;
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)

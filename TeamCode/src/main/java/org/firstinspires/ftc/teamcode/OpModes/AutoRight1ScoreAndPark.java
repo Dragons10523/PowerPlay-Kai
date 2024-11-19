@@ -11,16 +11,14 @@ import org.firstinspires.ftc.teamcode.Auto.AutoUtils;
 import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.Utils;
 
-@Autonomous(name = "Auto_Red_Right")
+@Autonomous(name = "Auto_Right_1Score")
 public class AutoRight1ScoreAndPark extends AutoControl {
     private final Utils.FieldSide fieldSide = Utils.FieldSide.RED_RIGHT;
     AutoUtils autoUtils;
     @Override
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
-
-        super.initialize();
-        SparkFunOTOS.Pose2D pos = new SparkFunOTOS.Pose2D(-14, 62, Math.toRadians(180));
+        SparkFunOTOS.Pose2D pos = new SparkFunOTOS.Pose2D(-14,62, Math.toRadians(180));
 
         robot.opticalSensor.setPosition(pos);
 

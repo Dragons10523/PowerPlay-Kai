@@ -63,10 +63,13 @@ import static org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.DriveCo
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0.3*5, 0.15*5, 0.05*5);
+    //public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(0, 0, 0); //y drive
+    //derivative gain must be negative to have negating effect
+    public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(1.1, 0.4, -0.2); //y drive
+    public static PIDCoefficients TRANSLATIONAL_PID_LATERAL = new PIDCoefficients(1.6, 1.1, -0.3); //x strafe
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(4, 1, 0.01);
 
-    public static double LATERAL_MULTIPLIER = 10.0 / 9.0;
+    public static double LATERAL_MULTIPLIER = 1.7;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -92,8 +95,8 @@ public class SampleMecanumDrive extends MecanumDrive {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
 
-        follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
+        follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID_AXIAL, TRANSLATIONAL_PID_LATERAL, HEADING_PID,
+                new Pose2d(0.2, 0.2, Math.toRadians(3.0)), 3);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
