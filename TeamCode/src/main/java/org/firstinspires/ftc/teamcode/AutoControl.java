@@ -9,12 +9,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Auto.OpticalSensor;
 import org.firstinspires.ftc.teamcode.Auto.AutoUtils;
+import org.firstinspires.ftc.teamcode.Camera.Limelight;
 import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.SampleMecanumDrive;
 
 public class AutoControl extends LinearOpMode {
     public RobotClass robot;
     public AutoUtils autoUtils;
     public SampleMecanumDrive drive;
+    public Limelight limelightObj;
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -29,7 +31,7 @@ public class AutoControl extends LinearOpMode {
         drive = new SampleMecanumDrive(hardwareMap);
         autoUtils = new AutoUtils(robot, telemetry);
         new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
-        //^^^^ fixes inertial odometry  drift
-    }
+        limelightObj = new Limelight(robot);
 
+    }
 }

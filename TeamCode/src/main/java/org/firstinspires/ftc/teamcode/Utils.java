@@ -28,6 +28,10 @@ public class Utils {
         RAW_POWER,
         ENCODER_DRIVE
     }
+    public enum ServoState{
+        OPEN,
+        CLOSED
+    }
     public enum ArmFlipState {
         UP,
         GROUND,
@@ -61,7 +65,7 @@ public class Utils {
     public static LiftMode liftMode = LiftMode.ENCODER_DRIVE;
     public static LiftState liftState = LiftState.GROUND;
     public static ArmState armState = ArmState.IN;
-    public static ArmFlipState armFlipState = ArmFlipState.UP;
+    public static ServoState servoState = ServoState.OPEN;
     public static boolean slowMode = false;
     ElapsedTime elapsedTime = new ElapsedTime();
     double timeWhenPressed = 0;
@@ -265,6 +269,25 @@ public class Utils {
                 robot.Motors.get(RobotClass.MOTORS.BACK_LEFT).setPower(-.8);
                 robot.Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setPower(.8);
                 robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT).setPower(.8);
+            }
+        }
+    }
+    boolean intakeServoFirstPress = true;
+    public void intakeServo(boolean button){
+        if(!button){
+            intakeServoFirstPress = true;
+        }
+        if(button && intakeServoFirstPress){
+            intakeServoFirstPress = false;
+            switch(servoState){
+                case OPEN:
+                    servoState = ServoState.CLOSED;
+                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.94);
+                    break;
+                case CLOSED:
+                    servoState = ServoState.OPEN;
+                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.6);
+                    break;
             }
         }
     }

@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.Auto.ColorSensorClass;
 import org.firstinspires.ftc.teamcode.Auto.OpticalSensor;
 import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.SampleMecanumDrive;
 
@@ -12,6 +13,7 @@ public class Control extends OpMode {
     public RobotClass robot;
     public Utils utils;
     public SampleMecanumDrive drive;
+    public ColorSensorClass colorSensorClassObj;
     @Override
     public void init() {
         robot = new RobotClass(hardwareMap);
@@ -19,6 +21,7 @@ public class Control extends OpMode {
         robot.initResetLift();
         drive = new SampleMecanumDrive(hardwareMap);
         new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
+        colorSensorClassObj = new ColorSensorClass(robot.colorSensor);
     }
     @Override
     public void loop() {

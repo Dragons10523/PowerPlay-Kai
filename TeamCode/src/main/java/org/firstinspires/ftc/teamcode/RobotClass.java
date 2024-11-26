@@ -37,7 +37,6 @@ public class RobotClass {
     public Map<CR_SERVOS, CRServo> CR_Servos;
     public Limelight3A limelight;
     public final IMU imu;
-
     public SparkFunOTOS opticalSensor;
     public VoltageSensor voltageSensor;
     public ColorSensor colorSensor;
@@ -47,6 +46,7 @@ public class RobotClass {
         ARM_LEFT,
         ARM_RIGHT,
         BUCKET,
+        INTAKE_SERVO,
     }
     public static enum CR_SERVOS{
         INTAKE,
@@ -60,27 +60,31 @@ public class RobotClass {
         LIFT_RIGHT,
         ARM_FLIP
     }
-
     public RobotClass(HardwareMap hwmap) {
         this.hwmap = hwmap;
 
         opticalSensor = hwmap.get(SparkFunOTOS.class, "opticalSensor");
+        //I2C port 1 control
         //colorSensor = hwmap.get(ColorSensor.class, "colorSensor");
 
         Motors = new HashMap<>();
         Servos = new HashMap<>();
         CR_Servos = new HashMap<>();
         Motors.put(MOTORS.FRONT_LEFT, hwmap.get(DcMotorEx.class, "frontLeft"));
+        //port 0 control
         Motors.put(MOTORS.FRONT_RIGHT, hwmap.get(DcMotorEx.class, "frontRight"));
+        //port 3 Expansion
         Motors.put(MOTORS.BACK_LEFT, hwmap.get(DcMotorEx.class, "backLeft"));
+        //port 2 control
         Motors.put(MOTORS.BACK_RIGHT, hwmap.get(DcMotorEx.class, "backRight"));
+        //port 1 control
         voltageSensor = hwmap.get(VoltageSensor.class, "Control Hub");
         imu = hwmap.get(IMU.class, "imu");
         //initMotorsProto();
         initMotorsComp();
         new Utils(this);
         drivetrain = new MecanumDrive(Motors, this);
-        //limelight = hwmap.get(Limelight3A.class, "limelight");
+        limelight = hwmap.get(Limelight3A.class, "limelight");
 
 //        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
 //                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
@@ -88,7 +92,7 @@ public class RobotClass {
 //
 //        imu.initialize(new IMU.Parameters(orientationOnRobot));
 
-        //IMU become defective when volts drop too low
+        //IMU becomes defective when the voltage drops too low
     }
     public double getHeading() {
         return opticalSensor.getPosition().h;
@@ -108,19 +112,27 @@ public class RobotClass {
         //Proto-Bot
     }
     public void initMotorsComp(){
+        colorSensor = hwmap.get(ColorSensor.class, "sensor_color_distance");
+        distanceSensor = hwmap.get(DistanceSensor.class, "sensor_color_distance");
+
         Motors.put(MOTORS.LIFT_LEFT, hwmap.get(DcMotorEx.class, "liftLeft"));
+        //port 0 Expansion
         Motors.put(MOTORS.LIFT_RIGHT, hwmap.get(DcMotorEx.class,"liftRight"));
+        //port 1 Expansion
         Motors.put(MOTORS.ARM_FLIP, hwmap.get(DcMotorEx.class, "armFlip"));
-        //port 1, 2, 3 expansion hub
+        //port 2 Expansion
 
         Servos.put(SERVOS.ARM_LEFT, hwmap.get(Servo.class, "armLeft"));
+        //port 0 expansion
         Servos.put(SERVOS.ARM_RIGHT, hwmap.get(Servo.class, "armRight"));
+        //port 1 expansion
         Servos.put(SERVOS.BUCKET, hwmap.get(Servo.class, "bucket"));
-        //port 1, 2 expansion hub
+        //port 2 expansion
+        Servos.put(SERVOS.INTAKE_SERVO, hwmap.get(Servo.class, "intakeServo"));
 
         CR_Servos.put(CR_SERVOS.INTAKE, hwmap.get(CRServo.class, "intake"));
+        //port 5 expansion
 
-        //port 5 expansion hub
         Motors.get(MOTORS.FRONT_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
         Motors.get(MOTORS.BACK_LEFT).setDirection(DcMotorSimple.Direction.REVERSE);
         Motors.get(MOTORS.FRONT_RIGHT).setDirection(DcMotorSimple.Direction.FORWARD);

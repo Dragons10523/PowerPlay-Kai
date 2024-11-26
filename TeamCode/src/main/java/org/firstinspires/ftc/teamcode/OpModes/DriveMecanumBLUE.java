@@ -1,20 +1,19 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Control;
 import org.firstinspires.ftc.teamcode.RobotClass;
-import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Utils;
 
+import java.util.Arrays;
+import java.util.Locale;
+
 @TeleOp
-public class DriveMecanum extends Control {
+public class DriveMecanumBLUE extends Control {
     @Override
     public void start() {
         robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.67);
@@ -26,6 +25,7 @@ public class DriveMecanum extends Control {
         double leftY = -gamepad1.left_stick_y;
         double leftX = gamepad1.left_stick_x;
         double turn = gamepad1.left_trigger - gamepad1.right_trigger;
+        float[] hsvValues = colorSensorClassObj.getHsvValues();
 
         double liftPower = gamepad2.dpad_down ? -1 : 0;
         liftPower += gamepad2.dpad_up ? 1 : 0;
@@ -36,11 +36,16 @@ public class DriveMecanum extends Control {
         telemetry.addData("driveMode", Utils.driveMode);
         telemetry.addData("liftMode", Utils.liftMode);
         telemetry.addData("liftState", Utils.liftState);
-        telemetry.addData("liftPos", (robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).getCurrentPosition()));
         telemetry.addData("armState", Utils.armState);
         telemetry.addData("heading", robot.getHeading());
-        telemetry.addData("armPos", robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition());
-        telemetry.addLine(String.format("XYH %.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h));
+        telemetry.addData("hsvValues", Arrays.toString(hsvValues));
+        telemetry.addData("Distance (cm)",
+                String.format(Locale.US, "%.02f", robot.distanceSensor.getDistance(DistanceUnit.CM)));
+        telemetry.addData("Alpha", robot.colorSensor.alpha());
+        telemetry.addData("Red  ", robot.colorSensor.red());
+        telemetry.addData("Green", robot.colorSensor.green());
+        telemetry.addData("Blue ", robot.colorSensor.blue());
+        telemetry.addData("Hue", hsvValues[0]);
         telemetry.addData("currentVoltage", robot.voltageSensor.getVoltage());
         telemetry.update();
 
@@ -55,7 +60,15 @@ public class DriveMecanum extends Control {
         utils.extendAndRetractArm(-gamepad2.right_stick_y);
         utils.flipArm(armPower, gamepad2.y);
         utils.flipBucket(gamepad2.b);
-        utils.powerIntake(gamepad2.left_stick_y);
+        utils.intakeServo(gamepad2.x);
+        if(robot.distanceSensor.getDistance(DistanceUnit.CM) < 5){
+            if(robot.colorSensor.red() > robot.colorSensor.blue() && robot.colorSensor.alpha() > 160){
+                utils.powerIntake(1);
+            }
+        }
+        else{
+            utils.powerIntake(gamepad2.left_stick_y);
+        }
         utils.switchSlowMode(gamepad1.a);
         utils.deathWiggle(gamepad1.b);
     }
