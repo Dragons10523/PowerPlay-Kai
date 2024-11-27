@@ -53,6 +53,7 @@ public class TestOpMode extends AutoControl {
                 Pose3D botpose = result.getBotpose_MT2();
                 botpose.getPosition().toUnit(DistanceUnit.INCH);
 
+
                 double captureLatency = result.getCaptureLatency();
                 double targetingLatency = result.getTargetingLatency();
                 double parseLatency = result.getParseLatency();
@@ -64,6 +65,7 @@ public class TestOpMode extends AutoControl {
                     telemetry.addData("MT2Stddev", Arrays.toString(result.getStddevMt2()));
                     telemetry.addData("Botpose IN", "XYZ: %.3f %.3f %.3f", botpose.getPosition().toUnit(DistanceUnit.INCH).x, botpose.getPosition().toUnit(DistanceUnit.INCH).y, botpose.getPosition().z);
                     List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+
                     for(LLResultTypes.FiducialResult fr : fiducialResults){
                         telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(), fr.getTargetXDegrees(), fr.getTargetYDegrees());
                     }

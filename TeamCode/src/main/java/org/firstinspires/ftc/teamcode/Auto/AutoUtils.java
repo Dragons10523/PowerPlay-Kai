@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Auto;
 
 import android.annotation.SuppressLint;
 
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -295,6 +296,56 @@ public class AutoUtils {
         setLiftMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         setLiftPower(0);
         isLiftAtPos = true;
+    }
+    public boolean updateOpticalSensorToPoseEstimateCamera(int targetPullCount){
+        ElapsedTime time = new ElapsedTime();
+        double startTime = time.seconds();
+        int successfulPullCount = 0;
+
+        double avgPosX = 0, avgPosY = 0;
+        while(!autoControl.getStopRequested()) {
+            LLResult result = robot.limelight.getLatestResult();
+            robot.limelight.updateRobotOrientation(Math.toDegrees(robot.getHeading()));
+            telemetry.addLine("processing StartPos");
+            if (result != null) {
+                boolean doRejectPosUpdate = false;
+                double[] stdDevMt2 = result.getStddevMt2();
+                if (stdDevMt2[0] > 0.03 || stdDevMt2[1] > 0.03) {
+                    telemetry.addLine("stdDevMt2 > 0.03");
+                    doRejectPosUpdate = true;
+                }
+                if(!result.isValid()){
+                    telemetry.addLine("result is not valid");
+                    doRejectPosUpdate = true;
+                }
+                if(result.getStaleness() > 100){
+                    telemetry.addLine("result is stale");
+                    doRejectPosUpdate = true;
+                }
+                if (!doRejectPosUpdate) {
+                    successfulPullCount++;
+                    telemetry.addData("pullCount", successfulPullCount);
+                    avgPosX += result.getBotpose_MT2().getPosition().x;
+                    avgPosY += result.getBotpose_MT2().getPosition().y;
+                }
+                if (successfulPullCount >= targetPullCount) {
+                    robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(
+                            (avgPosX * 39.37) / successfulPullCount,
+                            (avgPosY * 39.37) / successfulPullCount,
+                                robot.getHeading()));
+                    return true;
+                }
+            }
+            else{
+                telemetry.addLine("No Data Available");
+            }
+            if (startTime + 8 < time.seconds()) {
+                robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(14, 61, Math.toRadians(180)));
+                return false;
+            }
+            telemetry.update();
+        }
+        return false;
     }
     public void setLiftMode(DcMotor.RunMode runMode){
         robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(runMode);

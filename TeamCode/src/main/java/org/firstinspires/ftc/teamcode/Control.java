@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -22,6 +23,10 @@ public class Control extends OpMode {
         drive = new SampleMecanumDrive(hardwareMap);
         new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
         colorSensorClassObj = new ColorSensorClass(robot.colorSensor);
+        robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(0,0, Math.toRadians(180)));
+        robot.limelight.pipelineSwitch(0);
+        robot.limelight.setPollRateHz(100);
+        robot.limelight.start();
     }
     @Override
     public void loop() {

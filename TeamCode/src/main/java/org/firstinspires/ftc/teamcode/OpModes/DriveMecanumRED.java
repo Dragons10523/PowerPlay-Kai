@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.LLStatus;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -23,8 +24,6 @@ public class DriveMecanumRED extends Control {
     public void start() {
         robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.67);
         robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.52);
-        robot.limelight.pipelineSwitch(0);
-        robot.limelight.start();
     }
 
     @Override
@@ -36,10 +35,10 @@ public class DriveMecanumRED extends Control {
                 status.getTemp(), status.getCpu(), (int) status.getFps());
         telemetry.addData("Pipeline", "Index: %d, Type: %s",
                 status.getPipelineIndex(), status.getPipelineType());
-
+        robot.limelight.updateRobotOrientation(Math.toDegrees(robot.getHeading()));
         LLResult result = robot.limelight.getLatestResult();
         if (result != null) {
-            Pose3D botpose = result.getBotpose();
+            Pose3D botpose = result.getBotpose_MT2();
 
             double captureLatency = result.getCaptureLatency();
             double targetingLatency = result.getTargetingLatency();

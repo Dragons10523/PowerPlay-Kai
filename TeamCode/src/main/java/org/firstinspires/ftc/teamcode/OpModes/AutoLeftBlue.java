@@ -3,86 +3,44 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import android.annotation.SuppressLint;
 
-import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.RobotClass;
 import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.Utils;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name = "Auto_Left")
-public class AutoLeft extends AutoControl {
-
+@Autonomous(name = "Auto_Left_Blue")
+public class AutoLeftBlue extends AutoControl {
     private final Utils.FieldSide fieldSide = Utils.FieldSide.BLUE_LEFT;
-
     enum AutoState {
         FIRST_SCORE,
         MOVE_TO_BLOCK,
 
     }
-
     AutoState autoState = AutoState.FIRST_SCORE;
 
     @SuppressLint("DefaultLocale")
     @Override
     public void runOpMode() throws InterruptedException {
-        ElapsedTime time = new ElapsedTime();
         super.runOpMode();
         telemetry.addLine("opMode started");
         telemetry.update();
         super.initialize();
         telemetry.addLine("opMode INIT");
         telemetry.update();
-        double startTime = time.seconds();
-        SparkFunOTOS.Pose2D pos;
-        double avgPosX = 0, avgPosY = 0, avgPosH = 0;
-        int pullCount = 0;
-        while(true) {
-            LLResult result = limelightObj.getResult();
-            telemetry.addLine("processing StartPos");
-            if (result != null) {
-                boolean doRejectPosUpdate = false;
-                double[] stdDevMt2 = result.getStddevMt2();
 
-                if (stdDevMt2[0] > 0.003 || stdDevMt2[1] > 0.003) {
-                    doRejectPosUpdate = true;
-                }
-                if(!result.isValid()){
-                    doRejectPosUpdate = true;
-                }
-                if (!doRejectPosUpdate) {
-                    pullCount++;
-                    telemetry.addData("pullCount", pullCount);
-                    avgPosX += result.getBotpose_MT2().getPosition().x;
-                    avgPosY += result.getBotpose_MT2().getPosition().y;
-                    avgPosH += result.getBotpose_MT2().getOrientation().getYaw();
-                }
-                if (pullCount == 120) {
-                    pos = new SparkFunOTOS.Pose2D((avgPosX * 39.37) / pullCount, (avgPosY * 39.37) / pullCount, (avgPosH * 39.37) / pullCount);
-                    break;
-                }
-            }
-            if (startTime + 8 < time.seconds() || isStarted()) {
-                pos = new SparkFunOTOS.Pose2D(34, 62, Math.toRadians(270));
-                break;
-            }
-            telemetry.update();
-        }
-        double bucketScoreTime = 4;
-        SparkFunOTOS.Pose2D defaultPos = new SparkFunOTOS.Pose2D(34, 62, Math.toRadians(270));
-        Pose2d scorePosition = new Pose2d(54, 54, Math.toRadians(225));
-        telemetry.addData("pos", "XYH %.3f %.3f %.3f", pos.x, pos.y, pos.h);
-        telemetry.update();
+        SparkFunOTOS.Pose2D pos = new SparkFunOTOS.Pose2D(0, 0, Math.toRadians(180));
         robot.opticalSensor.setPosition(pos);
 
+        boolean successfulCameraPos = autoUtils.updateOpticalSensorToPoseEstimateCamera(120);
+
+        Pose2d scorePosition = new Pose2d(-54, -54, Math.toRadians(225));
+
+        double bucketScoreTime = 4;
         TrajectorySequence firstScore = drive.trajectorySequenceBuilder(new Pose2d(34, 62, Math.toRadians(270)))
                 .addTemporalMarker(0, () -> {
                     Thread t1 = new Thread() {
@@ -282,8 +240,7 @@ public class AutoLeft extends AutoControl {
         while (!isStarted()) {
             SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
             telemetry.addData("XYH: ", "%.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h);
-            telemetry.addData("aprilTag3dPos","%.3f %.3f %.3f", pos.x, pos.y, pos.h);
-            telemetry.addData("defaultPos", "%.3f %.3f %.3f", defaultPos.x,  defaultPos.y, defaultPos.h);
+            telemetry.addData("successFulCameraLocalization", successfulCameraPos);
             telemetry.addLine();
             telemetry.update();
         }

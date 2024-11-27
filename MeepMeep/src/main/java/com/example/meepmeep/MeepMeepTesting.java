@@ -18,23 +18,26 @@ public class MeepMeepTesting {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
 
-        Pose2d scorePosition = new Pose2d(53, 53, Math.toRadians(225));
-        Pose2d AutoRightPos = new Pose2d(-14, 62, 0);
-        Pose2d AutoLeftPos = new Pose2d(34, 62, Math.toRadians(270));
+        Pose2d scorePositionRed = new Pose2d(53, 53, Math.toRadians(225));
+        Pose2d scorePositionBlue = new Pose2d(-53, -53, Math.toRadians(45));
+        Pose2d AutoRightBluePos = new Pose2d(-14, 62, 0);
+        Pose2d AutoLeftBluePos = new Pose2d(14, -64, Math.toRadians(180));
         Pose2d AutoRightScorePos = new Pose2d(-14,62, Math.toRadians(180));
         double bucketScoreTime = 2;
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(30, 30, Math.toRadians(137.87183), Math.toRadians(90), 5.57)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(AutoLeftPos)
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(AutoLeftBluePos)
 //                        .addTemporalMarker(0, () -> {})
 //                        .addTemporalMarker(0.5, () -> {})//extend vertical slides and score
-                        .splineToLinearHeading(scorePosition, Math.toRadians(225))
-                        .strafeLeft(1)
+                        .strafeRight(5)
+
+                        .splineToLinearHeading(scorePositionBlue, Math.toRadians(45))
+
                         .waitSeconds(bucketScoreTime)
 //                        .addTemporalMarker(() -> {}) //retract vertical slides
                         .forward(3)
-                        .splineToLinearHeading(new Pose2d(32, 35, Math.toRadians(335)), Math.toRadians(335))
+                        .splineToLinearHeading(new Pose2d(-32, -35, Math.toRadians(335)), Math.toRadians(335))
                         .strafeLeft(.5)
 //                        .addDisplacementMarker(() -> {})
                         .forward(1)
@@ -42,14 +45,14 @@ public class MeepMeepTesting {
                         .waitSeconds(.2)
 //                        .addTemporalMarker(() -> {})
                         .waitSeconds(2)
-                        .splineToLinearHeading(scorePosition, Math.toRadians(225))
+                        .splineToLinearHeading(scorePositionBlue, Math.toRadians(45))
                         .back(.5)
 //                        .addTemporalMarkerOffset(0.5,() -> {}) //extend vertical slides
                         .waitSeconds(bucketScoreTime)
 //                        .addTemporalMarker(() -> {}) //retract vertical slides
                         .waitSeconds(1.5)
 //                        .addTemporalMarkerOffset(.5,()->{})
-                        .splineToLinearHeading(new Pose2d(40, 33, Math.toRadians(335)), Math.toRadians(335))
+                        .splineToLinearHeading(new Pose2d(-40, -33, Math.toRadians(335)), Math.toRadians(335))
 
                         .build());
 
