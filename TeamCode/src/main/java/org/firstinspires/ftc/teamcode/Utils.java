@@ -6,27 +6,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Utils {
     RobotClass robot;
-    ElapsedTime time = new ElapsedTime();
-
     public Utils(RobotClass robot) {
         this.robot = robot;
     }
-
-    /*
-       define global enums here
-        v
-
-        ex.
-        public enum Pos{
-           OPEN,
-           CLOSED
-        }
-
-        ^
-    */
     public enum LiftMode{
-        RAW_POWER,
-        ENCODER_DRIVE
+        HANG_LIFT,
+        LIFT
     }
     public enum ServoState{
         OPEN,
@@ -48,12 +33,10 @@ public class Utils {
         LOW,
         HIGH,
     }
-
     public enum DriveMode {
         GLOBAL,
         LOCAL
     }
-
     public enum FieldSide {
         BLUE_LEFT,
         BLUE_RIGHT,
@@ -62,38 +45,12 @@ public class Utils {
     }
 
     public static DriveMode driveMode = DriveMode.GLOBAL;
-    public static LiftMode liftMode = LiftMode.ENCODER_DRIVE;
-    public static LiftState liftState = LiftState.GROUND;
+    public static LiftMode liftMode = LiftMode.LIFT;
     public static ArmState armState = ArmState.IN;
     public static ServoState servoState = ServoState.OPEN;
     public static boolean slowMode = false;
     ElapsedTime elapsedTime = new ElapsedTime();
     double timeWhenPressed = 0;
-    public void runToLiftPos() {
-        robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPositionTolerance(10);
-        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPositionTolerance(10);
-        int distanceToGoal = Math.abs(robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).getTargetPosition()
-                -robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).getCurrentPosition());
-        switch (liftState) {
-            case HIGH:
-                if(distanceToGoal > 200){
-
-                }
-                else {
-                    setLiftMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    setLiftPower(0);
-                }
-            case GROUND:
-                if(distanceToGoal > 200){
-                    setLiftMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    setLiftPower(.8);
-                }
-                else {
-                    setLiftMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    setLiftPower(0);
-                }
-        }
-    }
     void setLiftMode(DcMotor.RunMode runMode) {
         robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(runMode);
         robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMode(runMode);
@@ -104,7 +61,7 @@ public class Utils {
         robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(targetPos);
     }
 
-    void setLiftPower(double power) {
+    void setHangLiftPower(double power) {
         robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setPower(power);
         robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setPower(power);
     }
@@ -121,15 +78,11 @@ public class Utils {
         }
     }
     double startTime = 0;
-    public void liftPower(double liftPower, boolean button) {
-        if(button){
-            startTime = time.seconds();
-            setLiftPower(-1);
-        }
-        else if (startTime + 2 < time.seconds()){
-            setLiftMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            setLiftPower(liftPower);
-        }
+    public void hangLiftPower(double hangPower) {
+        setHangLiftPower(hangPower);
+    }
+    public void liftPower(double liftPower){
+        robot.Motors.get(RobotClass.MOTORS.LIFT).setPower(liftPower);
     }
 
     double[] arm_leftPos = {0.69, 0.68, 0.67, 0.66, 0.65, 0.64 ,0.63, 0.62, 0.61,
@@ -159,10 +112,8 @@ public class Utils {
             robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(arm_rightPos[index]);
         }
     }
-
     boolean firstPressOverRide = true;
     boolean overRideArmLimiter = false;
-
     public void flipArm(double power, boolean button) {
         if (!button) {
             firstPressOverRide = true;
@@ -189,7 +140,6 @@ public class Utils {
             robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(power / 2);
         }
     }
-
     public void powerIntake(double power) {
         power = Math.min(.75, Math.max(-.75, power));
         power *= .7;
@@ -242,14 +192,13 @@ public class Utils {
         if(button && firstPressSwitchLiftMode){
             firstPressSwitchLiftMode = false;
             switch (Utils.liftMode) {
-                case ENCODER_DRIVE:
-                    Utils.liftMode = Utils.LiftMode.RAW_POWER;
+                case LIFT:
+                    Utils.liftMode = LiftMode.HANG_LIFT;
                     robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
                     break;
-                case RAW_POWER:
-                    Utils.liftMode = Utils.LiftMode.ENCODER_DRIVE;
+                case HANG_LIFT:
+                    Utils.liftMode = LiftMode.LIFT;
                     robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     break;
@@ -291,7 +240,21 @@ public class Utils {
             }
         }
     }
-
+    boolean firstPressSpecimenGrab = true;
+    boolean grabberClosed = false;
+    public void specimenGrab(boolean button){
+        if(!button){
+            firstPressSpecimenGrab = true;
+        }
+        if(button && firstPressSpecimenGrab){
+            firstPressSpecimenGrab = false;
+            grabberClosed = !grabberClosed;
+            if(grabberClosed){
+                robot.Servos.get(RobotClass.SERVOS.SPECIMEN_GRABBER).setPosition(1);
+            }
+            else robot.Servos.get(RobotClass.SERVOS.SPECIMEN_GRABBER).setPosition(0);
+        }
+    }
     boolean firstPressSwitchSlowMode = true;
 
     public void switchSlowMode(boolean button) {

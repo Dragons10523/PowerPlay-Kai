@@ -27,15 +27,12 @@ public class DriveMecanumBLUE extends Control {
         double turn = gamepad1.left_trigger - gamepad1.right_trigger;
         float[] hsvValues = colorSensorClassObj.getHsvValues();
 
-        double liftPower = gamepad2.dpad_down ? -1 : 0;
-        liftPower += gamepad2.dpad_up ? 1 : 0;
+        double hangPower = gamepad2.dpad_down ? -1 : 0;
+        hangPower += gamepad2.dpad_up ? 1 : 0;
         double armPower = gamepad2.left_trigger - gamepad2.right_trigger;
-
-        SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
 
         telemetry.addData("driveMode", Utils.driveMode);
         telemetry.addData("liftMode", Utils.liftMode);
-        telemetry.addData("liftState", Utils.liftState);
         telemetry.addData("armState", Utils.armState);
         telemetry.addData("heading", robot.getHeading());
         telemetry.addData("hsvValues", Arrays.toString(hsvValues));
@@ -53,7 +50,7 @@ public class DriveMecanumBLUE extends Control {
         else utils.mecanumDrive(leftY, leftX, turn);
 
         utils.resetIMU(gamepad1.back);
-        utils.liftPower(liftPower, gamepad2.a);
+        utils.hangLiftPower(hangPower);
         utils.resetLift(gamepad2.back);
         utils.switchDriveMode(gamepad1.start);
         utils.switchLiftMode(gamepad2.start);

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.hardware.rev.RevSPARKMini;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -47,6 +48,7 @@ public class RobotClass {
         ARM_RIGHT,
         BUCKET,
         INTAKE_SERVO,
+        SPECIMEN_GRABBER,
     }
     public static enum CR_SERVOS{
         INTAKE,
@@ -58,7 +60,8 @@ public class RobotClass {
         BACK_RIGHT,
         LIFT_LEFT,
         LIFT_RIGHT,
-        ARM_FLIP
+        ARM_FLIP,
+        LIFT
     }
     public RobotClass(HardwareMap hwmap) {
         this.hwmap = hwmap;
@@ -119,9 +122,10 @@ public class RobotClass {
         //port 0 Expansion
         Motors.put(MOTORS.LIFT_RIGHT, hwmap.get(DcMotorEx.class,"liftRight"));
         //port 1 Expansion
+        Motors.put(MOTORS.LIFT, hwmap.get(DcMotorEx.class, "lift"));
+        //RevSparkMini servo port 0 Control
         Motors.put(MOTORS.ARM_FLIP, hwmap.get(DcMotorEx.class, "armFlip"));
         //port 2 Expansion
-
         Servos.put(SERVOS.ARM_LEFT, hwmap.get(Servo.class, "armLeft"));
         //port 0 expansion
         Servos.put(SERVOS.ARM_RIGHT, hwmap.get(Servo.class, "armRight"));
@@ -129,7 +133,9 @@ public class RobotClass {
         Servos.put(SERVOS.BUCKET, hwmap.get(Servo.class, "bucket"));
         //port 2 expansion
         Servos.put(SERVOS.INTAKE_SERVO, hwmap.get(Servo.class, "intakeServo"));
-
+        //port 3 expansion
+        Servos.put(SERVOS.SPECIMEN_GRABBER, hwmap.get(Servo.class, "specimenGrabber"));
+        //port 4 expansion
         CR_Servos.put(CR_SERVOS.INTAKE, hwmap.get(CRServo.class, "intake"));
         //port 5 expansion
 
@@ -149,7 +155,6 @@ public class RobotClass {
         Motors.get(MOTORS.ARM_FLIP).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
     public void initResetLift(){
-        Motors.get(MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        Motors.get(MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Motors.get(MOTORS.LIFT).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 }
