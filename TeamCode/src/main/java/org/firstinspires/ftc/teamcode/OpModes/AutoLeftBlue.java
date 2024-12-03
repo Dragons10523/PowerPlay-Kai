@@ -246,8 +246,6 @@ public class AutoLeftBlue extends AutoControl {
         }
         waitForStart();
 
-        robot.initResetLift();
-
         drive.followTrajectorySequence(firstScore);
         //drive.followTrajectorySequence(moveToFirstPiece);
         //drive.followTrajectorySequence(secondScore);

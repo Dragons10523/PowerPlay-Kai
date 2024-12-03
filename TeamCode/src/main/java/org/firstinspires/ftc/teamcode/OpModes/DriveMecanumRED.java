@@ -38,7 +38,6 @@ public class DriveMecanumRED extends Control {
         telemetry.addData("Distance (cm)",
                 String.format(Locale.US, "%.02f", robot.distanceSensor.getDistance(DistanceUnit.CM)));
         telemetry.addData("currentVoltage", robot.voltageSensor.getVoltage());
-        telemetry.addData("liftPos", robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition());
         telemetry.update();
 
         if (Utils.slowMode) utils.mecanumDrive(leftY / 2, leftX / 2, turn / 2);
@@ -48,8 +47,6 @@ public class DriveMecanumRED extends Control {
         if(Utils.liftMode == Utils.LiftMode.LIFT) utils.liftPower(liftPower);
         else utils.hangLiftPower(liftPower);
         utils.switchLiftMode(gamepad2.start);
-
-        utils.resetLift(gamepad2.back);
         utils.switchDriveMode(gamepad1.start);
         utils.extendAndRetractArm(-gamepad2.right_stick_y);
         utils.flipArm(armPower, gamepad2.y);

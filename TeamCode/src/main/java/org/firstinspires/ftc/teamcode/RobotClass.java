@@ -35,6 +35,7 @@ public class RobotClass {
     public AbstractOmniDrivetrain drivetrain;
     public Map<MOTORS, DcMotorEx> Motors;
     public Map<SERVOS, Servo> Servos;
+    public DcMotorSimple frontLeft;
     public Map<CR_SERVOS, CRServo> CR_Servos;
     public Limelight3A limelight;
     public final IMU imu;
@@ -53,6 +54,7 @@ public class RobotClass {
     public static enum CR_SERVOS{
         INTAKE,
     }
+
     public static enum MOTORS {
         FRONT_LEFT,
         FRONT_RIGHT,
@@ -61,7 +63,7 @@ public class RobotClass {
         LIFT_LEFT,
         LIFT_RIGHT,
         ARM_FLIP,
-        LIFT
+        LIFT,
     }
     public RobotClass(HardwareMap hwmap) {
         this.hwmap = hwmap;
@@ -73,7 +75,9 @@ public class RobotClass {
         Motors = new HashMap<>();
         Servos = new HashMap<>();
         CR_Servos = new HashMap<>();
-        Motors.put(MOTORS.FRONT_LEFT, hwmap.get(DcMotorEx.class, "frontLeft"));
+
+        frontLeft = hwmap.get(DcMotorSimple.class, "frontLeft");
+
         //port 0 control
         Motors.put(MOTORS.FRONT_RIGHT, hwmap.get(DcMotorEx.class, "frontRight"));
         //port 3 Expansion
@@ -103,7 +107,6 @@ public class RobotClass {
     public void resetIMU() {
         SparkFunOTOS.Pose2D pos = opticalSensor.getPosition();
         SparkFunOTOS.Pose2D posNew = new SparkFunOTOS.Pose2D(pos.x, pos.y, 0);
-
         opticalSensor.setPosition(posNew);
     }
     private void initMotorsProto() {
@@ -119,6 +122,7 @@ public class RobotClass {
         distanceSensor = hwmap.get(DistanceSensor.class, "sensor_color_distance");
 
         Motors.put(MOTORS.LIFT_LEFT, hwmap.get(DcMotorEx.class, "liftLeft"));
+
         //port 0 Expansion
         Motors.put(MOTORS.LIFT_RIGHT, hwmap.get(DcMotorEx.class,"liftRight"));
         //port 1 Expansion
@@ -151,10 +155,6 @@ public class RobotClass {
 
         Motors.get(MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
         Motors.get(MOTORS.ARM_FLIP).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    }
-    public void initResetLift(){
-        Motors.get(MOTORS.LIFT).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 }

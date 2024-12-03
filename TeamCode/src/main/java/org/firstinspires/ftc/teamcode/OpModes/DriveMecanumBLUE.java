@@ -27,8 +27,8 @@ public class DriveMecanumBLUE extends Control {
         double turn = gamepad1.left_trigger - gamepad1.right_trigger;
         float[] hsvValues = colorSensorClassObj.getHsvValues();
 
-        double hangPower = gamepad2.dpad_down ? -1 : 0;
-        hangPower += gamepad2.dpad_up ? 1 : 0;
+        double liftPower = gamepad2.dpad_down ? -1 : 0;
+        liftPower += gamepad2.dpad_up ? 1 : 0;
         double armPower = gamepad2.left_trigger - gamepad2.right_trigger;
 
         telemetry.addData("driveMode", Utils.driveMode);
@@ -50,14 +50,15 @@ public class DriveMecanumBLUE extends Control {
         else utils.mecanumDrive(leftY, leftX, turn);
 
         utils.resetIMU(gamepad1.back);
-        utils.hangLiftPower(hangPower);
-        utils.resetLift(gamepad2.back);
-        utils.switchDriveMode(gamepad1.start);
+        if(Utils.liftMode == Utils.LiftMode.LIFT) utils.liftPower(liftPower);
+        else utils.hangLiftPower(liftPower);
         utils.switchLiftMode(gamepad2.start);
+        utils.switchDriveMode(gamepad1.start);
         utils.extendAndRetractArm(-gamepad2.right_stick_y);
         utils.flipArm(armPower, gamepad2.y);
         utils.flipBucket(gamepad2.b);
         utils.intakeServo(gamepad2.x);
+        utils.specimenGrab(gamepad2.left_bumper);
         if(robot.distanceSensor.getDistance(DistanceUnit.CM) < 5){
             if(robot.colorSensor.red() > robot.colorSensor.blue() && robot.colorSensor.alpha() > 160){
                 utils.powerIntake(1);

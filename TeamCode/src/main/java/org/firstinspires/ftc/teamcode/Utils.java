@@ -65,11 +65,6 @@ public class Utils {
         robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setPower(power);
         robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setPower(power);
     }
-    public void resetLift(boolean button){
-        if(button){
-            robot.initResetLift();
-        }
-    }
     public void mecanumDrive(double leftY, double leftX, double turn) {
         if (Utils.driveMode == Utils.DriveMode.GLOBAL) {
             robot.drivetrain.mecanumDriveGlobal(leftY, leftX, turn, robot.getHeading());
