@@ -3,19 +3,18 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import android.annotation.SuppressLint;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.RobotClass;
 import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.Utils;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-@Autonomous(name = "Auto_Left_Blue")
-public class AutoLeftBlue extends AutoControl {
+@Autonomous(name = "Auto_Left_Red")
+public class AutoLeftRed extends AutoControl {
     private final Utils.FieldSide fieldSide = Utils.FieldSide.BLUE_LEFT;
     ElapsedTime time = new ElapsedTime();
 
@@ -34,10 +33,11 @@ public class AutoLeftBlue extends AutoControl {
 
         boolean successfulCameraPos = autoUtils.updateOpticalSensorToPoseEstimateCamera(120);
 
-        Pose2d scorePosition = new Pose2d(54, 54, Math.toRadians(225));
+        Pose2d scorePosition = new Pose2d(-54, -54, Math.toRadians(45));
 
-        double bucketScoreTime = 4;
+        double bucketScoreTime = 2;
         SparkFunOTOS.Pose2D posAfterCameraReset = robot.opticalSensor.getPosition();
+
         TrajectorySequence firstScore = drive.trajectorySequenceBuilder(new Pose2d(posAfterCameraReset.x, posAfterCameraReset.y, posAfterCameraReset.h))
                 .addTemporalMarker(0, () -> {
                     Thread t1 = new Thread() {
@@ -55,7 +55,7 @@ public class AutoLeftBlue extends AutoControl {
                     };
                     t2.start();
                 })//extend vertical slides and score
-                .splineToLinearHeading(scorePosition, Math.toRadians(225))
+                .splineToLinearHeading(scorePosition, Math.toRadians(45))
                 .addDisplacementMarker(()->{
                     Thread t3 = new Thread(){
                         public void run(){
@@ -114,8 +114,7 @@ public class AutoLeftBlue extends AutoControl {
         telemetry.addLine("firstPiece success");
         telemetry.update();
         TrajectorySequence secondScore = drive.trajectorySequenceBuilder(moveToFirstPiece.end())
-                .splineToLinearHeading(scorePosition, Math.toRadians(225))
-                .forward(1.5)
+                .splineToLinearHeading(scorePosition, Math.toRadians(45))
                 .addTemporalMarker(0.5, () -> {
                     Thread t1 = new Thread() {
                         public void run() {

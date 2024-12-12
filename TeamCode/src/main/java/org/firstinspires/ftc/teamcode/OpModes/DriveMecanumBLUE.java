@@ -35,22 +35,16 @@ public class DriveMecanumBLUE extends Control {
         telemetry.addData("liftMode", Utils.liftMode);
         telemetry.addData("armState", Utils.armState);
         telemetry.addData("heading", robot.getHeading());
-        telemetry.addData("hsvValues", Arrays.toString(hsvValues));
         telemetry.addData("Distance (cm)",
                 String.format(Locale.US, "%.02f", robot.distanceSensor.getDistance(DistanceUnit.CM)));
-        telemetry.addData("Alpha", robot.colorSensor.alpha());
-        telemetry.addData("Red  ", robot.colorSensor.red());
-        telemetry.addData("Green", robot.colorSensor.green());
-        telemetry.addData("Blue ", robot.colorSensor.blue());
-        telemetry.addData("Hue", hsvValues[0]);
         telemetry.addData("currentVoltage", robot.voltageSensor.getVoltage());
         telemetry.update();
 
-        if(Utils.slowMode) utils.mecanumDrive(leftY/2, leftX/2, turn/2);
+        if (Utils.slowMode) utils.mecanumDrive(leftY / 2, leftX / 2, turn / 2);
         else utils.mecanumDrive(leftY, leftX, turn);
 
         utils.resetIMU(gamepad1.back);
-        if(Utils.liftMode == Utils.LiftMode.LIFT) utils.liftPower(liftPower);
+        if(Utils.liftMode == Utils.LiftMode.LIFT) utils.liftPower(liftPower, gamepad2.a);
         else utils.hangLiftPower(liftPower);
         utils.switchLiftMode(gamepad2.start);
         utils.switchDriveMode(gamepad1.start);
@@ -59,6 +53,7 @@ public class DriveMecanumBLUE extends Control {
         utils.flipBucket(gamepad2.b);
         utils.intakeServo(gamepad2.x);
         utils.specimenGrab(gamepad2.left_bumper);
+
         if(robot.distanceSensor.getDistance(DistanceUnit.CM) < 5){
             if(robot.colorSensor.red() > robot.colorSensor.blue() && robot.colorSensor.alpha() > 160){
                 utils.powerIntake(1);

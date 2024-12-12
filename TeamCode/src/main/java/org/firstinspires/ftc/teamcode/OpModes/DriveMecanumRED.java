@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Control;
@@ -16,6 +17,7 @@ public class DriveMecanumRED extends Control {
     public void start() {
         robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.67);
         robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.52);
+        robot.Motors.get(RobotClass.MOTORS.LIFT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     @Override
@@ -34,7 +36,8 @@ public class DriveMecanumRED extends Control {
         telemetry.addData("liftMode", Utils.liftMode);
         telemetry.addData("armState", Utils.armState);
         telemetry.addData("heading", robot.getHeading());
-        telemetry.addData("hsvValues", Arrays.toString(hsvValues));
+        telemetry.addData("liftPos", robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition());
+        telemetry.addData("armPos", robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition());
         telemetry.addData("Distance (cm)",
                 String.format(Locale.US, "%.02f", robot.distanceSensor.getDistance(DistanceUnit.CM)));
         telemetry.addData("currentVoltage", robot.voltageSensor.getVoltage());
@@ -44,7 +47,7 @@ public class DriveMecanumRED extends Control {
         else utils.mecanumDrive(leftY, leftX, turn);
 
         utils.resetIMU(gamepad1.back);
-        if(Utils.liftMode == Utils.LiftMode.LIFT) utils.liftPower(liftPower);
+        if(Utils.liftMode == Utils.LiftMode.LIFT) utils.liftPower(liftPower, gamepad2.a);
         else utils.hangLiftPower(liftPower);
         utils.switchLiftMode(gamepad2.start);
         utils.switchDriveMode(gamepad1.start);

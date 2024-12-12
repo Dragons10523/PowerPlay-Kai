@@ -38,23 +38,6 @@ public class AutoUtils {
 
     Map<RobotClass.MOTORS, Double> wheelSpeeds = new HashMap<>();
 
-    public void runToLiftPos(Utils.LiftState liftState) {
-        switch (liftState) {
-            case GROUND:
-                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(0);
-                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPosition(0);
-            case LOW:
-                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(100);
-                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPosition(100);
-            case HIGH:
-                robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(200);
-                robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPosition(200);
-        }
-
-        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
-
     @SuppressLint("DefaultLocale")
     public void AutoDrive(double targetDistance_INCH_X, double targetDistance_INCH_Y) {
         ElapsedTime timer = new ElapsedTime();
@@ -162,14 +145,12 @@ public class AutoUtils {
         while (!atTarget);
         stopMotors();
     }
-
     public void stopMotors() {
         wheelSpeeds.put(RobotClass.MOTORS.FRONT_LEFT, 0.0);
         wheelSpeeds.put(RobotClass.MOTORS.BACK_LEFT, 0.0);
         wheelSpeeds.put(RobotClass.MOTORS.BACK_RIGHT, 0.0);
         wheelSpeeds.put(RobotClass.MOTORS.FRONT_RIGHT, 0.0);
         UpdateWheelPowers();
-
         setStopWheelBehavior();
         try {
             Thread.sleep(50);
@@ -180,33 +161,27 @@ public class AutoUtils {
         try {
             Thread.sleep(50);
         } catch (InterruptedException ignored) {
-
         }
     }
-
     public void UpdateWheelPowers() {
         robot.Motors.get(RobotClass.MOTORS.FRONT_LEFT).setPower(wheelSpeeds.get(RobotClass.MOTORS.FRONT_LEFT));
         robot.Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setPower(wheelSpeeds.get(RobotClass.MOTORS.FRONT_RIGHT));
         robot.Motors.get(RobotClass.MOTORS.BACK_LEFT).setPower(wheelSpeeds.get(RobotClass.MOTORS.BACK_LEFT));
         robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT).setPower(wheelSpeeds.get(RobotClass.MOTORS.BACK_RIGHT));
     }
-
     public void setStopWheelBehavior() {
         robot.Motors.get(RobotClass.MOTORS.FRONT_LEFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.Motors.get(RobotClass.MOTORS.BACK_LEFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
-
     public void setCoastWheelBehavior() {
         robot.Motors.get(RobotClass.MOTORS.FRONT_LEFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         robot.Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         robot.Motors.get(RobotClass.MOTORS.BACK_LEFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
-
     public void intakeTransition() {
-
         //flip arm up
         armFlip(Utils.ArmFlipState.UP, .6);
         //extake pixel into bucket
@@ -214,14 +189,11 @@ public class AutoUtils {
         while (startTime + 0.35 > time.seconds()) {
             robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
         }
-
         //turn off intake
         robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0);
 
         armFlip(Utils.ArmFlipState.GROUND, 1);
-
     }
-
     public void armFlip(Utils.ArmFlipState state, double power) {
         double startTime = time.seconds();
         switch (state) {
@@ -249,7 +221,6 @@ public class AutoUtils {
                 break;
             case MIDDLE:
                 robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(400);
-
                 while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < 400 - 10
                         || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 400 + 10) {
                     robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -262,39 +233,46 @@ public class AutoUtils {
         }
         robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0);
     }
-
     public static boolean isLiftAtPos = false;
     public void verticalSlide(Utils.LiftState liftState) {
-        //TODO: encoders possibly not synced up, may result in improper results from RUN_TO_POSITION
-        robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPositionTolerance(10);
-        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPositionTolerance(10);
         isLiftAtPos = false;
         double startTime = time.seconds();
+        int currentPos = robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition();
+        setLiftMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         switch (liftState) {
             case HIGH:
-                setLiftTargetPos(4600);
-                while (robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).getCurrentPosition() < 4600
-                        || robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).getCurrentPosition() > 4650
-                        && startTime + 3 > time.seconds())
+                int targetPos = -1300;
+                setLiftTargetPos(targetPos);
+                while (currentPos > targetPos + 10 || currentPos < targetPos - 10)
                 {
-                    setLiftMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    setLiftPower(1);
+                    currentPos = robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition();
+                    double powerOut = (double) -(targetPos - currentPos) / 300.0;
+                    telemetry.addData("powerOut", powerOut);
+                    telemetry.update();
+                    if(powerOut > 0){
+                        powerOut = Math.max(powerOut, 0.6);
+                    }
+                    else{
+                        powerOut = Math.min(powerOut, -0.4);
+                    }
+                    setLiftPower(powerOut);
+                    if(startTime + 3 < time.seconds() || autoControl.isStopRequested()){
+                        break;
+                    }
                 }
-                while(startTime + 3 > time.seconds()){
-                    
-                }
-                robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0);
+                setLiftPower(0.2);
                 break;
             case GROUND:
                 while(startTime + 2 > time.seconds()){
                     setLiftMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     setLiftPower(-1);
+                    if(autoControl.isStopRequested()){
+                        break;
+                    }
                 }
-                robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.5);
+                setLiftPower(0);
                 break;
         }
-        setLiftMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        setLiftPower(0);
         isLiftAtPos = true;
     }
     public boolean updateOpticalSensorToPoseEstimateCamera(int targetPullCount){
@@ -310,8 +288,8 @@ public class AutoUtils {
             if (result != null) {
                 boolean doRejectPosUpdate = false;
                 double[] stdDevMt2 = result.getStddevMt2();
-                if (stdDevMt2[0] > 0.03 || stdDevMt2[1] > 0.03) {
-                    telemetry.addLine("stdDevMt2 > 0.03");
+                if (stdDevMt2[0] > 0.06 || stdDevMt2[1] > 0.06) {
+                    telemetry.addLine("stdDevMt2 > 0.06");
                     doRejectPosUpdate = true;
                 }
                 if(!result.isValid()){
@@ -330,7 +308,7 @@ public class AutoUtils {
                 }
                 if (successfulPullCount >= targetPullCount) {
                     robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(
-                            -(avgPosX * 39.37) / successfulPullCount,
+                            (avgPosX * 39.37) / successfulPullCount,
                             (avgPosY * 39.37) / successfulPullCount,
                                 robot.getHeading()));
                     return true;
@@ -348,16 +326,13 @@ public class AutoUtils {
         return false;
     }
     public void setLiftMode(DcMotor.RunMode runMode){
-        robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(runMode);
-        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMode(runMode);
+        robot.Motors.get(RobotClass.MOTORS.LIFT).setMode(runMode);
     }
     public void setLiftTargetPos(int targetPos){
-        robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPosition(targetPos);
-        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(targetPos);
+        robot.Motors.get(RobotClass.MOTORS.LIFT).setTargetPosition(targetPos);
     }
     public void setLiftPower(double power){
-        robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setPower(power);
-        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setPower(power);
+        robot.Motors.get(RobotClass.MOTORS.LIFT).setPower(power);
     }
 
     public double constrainDouble(double lowerBound, double upperBound, double val) {

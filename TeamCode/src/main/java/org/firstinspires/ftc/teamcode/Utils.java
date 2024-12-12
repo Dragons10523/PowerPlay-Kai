@@ -51,20 +51,6 @@ public class Utils {
     public static boolean slowMode = false;
     ElapsedTime elapsedTime = new ElapsedTime();
     double timeWhenPressed = 0;
-    void setLiftMode(DcMotor.RunMode runMode) {
-        robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(runMode);
-        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMode(runMode);
-    }
-
-    void setLiftTargetPos(int targetPos) {
-        robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setTargetPosition(targetPos);
-        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setTargetPosition(targetPos);
-    }
-
-    void setHangLiftPower(double power) {
-        robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setPower(power);
-        robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setPower(power);
-    }
     public void mecanumDrive(double leftY, double leftX, double turn) {
         if (Utils.driveMode == Utils.DriveMode.GLOBAL) {
             robot.drivetrain.mecanumDriveGlobal(leftY, leftX, turn, robot.getHeading());
@@ -72,18 +58,42 @@ public class Utils {
             robot.drivetrain.mecanumDriveLocal(leftY, leftX, turn);
         }
     }
-    double startTime = 0;
+
     public void hangLiftPower(double hangPower) {
-        setHangLiftPower(hangPower);
+        robot.liftLeft.setPower(hangPower);
+        robot.liftRight.setPower(hangPower);
     }
-    public void liftPower(double liftPower){
-        robot.Motors.get(RobotClass.MOTORS.LIFT).setPower(liftPower);
+    boolean firstPressLiftPower = true;
+    double startTime = -10;
+    public void liftPower(double liftPower, boolean button){
+        if(!button) firstPressLiftPower = true;
+        if(button && firstPressLiftPower){
+            firstPressLiftPower = false;
+            startTime = elapsedTime.seconds();
+        }
+        if(startTime + 2 < elapsedTime.seconds()){
+            if(liftPower >= 0){
+                robot.Motors.get(RobotClass.MOTORS.LIFT).setPower(liftPower + 0.12);
+            }else{
+                robot.Motors.get(RobotClass.MOTORS.LIFT).setPower(liftPower);
+            }
+
+        }
+        if(startTime + 2 > elapsedTime.seconds()){
+            if(liftPower == 0){
+                robot.Motors.get(RobotClass.MOTORS.LIFT).setPower(-1);
+            }
+            else{
+                startTime -= 2;
+            }
+        }
+
     }
 
-    double[] arm_leftPos = {0.69, 0.68, 0.67, 0.66, 0.65, 0.64 ,0.63, 0.62, 0.61,
-            0.60, 0.59, 0.58, 0.57, 0.56, 0.55, 0.54, 0.53, 0.52,
-            0.51, 0.50, 0.49, 0.48, 0.47, 0.46, 0.45, 0.44};// in to out
-    double[] arm_rightPos = {0.52, 0.52, 0.53, 0.54, 0.55, 0.56, 0.57, 0.58, 0.59,
+    double[] arm_leftPos = {0.43, 0.42, 0.41, 0.40, 0.39, 0.38 ,0.37, 0.36, 0.35,
+            0.34, 0.33, 0.32, 0.31, 0.30, 0.29, 0.28, 0.27, 0.26,
+            0.25, 0.24, 0.23, 0.22, 0.21, 0.20, 0.19, 0.18};// in to out
+    double[] arm_rightPos = {0.51, 0.52, 0.53, 0.54, 0.55, 0.56, 0.57, 0.58, 0.59,
             0.60, 0.61, 0.62, 0.63, 0.64, 0.65, 0.66, 0.67, 0.68,
             0.69, 0.70, 0.71, 0.72, 0.73, 0.74, 0.76};// in to out
     int index = 0;
@@ -163,9 +173,7 @@ public class Utils {
             }
         }
     }
-
     boolean firstPressFlipBucket = true;
-
     public void flipBucket(boolean button) {
         if (!button) {
             firstPressFlipBucket = true;
@@ -173,10 +181,10 @@ public class Utils {
         if (button && firstPressFlipBucket) {
             firstPressFlipBucket = false;
             timeWhenPressed = elapsedTime.seconds();
-            robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0);
+            robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.77);
         }
         if (elapsedTime.seconds() - 3 > timeWhenPressed) {
-            robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(.5);
+            robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.39);
         }
     }
     boolean firstPressSwitchLiftMode = true;
@@ -189,13 +197,9 @@ public class Utils {
             switch (Utils.liftMode) {
                 case LIFT:
                     Utils.liftMode = LiftMode.HANG_LIFT;
-                    robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     break;
                 case HANG_LIFT:
                     Utils.liftMode = LiftMode.LIFT;
-                    robot.Motors.get(RobotClass.MOTORS.LIFT_LEFT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    robot.Motors.get(RobotClass.MOTORS.LIFT_RIGHT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     break;
             }
         }

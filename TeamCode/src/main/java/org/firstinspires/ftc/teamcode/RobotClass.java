@@ -35,7 +35,8 @@ public class RobotClass {
     public AbstractOmniDrivetrain drivetrain;
     public Map<MOTORS, DcMotorEx> Motors;
     public Map<SERVOS, Servo> Servos;
-    public DcMotorSimple frontLeft;
+    public DcMotorSimple liftLeft;
+    public DcMotorSimple liftRight;
     public Map<CR_SERVOS, CRServo> CR_Servos;
     public Limelight3A limelight;
     public final IMU imu;
@@ -60,8 +61,6 @@ public class RobotClass {
         FRONT_RIGHT,
         BACK_LEFT,
         BACK_RIGHT,
-        LIFT_LEFT,
-        LIFT_RIGHT,
         ARM_FLIP,
         LIFT,
     }
@@ -76,9 +75,8 @@ public class RobotClass {
         Servos = new HashMap<>();
         CR_Servos = new HashMap<>();
 
-        frontLeft = hwmap.get(DcMotorSimple.class, "frontLeft");
-
-        //port 0 control
+        Motors.put(MOTORS.FRONT_LEFT, hwmap.get(DcMotorEx.class, "frontLeft"));
+        //port 0 Expansion
         Motors.put(MOTORS.FRONT_RIGHT, hwmap.get(DcMotorEx.class, "frontRight"));
         //port 3 Expansion
         Motors.put(MOTORS.BACK_LEFT, hwmap.get(DcMotorEx.class, "backLeft"));
@@ -121,13 +119,12 @@ public class RobotClass {
         colorSensor = hwmap.get(ColorSensor.class, "sensor_color_distance");
         distanceSensor = hwmap.get(DistanceSensor.class, "sensor_color_distance");
 
-        Motors.put(MOTORS.LIFT_LEFT, hwmap.get(DcMotorEx.class, "liftLeft"));
-
-        //port 0 Expansion
-        Motors.put(MOTORS.LIFT_RIGHT, hwmap.get(DcMotorEx.class,"liftRight"));
+        liftLeft = hwmap.get(DcMotorSimple.class, "liftLeft");
+        //SparkMini Servo port 0 Control
+        liftRight = hwmap.get(DcMotorSimple.class, "liftRight");
         //port 1 Expansion
         Motors.put(MOTORS.LIFT, hwmap.get(DcMotorEx.class, "lift"));
-        //RevSparkMini servo port 0 Control
+        //port 0 Control
         Motors.put(MOTORS.ARM_FLIP, hwmap.get(DcMotorEx.class, "armFlip"));
         //port 2 Expansion
         Servos.put(SERVOS.ARM_LEFT, hwmap.get(Servo.class, "armLeft"));
@@ -154,6 +151,9 @@ public class RobotClass {
         Motors.get(MOTORS.BACK_RIGHT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         Motors.get(MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        Motors.get(MOTORS.LIFT).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Motors.get(MOTORS.LIFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         Motors.get(MOTORS.ARM_FLIP).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }

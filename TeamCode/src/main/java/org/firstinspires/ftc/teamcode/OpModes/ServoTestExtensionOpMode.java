@@ -31,7 +31,7 @@ public class ServoTestExtensionOpMode extends LinearOpMode {
             if(gamepad1.a && firstPressA){
                 firstPressA = false;
                 servoPos1 += .01;
-            }
+            } 
             if(!gamepad1.b){
                 firstPressB = true;
             }
@@ -39,8 +39,6 @@ public class ServoTestExtensionOpMode extends LinearOpMode {
                 firstPressB = false;
                 servoPos1 -= .01;
             }
-            //0.94 Closed
-            //0.6 OPEN
             robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(servoPos1);
 //            if(!gamepad1.x){
 //                firstPressX = true;
@@ -59,10 +57,8 @@ public class ServoTestExtensionOpMode extends LinearOpMode {
 //                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(servoPos2);
 //            }
             telemetry.addData("servoPos1", servoPos1);
-//            telemetry.addData("servoPos2", servoPos2);
+            telemetry.addData("servoPos2", servoPos2);
             telemetry.update();
-            //servoPos1 IN : 0.67
-            //servoPos1 OUT : 0.42
         }
     }
 }

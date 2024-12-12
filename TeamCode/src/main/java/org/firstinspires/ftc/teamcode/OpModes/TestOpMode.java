@@ -12,8 +12,6 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.ServoController;
 
 
@@ -31,18 +29,33 @@ import java.util.List;
 
 
 @TeleOp
-public class TestOpMode extends LinearOpMode {
+public class TestOpMode extends AutoControl {
     private final Utils.FieldSide fieldSide = Utils.FieldSide.BLUE_LEFT;
 
     @SuppressLint("DefaultLocale")
     public void runOpMode() throws InterruptedException {
-        DcMotor motor1 = hardwareMap.get(DcMotor.class,"motor");
+        super.runOpMode();
+
+        super.initialize();
 
         waitForStart();
-        while(!isStopRequested()){
-            motor1.setPower(gamepad1.left_stick_y);
-        }
+        SparkFunOTOS.Pose2D pos = new SparkFunOTOS.Pose2D(0, 0, Math.toRadians(90));
+        robot.opticalSensor.setPosition(pos);
 
+        autoUtils.verticalSlide(Utils.LiftState.HIGH);
+
+        while(!isStopRequested()){
+            SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
+            telemetry.addLine(String.format("XYH %.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h));
+            telemetry.addData("liftPos",robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition());
+            telemetry.update();
+        }
+        //drive.followTrajectorySequence(trajSeq);
+//        while(opModeIsActive()){
+//            SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
+//            telemetry.addLine(String.format("XYH %.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h));
+//            telemetry.update();
+//        }
     }
 
 
