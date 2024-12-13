@@ -36,7 +36,7 @@ public class AutoLeftBlue extends AutoControl {
 
         Pose2d scorePosition = new Pose2d(54, 54, Math.toRadians(225));
 
-        double bucketScoreTime = 4;
+        double bucketScoreTime = 2;
         SparkFunOTOS.Pose2D posAfterCameraReset = robot.opticalSensor.getPosition();
         TrajectorySequence firstScore = drive.trajectorySequenceBuilder(new Pose2d(posAfterCameraReset.x, posAfterCameraReset.y, posAfterCameraReset.h))
                 .addTemporalMarker(0, () -> {
@@ -56,11 +56,11 @@ public class AutoLeftBlue extends AutoControl {
                     t2.start();
                 })//extend vertical slides and score
                 .splineToLinearHeading(scorePosition, Math.toRadians(225))
-                .addDisplacementMarker(()->{
-                    Thread t3 = new Thread(){
-                        public void run(){
+                .addDisplacementMarker(() -> {
+                    Thread t3 = new Thread() {
+                        public void run() {
                             double startTime = time.seconds();
-                            while(startTime + 2 > time.seconds()){
+                            while (startTime + 2 > time.seconds()) {
                                 robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.77);
                             }
                             robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.39);
@@ -86,20 +86,14 @@ public class AutoLeftBlue extends AutoControl {
 
                     robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.56);
                     robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.64);
+                    Thread t1 = new Thread() {
+                        public void run(){
 
+                        }
+                    };
+                    t1.start();
                 })
                 .forward(1)
-                .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
-                })
-                .UNSTABLE_addTemporalMarkerOffset(.35, () -> {
-
-                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0);
-
-                    robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.69);
-                    robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.52);
-
-                }) //perform intake transition
                 .waitSeconds(.2)
                 .addTemporalMarker(() -> {
                     Thread t4 = new Thread() {

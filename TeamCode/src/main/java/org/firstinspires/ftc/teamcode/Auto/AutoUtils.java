@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.Camera.AprilTagPipeline;
 import org.firstinspires.ftc.teamcode.RobotClass;
@@ -24,6 +25,7 @@ public class AutoUtils {
     public static final int WHEEL_RADIUS = 2;
     public static final int CPR_OUTPUT_SHAFT_20TO1 = 560;
     public static final double WHEEL_CIRCUMFERENCE_INCH = 2 * Math.PI * WHEEL_RADIUS;
+    public static final double INCHES_PER_METER = 39.37;
     public static final double TICKS_PER_INCH = CPR_OUTPUT_SHAFT_20TO1 / WHEEL_CIRCUMFERENCE_INCH;
     Telemetry telemetry;
     AprilTagPipeline aprilTagPipeline;
@@ -68,7 +70,7 @@ public class AutoUtils {
             integralX = constrainDouble(-maxIntegral, maxIntegral, integralX);
             integralY = constrainDouble(-maxIntegral, maxIntegral, integralY);
             // calculate power to the motor based on error over time and constrain
-            // the value to maxIntegral
+            // the value to maxIntegrala
             double derivativeX = kD * (errorX - previousErrorX) / (timer.seconds() - previousTime);
             double derivativeY = kD * (errorY - previousErrorY) / (timer.seconds() - previousTime);
             // reduces power to the motor based on how quickly the robot approached the desired target
@@ -181,6 +183,7 @@ public class AutoUtils {
         robot.Motors.get(RobotClass.MOTORS.BACK_LEFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
+    //Performs transition from intake to bucket
     public void intakeTransition() {
         //flip arm up
         armFlip(Utils.ArmFlipState.UP, .6);
@@ -194,6 +197,7 @@ public class AutoUtils {
 
         armFlip(Utils.ArmFlipState.GROUND, 1);
     }
+    //Moves jointed arm to targe ArmFlipState
     public void armFlip(Utils.ArmFlipState state, double power) {
         double startTime = time.seconds();
         switch (state) {
@@ -233,9 +237,9 @@ public class AutoUtils {
         }
         robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0);
     }
-    public static boolean isLiftAtPos = false;
+    //Moves to liftState
+    //GROUND state powers in down direction for 2 seconds
     public void verticalSlide(Utils.LiftState liftState) {
-        isLiftAtPos = false;
         double startTime = time.seconds();
         int currentPos = robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition();
         setLiftMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -246,9 +250,11 @@ public class AutoUtils {
                 while (currentPos > targetPos + 10 || currentPos < targetPos - 10)
                 {
                     currentPos = robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition();
+                    //calculates powerOut based on difference between goal ticks / 300
                     double powerOut = (double) -(targetPos - currentPos) / 300.0;
                     telemetry.addData("powerOut", powerOut);
                     telemetry.update();
+                    //Limits power out between -0.4 > x > 0.6
                     if(powerOut > 0){
                         powerOut = Math.max(powerOut, 0.6);
                     }
@@ -256,6 +262,7 @@ public class AutoUtils {
                         powerOut = Math.min(powerOut, -0.4);
                     }
                     setLiftPower(powerOut);
+                    //Time out 3 seconds
                     if(startTime + 3 < time.seconds() || autoControl.isStopRequested()){
                         break;
                     }
@@ -273,8 +280,31 @@ public class AutoUtils {
                 setLiftPower(0);
                 break;
         }
-        isLiftAtPos = true;
     }
+    public void grabPiece(double time){
+        ElapsedTime elapsedTime = new ElapsedTime();
+        double startTime = elapsedTime.seconds();
+        double distanceToBlock;
+        int redIntensity, alpha;
+        double confidence;
+        do{
+            robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-0.75);
+            distanceToBlock = robot.distanceSensor.getDistance(DistanceUnit.INCH);
+            redIntensity = robot.colorSensor.red();
+            alpha = robot.colorSensor.alpha();
+            confidence = (alpha / 750.0) + (redIntensity / 500.0) - (distanceToBlock + 1);
+            telemetry.addData("redIntensity", redIntensity);
+            telemetry.addData("distanceToBlock", distanceToBlock);
+            telemetry.addData("alpha", alpha);
+            telemetry.addData("confidence", confidence);
+            telemetry.update();
+        }
+        while(confidence < 0.9 && startTime + time > elapsedTime.seconds());
+
+        robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0);
+    }
+    //Takes "pullCount" (number of captures to average from) and returns Pos
+    //Requires accurate Heading Data else returns incorrect Data
     public boolean updateOpticalSensorToPoseEstimateCamera(int targetPullCount){
         ElapsedTime time = new ElapsedTime();
         double startTime = time.seconds();
@@ -308,8 +338,8 @@ public class AutoUtils {
                 }
                 if (successfulPullCount >= targetPullCount) {
                     robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(
-                            (avgPosX * 39.37) / successfulPullCount,
-                            (avgPosY * 39.37) / successfulPullCount,
+                            (avgPosX * INCHES_PER_METER) / successfulPullCount,
+                            (avgPosY * INCHES_PER_METER) / successfulPullCount,
                                 robot.getHeading()));
                     return true;
                 }

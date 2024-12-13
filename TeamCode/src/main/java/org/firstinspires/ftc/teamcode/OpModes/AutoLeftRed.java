@@ -81,7 +81,7 @@ public class AutoLeftRed extends AutoControl {
         telemetry.addLine("firstScore success");
         telemetry.update();
         TrajectorySequence moveToFirstPiece = drive.trajectorySequenceBuilder(firstScore.end())
-                .splineToLinearHeading(new Pose2d(30.5, 37, Math.toRadians(335)), Math.toRadians(335))
+                .splineToLinearHeading(new Pose2d(-30.5, -37, Math.toRadians(155)), Math.toRadians(155))
                 .addDisplacementMarker(() -> {
 
                     robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.56);

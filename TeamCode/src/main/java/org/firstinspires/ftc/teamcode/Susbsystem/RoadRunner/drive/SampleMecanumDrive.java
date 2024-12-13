@@ -65,8 +65,8 @@ import static org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.DriveCo
 public class SampleMecanumDrive extends MecanumDrive {
     //public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(0, 0, 0); //y drive
     //derivative gain must be negative to have negating effect
-    public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(1.1, 0.4, -0.2); //y drive
-    public static PIDCoefficients TRANSLATIONAL_PID_LATERAL = new PIDCoefficients(1.6, 1.1, -0.3); //x strafe
+    public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(1.1 / 2, 0.4 / 2, -0.2 / 2); //y drive
+    public static PIDCoefficients TRANSLATIONAL_PID_LATERAL = new PIDCoefficients(1.6 / 2, 1.1 / 2, -0.3 / 2); //x strafe
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(4, 1, 0.01);
 
     public static double LATERAL_MULTIPLIER = 1.7;

@@ -41,13 +41,17 @@ public class TestOpMode extends AutoControl {
         waitForStart();
         SparkFunOTOS.Pose2D pos = new SparkFunOTOS.Pose2D(0, 0, Math.toRadians(90));
         robot.opticalSensor.setPosition(pos);
-
-        autoUtils.verticalSlide(Utils.LiftState.HIGH);
-
+        autoUtils.grabPiece(10);
         while(!isStopRequested()){
             SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
+            double distanceToBlock = robot.distanceSensor.getDistance(DistanceUnit.INCH);
+            int redIntensity = robot.colorSensor.red();
+            int alpha = robot.colorSensor.alpha();
             telemetry.addLine(String.format("XYH %.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h));
-            telemetry.addData("liftPos",robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition());
+            telemetry.addData("liftPos", robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition());
+            telemetry.addData("distance", distanceToBlock);
+            telemetry.addData("redIntensity", redIntensity);
+            telemetry.addData("alpha", alpha);
             telemetry.update();
         }
         //drive.followTrajectorySequence(trajSeq);
