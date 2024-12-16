@@ -32,7 +32,7 @@ public class AutoLeftBlue extends AutoControl {
         SparkFunOTOS.Pose2D pos = new SparkFunOTOS.Pose2D(0, 0, Math.toRadians(180));
         robot.opticalSensor.setPosition(pos);
 
-        boolean successfulCameraPos = autoUtils.updateOpticalSensorToPoseEstimateCamera(120);
+        autoUtils.updateOpticalSensorToPoseEstimateCamera(120);
 
         Pose2d scorePosition = new Pose2d(54, 54, Math.toRadians(225));
 
@@ -243,7 +243,7 @@ public class AutoLeftBlue extends AutoControl {
         while (!isStarted()) {
             SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
             telemetry.addData("XYH: ", "%.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h);
-            telemetry.addData("successFulCameraLocalization", successfulCameraPos);
+            telemetry.addData("successFulCameraLocalization", autoUtils.getSuccessfulLocalizationCount());
             telemetry.addLine();
             telemetry.update();
         }

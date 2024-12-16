@@ -14,21 +14,9 @@ public class MeepMeepTesting {
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(30, 30, Math.toRadians(137.87183), Math.toRadians(90), 5.57)
-                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-34,-62, Math.PI))
-                        .addTemporalMarker(0, () -> {})
-                        .addTemporalMarker(2, () -> {})//extend vertical slides and score
+                .followTrajectorySequence(drive -> drive.trajectorySequenceBuilder(new Pose2d(-7.36,-46.489, 0))
                         .splineToLinearHeading(scorePosition, Math.toRadians(45))
-                        .addDisplacementMarker(()->{})
                         .waitSeconds(bucketScoreTime)
-                        .addTemporalMarker(() -> {}) //retract vertical slides
-                        .splineToLinearHeading(new Pose2d(-30.5, -37, Math.toRadians(155)), Math.toRadians(155))
-                        .addDisplacementMarker(() -> {})
-                        .forward(1)
-                        .addTemporalMarkerOffset(.1, () -> {})
-                        .addTemporalMarkerOffset(.35, () -> {}) //perform intake transition
-                        .waitSeconds(.2)
-                        .addTemporalMarker(() -> {})
-                        .waitSeconds(1)
                         .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_INTOTHEDEEP_JUICE_DARK)

@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 import android.annotation.SuppressLint;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -15,7 +16,6 @@ import org.firstinspires.ftc.teamcode.Utils;
 
 @Autonomous(name = "Auto_Left_Red")
 public class AutoLeftRed extends AutoControl {
-    private final Utils.FieldSide fieldSide = Utils.FieldSide.BLUE_LEFT;
     ElapsedTime time = new ElapsedTime();
 
     @SuppressLint("DefaultLocale")
@@ -27,22 +27,31 @@ public class AutoLeftRed extends AutoControl {
         super.initialize();
         telemetry.addLine("opMode INIT");
         telemetry.update();
-
-        SparkFunOTOS.Pose2D pos = new SparkFunOTOS.Pose2D(0, 0, Math.toRadians(180));
-        robot.opticalSensor.setPosition(pos);
-
-        boolean successfulCameraPos = autoUtils.updateOpticalSensorToPoseEstimateCamera(120);
-
-        Pose2d scorePosition = new Pose2d(-54, -54, Math.toRadians(45));
+        super.cameraLocalization();
+        telemetry.addLine("cameraLocalization");
+        telemetry.update();
+        while(autoUtils.getSuccessfulLocalizationCount() < 4){
+            telemetry.addLine("localizing start");
+            sleep(20);
+        }
 
         double bucketScoreTime = 2;
-        SparkFunOTOS.Pose2D posAfterCameraReset = robot.opticalSensor.getPosition();
+        Pose2d scorePosition = new Pose2d(-54, -54, Math.toRadians(45));
+        SparkFunOTOS.Pose2D pos = robot.opticalSensor.getPosition();
 
-        TrajectorySequence firstScore = drive.trajectorySequenceBuilder(new Pose2d(posAfterCameraReset.x, posAfterCameraReset.y, posAfterCameraReset.h))
+        TrajectorySequence test = drive.trajectorySequenceBuilder(new Pose2d(pos.x, pos.y, pos.h))
+                .lineTo(new Vector2d(pos.x, pos.y + 5))
+                .splineToLinearHeading(scorePosition, Math.toRadians(45))
+                .build();
+
+        TrajectorySequence firstScore = drive.trajectorySequenceBuilder(new Pose2d(pos.x, pos.y, pos.h))
                 .addTemporalMarker(0, () -> {
                     Thread t1 = new Thread() {
                         public void run() {
                             autoUtils.armFlip(Utils.ArmFlipState.GROUND, 1);
+                            while (opModeIsActive()) {
+                                //autoUtils.updateOpticalSensorToPoseEstimateCamera(5);
+                            }
                         }
                     };
                     t1.start();
@@ -56,11 +65,11 @@ public class AutoLeftRed extends AutoControl {
                     t2.start();
                 })//extend vertical slides and score
                 .splineToLinearHeading(scorePosition, Math.toRadians(45))
-                .addDisplacementMarker(()->{
-                    Thread t3 = new Thread(){
-                        public void run(){
+                .addDisplacementMarker(() -> {
+                    Thread t3 = new Thread() {
+                        public void run() {
                             double startTime = time.seconds();
-                            while(startTime + 2 > time.seconds()){
+                            while (startTime + 2 > time.seconds()) {
                                 robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.77);
                             }
                             robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.39);
@@ -245,16 +254,10 @@ public class AutoLeftRed extends AutoControl {
 //                .build();
         telemetry.addLine("park success");
         telemetry.update();
-        while (!isStarted()) {
-            SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
-            telemetry.addData("XYH: ", "%.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h);
-            telemetry.addData("successFulCameraLocalization", successfulCameraPos);
-            telemetry.addLine();
-            telemetry.update();
-        }
         waitForStart();
+        drive.followTrajectorySequence(test);
 
-        drive.followTrajectorySequence(firstScore);
+//        drive.followTrajectorySequence(firstScore);
         //drive.followTrajectorySequence(moveToFirstPiece);
         //drive.followTrajectorySequence(secondScore);
 //        drive.followTrajectorySequence(moveToSecondPiece);
@@ -263,11 +266,5 @@ public class AutoLeftRed extends AutoControl {
 //        drive.followTrajectorySequence(fourthScore);
         //drive.followTrajectorySequence(moveToPark);
 
-        while (opModeIsActive()) {
-            SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
-            telemetry.addLine(String.format("XYH %.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h));
-
-            telemetry.update();
-        }
     }
 }

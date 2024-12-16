@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Utils;
 import java.util.Arrays;
 import java.util.Locale;
 
-@TeleOp
+@TeleOp(name = "DriveMecanumBLUE_DEPRECIATED")
 public class DriveMecanumBLUE extends Control {
     @Override
     public void start() {

@@ -15,8 +15,8 @@ import java.util.Locale;
 public class DriveMecanumRED extends Control {
     @Override
     public void start() {
-        robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.67);
-        robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.52);
+        robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.79);
+        robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.08);
         robot.Motors.get(RobotClass.MOTORS.LIFT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
@@ -56,14 +56,14 @@ public class DriveMecanumRED extends Control {
         utils.flipBucket(gamepad2.b);
         utils.intakeServo(gamepad2.x);
         utils.specimenGrab(gamepad2.left_bumper);
-
-        if (robot.distanceSensor.getDistance(DistanceUnit.CM) < 5) {
-            if (robot.colorSensor.blue() > robot.colorSensor.red() && robot.colorSensor.alpha() > 160) {
-                utils.powerIntake(1);
-            }
-        } else {
-            utils.powerIntake(gamepad2.left_stick_y);
-        }
+        utils.powerIntake(gamepad2.left_stick_y);
+//        if (robot.distanceSensor.getDistance(DistanceUnit.CM) < 5) {
+//            if (robot.colorSensor.blue() > robot.colorSensor.red() && robot.colorSensor.alpha() > 160 && robot.colorSensor.blue() > 1000) {
+//                utils.powerIntake(1);
+//            }
+//        } else {
+//            utils.powerIntake(gamepad2.left_stick_y);
+//        }
         utils.switchSlowMode(gamepad1.a);
         utils.deathWiggle(gamepad1.b);
     }

@@ -20,6 +20,7 @@ import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
@@ -32,6 +33,9 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.Auto.OpticalSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -65,11 +69,11 @@ import static org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.DriveCo
 public class SampleMecanumDrive extends MecanumDrive {
     //public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(0, 0, 0); //y drive
     //derivative gain must be negative to have negating effect
-    public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(1.1 / 2, 0.4 / 2, -0.2 / 2); //y drive
-    public static PIDCoefficients TRANSLATIONAL_PID_LATERAL = new PIDCoefficients(1.6 / 2, 1.1 / 2, -0.3 / 2); //x strafe
+    public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(0.4,0.2,0.1);//1.1 / 2, 0.4 / 2, -0.2 / 2); //y drive
+    public static PIDCoefficients TRANSLATIONAL_PID_LATERAL = new PIDCoefficients(0.4,0.2,0.1);//1.6 / 2, 1.1 / 2, -0.3 / 2); //x strafe
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(4, 1, 0.01);
 
-    public static double LATERAL_MULTIPLIER = 1.7;
+    public static double LATERAL_MULTIPLIER = 2.3;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -96,7 +100,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID_AXIAL, TRANSLATIONAL_PID_LATERAL, HEADING_PID,
-                new Pose2d(0.2, 0.2, Math.toRadians(3.0)), 3);
+                new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -109,7 +113,7 @@ public class SampleMecanumDrive extends MecanumDrive {
         RobotClass robot = new RobotClass(hardwareMap);
 
         new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
-        
+
 
         leftFront = robot.Motors.get(RobotClass.MOTORS.FRONT_LEFT);
         leftRear = robot.Motors.get(RobotClass.MOTORS.BACK_LEFT);
@@ -146,6 +150,15 @@ public class SampleMecanumDrive extends MecanumDrive {
             @NonNull
             @Override
             public Pose2d getPoseEstimate() {
+                LLResult result = robot.limelight.getLatestResult();
+                if (result != null) {
+                    if (result.isValid() && result.getStaleness() < 100) {
+                        Pose3D pose3D = result.getBotpose_MT2();
+                        Position pos = pose3D.getPosition().toUnit(DistanceUnit.INCH);
+                        robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(pos.x, pos.y, robot.getHeading()));
+                        return new Pose2d(pos.x, pos.y, robot.getHeading());
+                    }
+                }
                 SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
                 return new Pose2d(pose2D.x, pose2D.y, pose2D.h);
             }

@@ -18,6 +18,7 @@ import com.qualcomm.robotcore.hardware.ServoController;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.Camera.Limelight;
 import org.firstinspires.ftc.teamcode.RobotClass;
@@ -37,29 +38,43 @@ public class TestOpMode extends AutoControl {
         super.runOpMode();
 
         super.initialize();
+//        Thread t1 = new Thread() {
+//            public void run() {
+//                while (!isStopRequested()) {
+//
+//
+//                    telemetry.update();
+//                }
+//            }
+//        };
+//        t1.start();
 
         waitForStart();
-        SparkFunOTOS.Pose2D pos = new SparkFunOTOS.Pose2D(0, 0, Math.toRadians(90));
-        robot.opticalSensor.setPosition(pos);
-        autoUtils.grabPiece(10);
-        while(!isStopRequested()){
+        robot.opticalSensor.resetTracking();
+//        TrajectorySequence traj1 = drive.trajectorySequenceBuilder(new Pose2d())
+//                .strafeRight(10)
+//                .build();
+//
+//        drive.followTrajectorySequence(traj1);
+
+        while (!isStopRequested()) {
+            LLResult result = robot.limelight.getLatestResult();
+            robot.limelight.updateRobotOrientation(Math.toDegrees(robot.getHeading()));
+            if (result != null) {
+                if (result.isValid()) {
+                    Pose3D pos_MT2 = result.getBotpose_MT2();
+                    Position pos = pos_MT2.getPosition().toUnit(DistanceUnit.INCH);
+                    telemetry.addData("pos_MT2", "XY: %.2f %.2f", pos.x, pos.y);;
+                } else {
+                    telemetry.addLine("result is not valid");
+                }
+            } else {
+                telemetry.addLine("No data available");
+            }
             SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
-            double distanceToBlock = robot.distanceSensor.getDistance(DistanceUnit.INCH);
-            int redIntensity = robot.colorSensor.red();
-            int alpha = robot.colorSensor.alpha();
             telemetry.addLine(String.format("XYH %.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h));
-            telemetry.addData("liftPos", robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition());
-            telemetry.addData("distance", distanceToBlock);
-            telemetry.addData("redIntensity", redIntensity);
-            telemetry.addData("alpha", alpha);
             telemetry.update();
         }
-        //drive.followTrajectorySequence(trajSeq);
-//        while(opModeIsActive()){
-//            SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
-//            telemetry.addLine(String.format("XYH %.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h));
-//            telemetry.update();
-//        }
     }
 
 

@@ -8,16 +8,15 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.Camera.AprilTagPipeline;
 import org.firstinspires.ftc.teamcode.RobotClass;
 import org.firstinspires.ftc.teamcode.Utils;
-import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BooleanSupplier;
 
 public class AutoUtils {
     ElapsedTime time = new ElapsedTime();
@@ -147,6 +146,7 @@ public class AutoUtils {
         while (!atTarget);
         stopMotors();
     }
+
     public void stopMotors() {
         wheelSpeeds.put(RobotClass.MOTORS.FRONT_LEFT, 0.0);
         wheelSpeeds.put(RobotClass.MOTORS.BACK_LEFT, 0.0);
@@ -165,24 +165,28 @@ public class AutoUtils {
         } catch (InterruptedException ignored) {
         }
     }
+
     public void UpdateWheelPowers() {
         robot.Motors.get(RobotClass.MOTORS.FRONT_LEFT).setPower(wheelSpeeds.get(RobotClass.MOTORS.FRONT_LEFT));
         robot.Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setPower(wheelSpeeds.get(RobotClass.MOTORS.FRONT_RIGHT));
         robot.Motors.get(RobotClass.MOTORS.BACK_LEFT).setPower(wheelSpeeds.get(RobotClass.MOTORS.BACK_LEFT));
         robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT).setPower(wheelSpeeds.get(RobotClass.MOTORS.BACK_RIGHT));
     }
+
     public void setStopWheelBehavior() {
         robot.Motors.get(RobotClass.MOTORS.FRONT_LEFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.Motors.get(RobotClass.MOTORS.BACK_LEFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
+
     public void setCoastWheelBehavior() {
         robot.Motors.get(RobotClass.MOTORS.FRONT_LEFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         robot.Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         robot.Motors.get(RobotClass.MOTORS.BACK_LEFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
+
     //Performs transition from intake to bucket
     public void intakeTransition() {
         //flip arm up
@@ -197,6 +201,7 @@ public class AutoUtils {
 
         armFlip(Utils.ArmFlipState.GROUND, 1);
     }
+
     //Moves jointed arm to targe ArmFlipState
     public void armFlip(Utils.ArmFlipState state, double power) {
         double startTime = time.seconds();
@@ -237,6 +242,7 @@ public class AutoUtils {
         }
         robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0);
     }
+
     //Moves to liftState
     //GROUND state powers in down direction for 2 seconds
     public void verticalSlide(Utils.LiftState liftState) {
@@ -247,33 +253,31 @@ public class AutoUtils {
             case HIGH:
                 int targetPos = -1300;
                 setLiftTargetPos(targetPos);
-                while (currentPos > targetPos + 10 || currentPos < targetPos - 10)
-                {
+                while (currentPos > targetPos + 10 || currentPos < targetPos - 10) {
                     currentPos = robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition();
                     //calculates powerOut based on difference between goal ticks / 300
                     double powerOut = (double) -(targetPos - currentPos) / 300.0;
                     telemetry.addData("powerOut", powerOut);
                     telemetry.update();
                     //Limits power out between -0.4 > x > 0.6
-                    if(powerOut > 0){
+                    if (powerOut > 0) {
                         powerOut = Math.max(powerOut, 0.6);
-                    }
-                    else{
+                    } else {
                         powerOut = Math.min(powerOut, -0.4);
                     }
                     setLiftPower(powerOut);
                     //Time out 3 seconds
-                    if(startTime + 3 < time.seconds() || autoControl.isStopRequested()){
+                    if (startTime + 3 < time.seconds() || autoControl.isStopRequested()) {
                         break;
                     }
                 }
                 setLiftPower(0.2);
                 break;
             case GROUND:
-                while(startTime + 2 > time.seconds()){
+                while (startTime + 2 > time.seconds()) {
                     setLiftMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     setLiftPower(-1);
-                    if(autoControl.isStopRequested()){
+                    if (autoControl.isStopRequested()) {
                         break;
                     }
                 }
@@ -281,13 +285,14 @@ public class AutoUtils {
                 break;
         }
     }
-    public void grabPiece(double time){
+
+    public void grabPiece(double time) {
         ElapsedTime elapsedTime = new ElapsedTime();
         double startTime = elapsedTime.seconds();
         double distanceToBlock;
         int redIntensity, alpha;
         double confidence;
-        do{
+        do {
             robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-0.75);
             distanceToBlock = robot.distanceSensor.getDistance(DistanceUnit.INCH);
             redIntensity = robot.colorSensor.red();
@@ -299,40 +304,74 @@ public class AutoUtils {
             telemetry.addData("confidence", confidence);
             telemetry.update();
         }
-        while(confidence < 0.9 && startTime + time > elapsedTime.seconds());
+        while (confidence < 0.9 && startTime + time > elapsedTime.seconds());
 
         robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0);
     }
+
     //Takes "pullCount" (number of captures to average from) and returns Pos
     //Requires accurate Heading Data else returns incorrect Data
-    public boolean updateOpticalSensorToPoseEstimateCamera(int targetPullCount){
+    int successfulLocalizationCount = 0;
+
+    public int getSuccessfulLocalizationCount() {
+        return successfulLocalizationCount;
+    }
+
+    double startTime = 0;
+    double heading_RADIANS = 0;
+    int pullCount = 0;
+
+    public double getCameraHeading() {
+        startTime = time.seconds();
+
+        while (!autoControl.isStopRequested()) {
+            LLResult result = robot.limelight.getLatestResult();
+
+            if (result != null && result.isValid()) {
+                pullCount++;
+                heading_RADIANS += result.getBotpose().getOrientation().getYaw(AngleUnit.RADIANS);
+                if (pullCount >= 10) {
+                    return heading_RADIANS / pullCount;
+                }
+
+            } else {
+                telemetry.addLine("No Data Available");
+                telemetry.update();
+            }
+            if (startTime + 5 < time.seconds()) {
+                break;
+            }
+        }
+        return 0;
+    }
+
+    public boolean updateOpticalSensorToPoseEstimateCamera(int targetPullCount) {
         ElapsedTime time = new ElapsedTime();
         double startTime = time.seconds();
         int successfulPullCount = 0;
 
         double avgPosX = 0, avgPosY = 0;
-        while(!autoControl.getStopRequested()) {
+        while (!autoControl.getStopRequested()) {
             LLResult result = robot.limelight.getLatestResult();
             robot.limelight.updateRobotOrientation(Math.toDegrees(robot.getHeading()));
-            telemetry.addLine("processing StartPos");
             if (result != null) {
                 boolean doRejectPosUpdate = false;
                 double[] stdDevMt2 = result.getStddevMt2();
                 if (stdDevMt2[0] > 0.06 || stdDevMt2[1] > 0.06) {
-                    telemetry.addLine("stdDevMt2 > 0.06");
+//                    telemetry.addLine("stdDevMt2 > 0.06");
                     doRejectPosUpdate = true;
                 }
-                if(!result.isValid()){
-                    telemetry.addLine("result is not valid");
+                if (!result.isValid()) {
+//                    telemetry.addLine("result is not valid");
                     doRejectPosUpdate = true;
                 }
-                if(result.getStaleness() > 100){
-                    telemetry.addLine("result is stale");
+                if (result.getStaleness() > 100) {
+//                    telemetry.addLine("result is stale");
                     doRejectPosUpdate = true;
                 }
                 if (!doRejectPosUpdate) {
                     successfulPullCount++;
-                    telemetry.addData("pullCount", successfulPullCount);
+//                    telemetry.addData("pullCount", successfulPullCount);
                     avgPosX += result.getBotpose_MT2().getPosition().x;
                     avgPosY += result.getBotpose_MT2().getPosition().y;
                 }
@@ -340,28 +379,30 @@ public class AutoUtils {
                     robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(
                             (avgPosX * INCHES_PER_METER) / successfulPullCount,
                             (avgPosY * INCHES_PER_METER) / successfulPullCount,
-                                robot.getHeading()));
+                            robot.getHeading()));
+                    successfulLocalizationCount++;
                     return true;
                 }
-            }
-            else{
+            } else {
                 telemetry.addLine("No Data Available");
             }
             if (startTime + 8 < time.seconds()) {
-                robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(14, 61, Math.toRadians(180)));
                 return false;
             }
-            telemetry.update();
         }
+
         return false;
     }
-    public void setLiftMode(DcMotor.RunMode runMode){
+
+    public void setLiftMode(DcMotor.RunMode runMode) {
         robot.Motors.get(RobotClass.MOTORS.LIFT).setMode(runMode);
     }
-    public void setLiftTargetPos(int targetPos){
+
+    public void setLiftTargetPos(int targetPos) {
         robot.Motors.get(RobotClass.MOTORS.LIFT).setTargetPosition(targetPos);
     }
-    public void setLiftPower(double power){
+
+    public void setLiftPower(double power) {
         robot.Motors.get(RobotClass.MOTORS.LIFT).setPower(power);
     }
 

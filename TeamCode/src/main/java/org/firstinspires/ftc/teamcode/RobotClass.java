@@ -154,6 +154,8 @@ public class RobotClass {
 
         Motors.get(MOTORS.LIFT).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Motors.get(MOTORS.LIFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Motors.get(MOTORS.LIFT).setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         Motors.get(MOTORS.ARM_FLIP).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
