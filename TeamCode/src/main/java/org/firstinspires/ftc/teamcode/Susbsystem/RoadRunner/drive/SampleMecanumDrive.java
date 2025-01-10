@@ -67,11 +67,11 @@ import static org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.DriveCo
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    //public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(0, 0, 0); //y drive
     //derivative gain must be negative to have negating effect
-    public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(0.4,0.2,0.1);//1.1 / 2, 0.4 / 2, -0.2 / 2); //y drive
-    public static PIDCoefficients TRANSLATIONAL_PID_LATERAL = new PIDCoefficients(0.4,0.2,0.1);//1.6 / 2, 1.1 / 2, -0.3 / 2); //x strafe
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(4, 1, 0.01);
+    public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(0.7, 0.6, 0.3);
+
+
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(5, 1, -0.01);
 
     public static double LATERAL_MULTIPLIER = 2.3;
 
@@ -99,8 +99,8 @@ public class SampleMecanumDrive extends MecanumDrive {
         super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
 
 
-        follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID_AXIAL, TRANSLATIONAL_PID_LATERAL, HEADING_PID,
-                new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
+        follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID_AXIAL, TRANSLATIONAL_PID_AXIAL, HEADING_PID,
+                new Pose2d(0.4, 0.4, Math.toRadians(2.0)), 0.5);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -146,21 +146,26 @@ public class SampleMecanumDrive extends MecanumDrive {
         List<Integer> lastTrackingEncPositions = new ArrayList<>();
         List<Integer> lastTrackingEncVels = new ArrayList<>();
 
+
         setLocalizer(new Localizer() {
+            LLResult previousResult = null;
+
             @NonNull
             @Override
             public Pose2d getPoseEstimate() {
                 LLResult result = robot.limelight.getLatestResult();
-                if (result != null) {
-                    if (result.isValid() && result.getStaleness() < 100) {
-                        Pose3D pose3D = result.getBotpose_MT2();
-                        Position pos = pose3D.getPosition().toUnit(DistanceUnit.INCH);
-                        robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(pos.x, pos.y, robot.getHeading()));
-                        return new Pose2d(pos.x, pos.y, robot.getHeading());
+                SparkFunOTOS.Pose2D pos_Sensor = robot.opticalSensor.getPosition();
+                robot.limelight.updateRobotOrientation(Math.toDegrees(robot.getHeading()));
+
+                if (result != null && result.isValid()) {
+                    Position pose2D = result.getBotpose_MT2().getPosition().toUnit(DistanceUnit.INCH);
+                    double[] stdDevMt2 = result.getStddevMt2();
+                    if(stdDevMt2[0] + stdDevMt2[1] + stdDevMt2[2] < 1.0){ //xyz
+                        robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(pose2D.toUnit(DistanceUnit.INCH).x, pose2D.toUnit(DistanceUnit.INCH).y, robot.getHeading()));
                     }
                 }
-                SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
-                return new Pose2d(pose2D.x, pose2D.y, pose2D.h);
+                return new Pose2d(pos_Sensor.x, pos_Sensor.y, pos_Sensor.h);
+
             }
 
             @Override

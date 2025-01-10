@@ -76,13 +76,13 @@ public class RobotClass {
         CR_Servos = new HashMap<>();
 
         Motors.put(MOTORS.FRONT_LEFT, hwmap.get(DcMotorEx.class, "frontLeft"));
-        //port 0 Expansion
+        //port 0 control
         Motors.put(MOTORS.FRONT_RIGHT, hwmap.get(DcMotorEx.class, "frontRight"));
-        //port 3 Expansion
-        Motors.put(MOTORS.BACK_LEFT, hwmap.get(DcMotorEx.class, "backLeft"));
-        //port 2 control
-        Motors.put(MOTORS.BACK_RIGHT, hwmap.get(DcMotorEx.class, "backRight"));
         //port 1 control
+        Motors.put(MOTORS.BACK_LEFT, hwmap.get(DcMotorEx.class, "backLeft"));
+        //port 3 control
+        Motors.put(MOTORS.BACK_RIGHT, hwmap.get(DcMotorEx.class, "backRight"));
+        //port 4 control
         voltageSensor = hwmap.get(VoltageSensor.class, "Control Hub");
         imu = hwmap.get(IMU.class, "imu");
         //initMotorsProto();
@@ -150,11 +150,12 @@ public class RobotClass {
         Motors.get(MOTORS.FRONT_RIGHT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         Motors.get(MOTORS.BACK_RIGHT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        Motors.get(MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         Motors.get(MOTORS.LIFT).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Motors.get(MOTORS.LIFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Motors.get(MOTORS.LIFT).setDirection(DcMotorSimple.Direction.REVERSE);
+
+        liftLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         Motors.get(MOTORS.ARM_FLIP).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

@@ -51,6 +51,8 @@ public class TestOpMode extends AutoControl {
 
         waitForStart();
         robot.opticalSensor.resetTracking();
+        robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(0,0, Math.toRadians(0)));
+        robot.opticalSensor.calibrateImu();
 //        TrajectorySequence traj1 = drive.trajectorySequenceBuilder(new Pose2d())
 //                .strafeRight(10)
 //                .build();

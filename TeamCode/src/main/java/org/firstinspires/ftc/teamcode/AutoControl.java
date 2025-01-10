@@ -38,7 +38,7 @@ public class AutoControl extends LinearOpMode {
     }
     public void cameraLocalization(){
 
-        robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(0, 0, autoUtils.getCameraHeading()));
+        //robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(0,0, autoUtils.getCameraHeading()));
 
         Thread thread1 = new Thread() {
             public void run() {
@@ -47,24 +47,34 @@ public class AutoControl extends LinearOpMode {
                     LLResult result = robot.limelight.getLatestResult();
                     telemetry.addData("XYH: ", "%.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h);
                     telemetry.addData("successfulLocalizations",  autoUtils.getSuccessfulLocalizationCount());
-                    telemetry.addData("validResult?", result.isValid());
+                    if(result != null){
+                        telemetry.addData("staleness", result.getStaleness());
+                        telemetry.addData("validResult?", result.isValid());
+                    }
+                    else{
+                        telemetry.addLine("No data available");
+                    }
                     telemetry.update();
                 }
             }
         };
         thread1.start();
-        Thread thread2 = new Thread() {
-            public void run() {
-                while(!isStopRequested()) {
-                    autoUtils.updateOpticalSensorToPoseEstimateCamera(5);
-                }
-            }
-        };
-        thread2.start();
 
         telemetry.addLine("sleeping 1 second");
         telemetry.update();
         sleep(1000);
+
+    }
+    public void initialHeading(double heading_RADIANS, boolean doCheckHeading){
+        if(doCheckHeading){
+            double testHeading = autoUtils.getCameraHeading();
+            if(autoUtils.inRange(testHeading, heading_RADIANS, Math.PI/2)){
+                robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(0,0, testHeading));
+            }
+        }
+        else{
+            robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(0,0, heading_RADIANS));
+        }
 
     }
 }

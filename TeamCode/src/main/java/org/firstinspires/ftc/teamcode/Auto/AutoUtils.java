@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.Camera.AprilTagPipeline;
 import org.firstinspires.ftc.teamcode.RobotClass;
@@ -345,53 +346,27 @@ public class AutoUtils {
         return 0;
     }
 
-    public boolean updateOpticalSensorToPoseEstimateCamera(int targetPullCount) {
-        ElapsedTime time = new ElapsedTime();
-        double startTime = time.seconds();
-        int successfulPullCount = 0;
+    public void updateOpticalSensorToPoseEstimateCamera() {
+        LLResult result = robot.limelight.getLatestResult();
+        SparkFunOTOS.Pose2D pos_Sensor = robot.opticalSensor.getPosition();
+        robot.limelight.updateRobotOrientation(Math.toDegrees(robot.getHeading()));
 
-        double avgPosX = 0, avgPosY = 0;
-        while (!autoControl.getStopRequested()) {
-            LLResult result = robot.limelight.getLatestResult();
-            robot.limelight.updateRobotOrientation(Math.toDegrees(robot.getHeading()));
-            if (result != null) {
-                boolean doRejectPosUpdate = false;
-                double[] stdDevMt2 = result.getStddevMt2();
-                if (stdDevMt2[0] > 0.06 || stdDevMt2[1] > 0.06) {
-//                    telemetry.addLine("stdDevMt2 > 0.06");
-                    doRejectPosUpdate = true;
-                }
-                if (!result.isValid()) {
-//                    telemetry.addLine("result is not valid");
-                    doRejectPosUpdate = true;
-                }
-                if (result.getStaleness() > 100) {
-//                    telemetry.addLine("result is stale");
-                    doRejectPosUpdate = true;
-                }
-                if (!doRejectPosUpdate) {
-                    successfulPullCount++;
-//                    telemetry.addData("pullCount", successfulPullCount);
-                    avgPosX += result.getBotpose_MT2().getPosition().x;
-                    avgPosY += result.getBotpose_MT2().getPosition().y;
-                }
-                if (successfulPullCount >= targetPullCount) {
-                    robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(
-                            (avgPosX * INCHES_PER_METER) / successfulPullCount,
-                            (avgPosY * INCHES_PER_METER) / successfulPullCount,
-                            robot.getHeading()));
-                    successfulLocalizationCount++;
-                    return true;
-                }
-            } else {
-                telemetry.addLine("No Data Available");
+        if (result != null && result.isValid()) {
+            Position pose2D = result.getBotpose_MT2().getPosition().toUnit(DistanceUnit.INCH);
+            double[] stdDevMt2 = result.getStddevMt2();
+            if (stdDevMt2[0] + stdDevMt2[1] + stdDevMt2[2] < 1.0) { //xyz
+                robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(pose2D.toUnit(DistanceUnit.INCH).x, pose2D.toUnit(DistanceUnit.INCH).y, robot.getHeading()));
+                successfulLocalizationCount++;
             }
-            if (startTime + 8 < time.seconds()) {
-                return false;
-            }
+        } else {
+            telemetry.addLine("No Data Available");
         }
+    }
+    public boolean inRange(double v1, double v2, double range){
+        double lowerRange = v1 - range;
+        double upperRange = v1 + range;
 
-        return false;
+        return lowerRange <= v2 && upperRange >= v2;
     }
 
     public void setLiftMode(DcMotor.RunMode runMode) {

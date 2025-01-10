@@ -21,27 +21,30 @@ public class AutoLeftRed extends AutoControl {
     @SuppressLint("DefaultLocale")
     @Override
     public void runOpMode() throws InterruptedException {
-        super.runOpMode();
         telemetry.addLine("opMode started");
         telemetry.update();
-        super.initialize();
+        super.runOpMode();
         telemetry.addLine("opMode INIT");
         telemetry.update();
-        super.cameraLocalization();
+        super.initialize();
         telemetry.addLine("cameraLocalization");
         telemetry.update();
-        while(autoUtils.getSuccessfulLocalizationCount() < 4){
-            telemetry.addLine("localizing start");
+        super.cameraLocalization();
+        telemetry.addLine("headingInit");
+        telemetry.update();
+        super.initialHeading(0, true);
+        double startTime = time.seconds();
+        do{
             sleep(20);
+            autoUtils.updateOpticalSensorToPoseEstimateCamera();;
         }
-
+        while(startTime + 5 < time.seconds());
+        SparkFunOTOS.Pose2D pos = robot.opticalSensor.getPosition();
         double bucketScoreTime = 2;
         Pose2d scorePosition = new Pose2d(-54, -54, Math.toRadians(45));
-        SparkFunOTOS.Pose2D pos = robot.opticalSensor.getPosition();
 
         TrajectorySequence test = drive.trajectorySequenceBuilder(new Pose2d(pos.x, pos.y, pos.h))
-                .lineTo(new Vector2d(pos.x, pos.y + 5))
-                .splineToLinearHeading(scorePosition, Math.toRadians(45))
+                .forward(10)
                 .build();
 
         TrajectorySequence firstScore = drive.trajectorySequenceBuilder(new Pose2d(pos.x, pos.y, pos.h))
@@ -49,9 +52,6 @@ public class AutoLeftRed extends AutoControl {
                     Thread t1 = new Thread() {
                         public void run() {
                             autoUtils.armFlip(Utils.ArmFlipState.GROUND, 1);
-                            while (opModeIsActive()) {
-                                //autoUtils.updateOpticalSensorToPoseEstimateCamera(5);
-                            }
                         }
                     };
                     t1.start();
@@ -265,6 +265,8 @@ public class AutoLeftRed extends AutoControl {
 //        drive.followTrajectorySequence(moveToThirdPiece);
 //        drive.followTrajectorySequence(fourthScore);
         //drive.followTrajectorySequence(moveToPark);
+        while(!getStopRequested()){
 
+        }
     }
 }

@@ -32,8 +32,6 @@ public class AutoLeftBlue extends AutoControl {
         SparkFunOTOS.Pose2D pos = new SparkFunOTOS.Pose2D(0, 0, Math.toRadians(180));
         robot.opticalSensor.setPosition(pos);
 
-        autoUtils.updateOpticalSensorToPoseEstimateCamera(120);
-
         Pose2d scorePosition = new Pose2d(54, 54, Math.toRadians(225));
 
         double bucketScoreTime = 2;
