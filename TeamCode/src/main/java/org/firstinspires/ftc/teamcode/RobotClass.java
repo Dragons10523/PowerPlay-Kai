@@ -91,12 +91,6 @@ public class RobotClass {
         drivetrain = new MecanumDrive(Motors, this);
         limelight = hwmap.get(Limelight3A.class, "limelight");
 
-//        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(
-//                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-//                RevHubOrientationOnRobot.UsbFacingDirection.UP);
-//
-//        imu.initialize(new IMU.Parameters(orientationOnRobot));
-
         //IMU becomes defective when the voltage drops too low
     }
     public double getHeading() {
@@ -116,6 +110,7 @@ public class RobotClass {
         //Proto-Bot
     }
     public void initMotorsComp(){
+
         colorSensor = hwmap.get(ColorSensor.class, "sensor_color_distance");
         distanceSensor = hwmap.get(DistanceSensor.class, "sensor_color_distance");
 
@@ -150,14 +145,11 @@ public class RobotClass {
         Motors.get(MOTORS.FRONT_RIGHT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         Motors.get(MOTORS.BACK_RIGHT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-
-        Motors.get(MOTORS.LIFT).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Motors.get(MOTORS.LIFT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Motors.get(MOTORS.LIFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        Motors.get(MOTORS.LIFT).setDirection(DcMotorSimple.Direction.REVERSE);
-
-        liftLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
+        Motors.get(MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Motors.get(MOTORS.ARM_FLIP).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 }

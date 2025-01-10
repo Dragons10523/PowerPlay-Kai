@@ -36,28 +36,10 @@ public class TestOpMode extends AutoControl {
     @SuppressLint("DefaultLocale")
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
-
         super.initialize();
-//        Thread t1 = new Thread() {
-//            public void run() {
-//                while (!isStopRequested()) {
-//
-//
-//                    telemetry.update();
-//                }
-//            }
-//        };
-//        t1.start();
+        super.initialHeading(Math.toRadians(0), true);
 
         waitForStart();
-        robot.opticalSensor.resetTracking();
-        robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(0,0, Math.toRadians(0)));
-        robot.opticalSensor.calibrateImu();
-//        TrajectorySequence traj1 = drive.trajectorySequenceBuilder(new Pose2d())
-//                .strafeRight(10)
-//                .build();
-//
-//        drive.followTrajectorySequence(traj1);
 
         while (!isStopRequested()) {
             LLResult result = robot.limelight.getLatestResult();

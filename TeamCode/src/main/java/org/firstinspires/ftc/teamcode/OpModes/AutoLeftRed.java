@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -43,10 +44,6 @@ public class AutoLeftRed extends AutoControl {
         double bucketScoreTime = 2;
         Pose2d scorePosition = new Pose2d(-54, -54, Math.toRadians(45));
 
-        TrajectorySequence test = drive.trajectorySequenceBuilder(new Pose2d(pos.x, pos.y, pos.h))
-                .forward(10)
-                .build();
-
         TrajectorySequence firstScore = drive.trajectorySequenceBuilder(new Pose2d(pos.x, pos.y, pos.h))
                 .addTemporalMarker(0, () -> {
                     Thread t1 = new Thread() {
@@ -65,34 +62,20 @@ public class AutoLeftRed extends AutoControl {
                     t2.start();
                 })//extend vertical slides and score
                 .splineToLinearHeading(scorePosition, Math.toRadians(45))
-                .addDisplacementMarker(() -> {
-                    Thread t3 = new Thread() {
-                        public void run() {
-                            double startTime = time.seconds();
-                            while (startTime + 2 > time.seconds()) {
-                                robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.77);
-                            }
-                            robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.39);
-                        }
-                    };
-                    t3.start();
-                })
-                .waitSeconds(bucketScoreTime)
-                .addTemporalMarker(() -> {
+                .build();
+        telemetry.addLine("firstScore success");
+        telemetry.update();
+        TrajectorySequence moveToFirstPiece = drive.trajectorySequenceBuilder(firstScore.end())
+                .addTemporalMarker(0, () -> {
                     Thread t1 = new Thread() {
                         public void run() {
                             autoUtils.verticalSlide(Utils.LiftState.GROUND);
                         }
                     };
                     t1.start();
-                }) //retract vertical slides
-                .build();
-        telemetry.addLine("firstScore success");
-        telemetry.update();
-        TrajectorySequence moveToFirstPiece = drive.trajectorySequenceBuilder(firstScore.end())
+                })
                 .splineToLinearHeading(new Pose2d(-30.5, -37, Math.toRadians(155)), Math.toRadians(155))
                 .addDisplacementMarker(() -> {
-
                     robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.56);
                     robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.64);
 
@@ -255,11 +238,19 @@ public class AutoLeftRed extends AutoControl {
         telemetry.addLine("park success");
         telemetry.update();
         waitForStart();
-        drive.followTrajectorySequence(test);
 
-//        drive.followTrajectorySequence(firstScore);
-        //drive.followTrajectorySequence(moveToFirstPiece);
-        //drive.followTrajectorySequence(secondScore);
+        drive.followTrajectorySequence(firstScore);
+        double displacementFromTarget = opticalSensorClass.getDisplacementFromTarget(scorePosition.getX(), scorePosition.getY());
+        if(displacementFromTarget > 3){
+            SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
+            Trajectory correctionTraj = drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
+                    .lineToConstantHeading(new Vector2d(scorePosition.getX(), scorePosition.getY()))
+                    .build();
+            drive.followTrajectory(correctionTraj);
+        }
+        autoUtils.scorePiece(2);
+//        drive.followTrajectorySequence(moveToFirstPiece);
+//        drive.followTrajectorySequence(secondScore);
 //        drive.followTrajectorySequence(moveToSecondPiece);
 //        drive.followTrajectorySequence(thirdScore); // and park
 //        drive.followTrajectorySequence(moveToThirdPiece);

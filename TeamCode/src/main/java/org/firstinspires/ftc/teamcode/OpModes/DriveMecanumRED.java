@@ -15,9 +15,10 @@ import java.util.Locale;
 public class DriveMecanumRED extends Control {
     @Override
     public void start() {
-        robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.79);
-        robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.08);
+        robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.80);
+        robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.23);
         robot.Motors.get(RobotClass.MOTORS.LIFT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     @Override
@@ -56,6 +57,7 @@ public class DriveMecanumRED extends Control {
         utils.flipBucket(gamepad2.b);
         utils.intakeServo(gamepad2.x);
         utils.specimenGrab(gamepad2.left_bumper);
+        utils.intakeTransition(gamepad2.right_bumper);
         utils.powerIntake(gamepad2.left_stick_y);
 //        if (robot.distanceSensor.getDistance(DistanceUnit.CM) < 5) {
 //            if (robot.colorSensor.blue() > robot.colorSensor.red() && robot.colorSensor.alpha() > 160 && robot.colorSensor.blue() > 1000) {

@@ -276,7 +276,6 @@ public class AutoUtils {
                 break;
             case GROUND:
                 while (startTime + 2 > time.seconds()) {
-                    setLiftMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     setLiftPower(-1);
                     if (autoControl.isStopRequested()) {
                         break;
@@ -286,7 +285,14 @@ public class AutoUtils {
                 break;
         }
     }
-
+    public void scorePiece(double time){
+        ElapsedTime elapsedTime = new ElapsedTime();
+        double startTime = elapsedTime.seconds();
+        while(startTime + time > elapsedTime.seconds()){
+            robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.85);
+        }
+        robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.39);
+    }
     public void grabPiece(double time) {
         ElapsedTime elapsedTime = new ElapsedTime();
         double startTime = elapsedTime.seconds();

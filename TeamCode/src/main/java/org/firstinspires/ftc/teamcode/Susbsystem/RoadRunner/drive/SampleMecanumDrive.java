@@ -67,7 +67,6 @@ import static org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.DriveCo
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    //derivative gain must be negative to have negating effect
     public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(0.7, 0.6, 0.3);
 
 

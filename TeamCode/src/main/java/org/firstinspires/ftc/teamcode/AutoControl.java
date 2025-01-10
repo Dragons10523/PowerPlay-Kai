@@ -17,6 +17,7 @@ public class AutoControl extends LinearOpMode {
     public RobotClass robot;
     public AutoUtils autoUtils;
     public SampleMecanumDrive drive;
+    public OpticalSensor opticalSensorClass;
     public Limelight limelightObj;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -30,7 +31,7 @@ public class AutoControl extends LinearOpMode {
         robot = new RobotClass(hardwareMap);
         drive = new SampleMecanumDrive(hardwareMap);
         autoUtils = new AutoUtils(robot, telemetry);
-        new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
+        opticalSensorClass = new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
         limelightObj = new Limelight(robot);
     }
     public void simpleInit(){
