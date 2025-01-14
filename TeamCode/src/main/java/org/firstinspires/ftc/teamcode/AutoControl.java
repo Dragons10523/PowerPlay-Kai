@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -33,39 +34,13 @@ public class AutoControl extends LinearOpMode {
         autoUtils = new AutoUtils(robot, telemetry);
         opticalSensorClass = new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
         limelightObj = new Limelight(robot);
+        robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
     public void simpleInit(){
         robot = new RobotClass(hardwareMap);
+        autoUtils = new AutoUtils(robot, telemetry);
     }
-    public void cameraLocalization(){
 
-        //robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(0,0, autoUtils.getCameraHeading()));
-
-        Thread thread1 = new Thread() {
-            public void run() {
-                while (!isStopRequested()) {
-                    SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
-                    LLResult result = robot.limelight.getLatestResult();
-                    telemetry.addData("XYH: ", "%.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h);
-                    telemetry.addData("successfulLocalizations",  autoUtils.getSuccessfulLocalizationCount());
-                    if(result != null){
-                        telemetry.addData("staleness", result.getStaleness());
-                        telemetry.addData("validResult?", result.isValid());
-                    }
-                    else{
-                        telemetry.addLine("No data available");
-                    }
-                    telemetry.update();
-                }
-            }
-        };
-        thread1.start();
-
-        telemetry.addLine("sleeping 1 second");
-        telemetry.update();
-        sleep(1000);
-
-    }
     public void initialHeading(double heading_RADIANS, boolean doCheckHeading){
         if(doCheckHeading){
             double testHeading = autoUtils.getCameraHeading();
@@ -76,6 +51,9 @@ public class AutoControl extends LinearOpMode {
         else{
             robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(0,0, heading_RADIANS));
         }
+
+    }
+    public void end(){
 
     }
 }

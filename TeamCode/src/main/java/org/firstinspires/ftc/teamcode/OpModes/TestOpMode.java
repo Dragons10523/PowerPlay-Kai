@@ -12,6 +12,8 @@ import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.ServoController;
 
 
@@ -31,35 +33,10 @@ import java.util.List;
 
 @TeleOp
 public class TestOpMode extends AutoControl {
-    private final Utils.FieldSide fieldSide = Utils.FieldSide.BLUE_LEFT;
-
-    @SuppressLint("DefaultLocale")
+    @Override
     public void runOpMode() throws InterruptedException {
-        super.runOpMode();
-        super.initialize();
-        super.initialHeading(Math.toRadians(0), true);
-
+        super.simpleInit();
         waitForStart();
-
-        while (!isStopRequested()) {
-            LLResult result = robot.limelight.getLatestResult();
-            robot.limelight.updateRobotOrientation(Math.toDegrees(robot.getHeading()));
-            if (result != null) {
-                if (result.isValid()) {
-                    Pose3D pos_MT2 = result.getBotpose_MT2();
-                    Position pos = pos_MT2.getPosition().toUnit(DistanceUnit.INCH);
-                    telemetry.addData("pos_MT2", "XY: %.2f %.2f", pos.x, pos.y);;
-                } else {
-                    telemetry.addLine("result is not valid");
-                }
-            } else {
-                telemetry.addLine("No data available");
-            }
-            SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
-            telemetry.addLine(String.format("XYH %.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h));
-            telemetry.update();
-        }
+        autoUtils.scorePiece(2);
     }
-
-
 }

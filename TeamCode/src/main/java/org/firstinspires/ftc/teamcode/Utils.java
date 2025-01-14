@@ -110,7 +110,8 @@ public class Utils {
             robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.80);
             robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.23);
             //set gate closed
-            robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.94);
+            servoState = ServoState.CLOSED;
+            robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.5);
             //bucket pos
             robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.37);
             //retract vertical slide
@@ -127,15 +128,17 @@ public class Utils {
             t1.start();
             //retract arm
             startTime = elapsedTime.seconds();
-            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(0);
-            while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < -10
-                    || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 10) {
+            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(50);
+            while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < 40
+                    || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 60) {
                 robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0.8);
+                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0.4);
                 if (startTime + 2 < elapsedTime.seconds()) {
                     break;
                 }
             }
+            servoState = ServoState.OPEN;
+            robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.8);
             robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             startTime = elapsedTime.seconds();
             while (startTime + 0.75 > elapsedTime.seconds()) {
@@ -179,28 +182,14 @@ public class Utils {
     public void flipArm(double power, boolean button) {
         if (!button) {
             firstPressOverRide = true;
+            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
         if (button && firstPressOverRide) {
             firstPressOverRide = false;
-            if (overRideArmLimiter) {
-                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            }
-            overRideArmLimiter = !overRideArmLimiter;
-            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
-        if (!overRideArmLimiter) {
-            int currentArmPos = robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition();
-            double armPower = power / 2;
-            if (currentArmPos > 1200) {
-                armPower = Math.min(0, armPower);
-            }
-            if (currentArmPos < 0) {
-                armPower = Math.max(0, armPower);
-            }
-            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(armPower);
-        } else {
-            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(power / 2);
-        }
+        robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(power / 2);
+
     }
 
     public void powerIntake(double power) {
@@ -295,11 +284,11 @@ public class Utils {
             switch (servoState) {
                 case OPEN:
                     servoState = ServoState.CLOSED;
-                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.94);
+                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.8);
                     break;
                 case CLOSED:
                     servoState = ServoState.OPEN;
-                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.6);
+                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.4);
                     break;
             }
         }

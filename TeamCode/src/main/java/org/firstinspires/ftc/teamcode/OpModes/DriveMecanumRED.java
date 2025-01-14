@@ -38,7 +38,9 @@ public class DriveMecanumRED extends Control {
         telemetry.addData("armState", Utils.armState);
         telemetry.addData("heading", robot.getHeading());
         telemetry.addData("liftPos", robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition());
+        telemetry.addData("liftMode", robot.Motors.get(RobotClass.MOTORS.LIFT).getMode());
         telemetry.addData("armPos", robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition());
+        telemetry.addData("armMode", robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getMode());
         telemetry.addData("Distance (cm)",
                 String.format(Locale.US, "%.02f", robot.distanceSensor.getDistance(DistanceUnit.CM)));
         telemetry.addData("currentVoltage", robot.voltageSensor.getVoltage());

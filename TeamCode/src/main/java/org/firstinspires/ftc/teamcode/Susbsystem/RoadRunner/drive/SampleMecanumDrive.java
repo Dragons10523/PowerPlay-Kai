@@ -67,10 +67,10 @@ import static org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.DriveCo
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(0.7, 0.6, 0.3);
+    public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(0.7, 0.6, 0.2);
 
 
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(5, 1, -0.01);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(5, 1, 0);
 
     public static double LATERAL_MULTIPLIER = 2.3;
 

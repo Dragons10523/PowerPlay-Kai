@@ -35,8 +35,8 @@ public class RobotClass {
     public AbstractOmniDrivetrain drivetrain;
     public Map<MOTORS, DcMotorEx> Motors;
     public Map<SERVOS, Servo> Servos;
-    public DcMotorSimple liftLeft;
-    public DcMotorSimple liftRight;
+    public DcMotor liftLeft;
+    public DcMotor liftRight;
     public Map<CR_SERVOS, CRServo> CR_Servos;
     public Limelight3A limelight;
     public final IMU imu;
@@ -114,9 +114,9 @@ public class RobotClass {
         colorSensor = hwmap.get(ColorSensor.class, "sensor_color_distance");
         distanceSensor = hwmap.get(DistanceSensor.class, "sensor_color_distance");
 
-        liftLeft = hwmap.get(DcMotorSimple.class, "liftLeft");
+        liftLeft = hwmap.get(DcMotor.class, "liftLeft");
         //SparkMini Servo port 0 Control
-        liftRight = hwmap.get(DcMotorSimple.class, "liftRight");
+        liftRight = hwmap.get(DcMotor.class, "liftRight");
         //port 1 Expansion
         Motors.put(MOTORS.LIFT, hwmap.get(DcMotorEx.class, "lift"));
         //port 0 Control
@@ -145,11 +145,14 @@ public class RobotClass {
         Motors.get(MOTORS.FRONT_RIGHT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         Motors.get(MOTORS.BACK_RIGHT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        Motors.get(MOTORS.LIFT).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        liftLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        liftRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        Motors.get(MOTORS.LIFT).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Motors.get(MOTORS.LIFT).setDirection(DcMotorSimple.Direction.REVERSE);
         Motors.get(MOTORS.LIFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-
-        Motors.get(MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Motors.get(MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Motors.get(MOTORS.ARM_FLIP).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 }

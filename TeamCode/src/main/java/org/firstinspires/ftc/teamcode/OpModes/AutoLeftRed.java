@@ -6,14 +6,19 @@ import android.annotation.SuppressLint;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.RobotClass;
+import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.DriveConstants;
+import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.Utils;
+
+import java.util.Objects;
 
 @Autonomous(name = "Auto_Left_Red")
 public class AutoLeftRed extends AutoControl {
@@ -28,40 +33,39 @@ public class AutoLeftRed extends AutoControl {
         telemetry.addLine("opMode INIT");
         telemetry.update();
         super.initialize();
-        telemetry.addLine("cameraLocalization");
-        telemetry.update();
-        super.cameraLocalization();
         telemetry.addLine("headingInit");
         telemetry.update();
-        super.initialHeading(0, true);
+        super.initialHeading(Math.toRadians(180), false);
         double startTime = time.seconds();
-        do{
+        do {
             sleep(20);
-            autoUtils.updateOpticalSensorToPoseEstimateCamera();;
+            telemetry.addLine("isLooping");
+            telemetry.addData("SuccessfulLocalizationCount", autoUtils.getSuccessfulLocalizationCount());
+            telemetry.update();
+            autoUtils.updateOpticalSensorToPoseEstimateCamera();
+            if (startTime + 5 < time.seconds() || isStarted()) {
+                break;
+            }
         }
-        while(startTime + 5 < time.seconds());
+        while (autoUtils.getSuccessfulLocalizationCount() < 60);
         SparkFunOTOS.Pose2D pos = robot.opticalSensor.getPosition();
         double bucketScoreTime = 2;
         Pose2d scorePosition = new Pose2d(-54, -54, Math.toRadians(45));
 
         TrajectorySequence firstScore = drive.trajectorySequenceBuilder(new Pose2d(pos.x, pos.y, pos.h))
-                .addTemporalMarker(0, () -> {
+                .addTemporalMarker(1, () -> {
                     Thread t1 = new Thread() {
                         public void run() {
                             autoUtils.armFlip(Utils.ArmFlipState.GROUND, 1);
+                            autoUtils.armExtension(Utils.ArmState.IN);
                         }
                     };
                     t1.start();
                 })
-                .addTemporalMarker(2, () -> {
-                    Thread t2 = new Thread() {
-                        public void run() {
-                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
-                        }
-                    };
-                    t2.start();
-                })//extend vertical slides and score
-                .splineToLinearHeading(scorePosition, Math.toRadians(45))
+                .lineToLinearHeading(new Pose2d(pos.x - 10, pos.y + 10, Math.toRadians(90)))
+                .setReversed(true)
+                .splineTo(new Vector2d(-54, -54), Math.toRadians(225))
+                .setReversed(false)
                 .build();
         telemetry.addLine("firstScore success");
         telemetry.update();
@@ -74,56 +78,34 @@ public class AutoLeftRed extends AutoControl {
                     };
                     t1.start();
                 })
-                .splineToLinearHeading(new Pose2d(-30.5, -37, Math.toRadians(155)), Math.toRadians(155))
+                .splineToLinearHeading(new Pose2d(-48, -47, Math.toRadians(90)), Math.toRadians(90))
                 .addDisplacementMarker(() -> {
-                    robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.56);
-                    robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.64);
-
-                })
-                .forward(1)
-                .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
                     robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
+                    autoUtils.armExtension(Utils.ArmState.EXTENDED);
                 })
-                .UNSTABLE_addTemporalMarkerOffset(.35, () -> {
 
-                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0);
-
-                    robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.69);
-                    robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.52);
+                .forward(1)
+                .UNSTABLE_addTemporalMarkerOffset(2, () -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
 
                 }) //perform intake transition
-                .waitSeconds(.2)
-                .addTemporalMarker(() -> {
-                    Thread t4 = new Thread() {
-                        public void run() {
-                            autoUtils.intakeTransition();
-                        }
-                    };
-                    t4.start();
-                })
-                .waitSeconds(1)
+                .waitSeconds(2)
                 .build();
         telemetry.addLine("firstPiece success");
         telemetry.update();
         TrajectorySequence secondScore = drive.trajectorySequenceBuilder(moveToFirstPiece.end())
-                .splineToLinearHeading(scorePosition, Math.toRadians(45))
-                .addTemporalMarker(0.5, () -> {
+                .addTemporalMarker(1, () -> {
                     Thread t1 = new Thread() {
                         public void run() {
-                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
+                            autoUtils.armExtension(Utils.ArmState.IN);
                         }
                     };
                     t1.start();
-                }) //extend vertical slides
-                .waitSeconds(bucketScoreTime)
-                .addTemporalMarker(() -> {
-                    Thread t1 = new Thread() {
-                        public void run() {
-                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
-                        }
-                    };
-                    t1.start();
-                }) //retract vertical slides
+                })
+                .setReversed(true)
+                .splineTo(new Vector2d(-54, -54), Math.toRadians(225))
+                .setReversed(false)
                 .build();
         telemetry.addLine("secondScore success");
         telemetry.update();
@@ -237,27 +219,101 @@ public class AutoLeftRed extends AutoControl {
 //                .build();
         telemetry.addLine("park success");
         telemetry.update();
+        while (!isStarted() && !isStopRequested()) {
+
+            SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
+            LLResult result = robot.limelight.getLatestResult();
+            telemetry.addData("XYH: ", "%.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h);
+            telemetry.addData("successfulLocalizations", autoUtils.getSuccessfulLocalizationCount());
+            if (result != null) {
+                telemetry.addData("staleness", result.getStaleness());
+                telemetry.addData("validResult?", result.isValid());
+            } else {
+                telemetry.addLine("No data available");
+            }
+            telemetry.update();
+
+        }
         waitForStart();
 
+
         drive.followTrajectorySequence(firstScore);
+        autoUtils.armExtension(Utils.ArmState.IN);
         double displacementFromTarget = opticalSensorClass.getDisplacementFromTarget(scorePosition.getX(), scorePosition.getY());
-        if(displacementFromTarget > 3){
+        Trajectory correctionTraj = null;
+        if (displacementFromTarget > 3) {
             SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
-            Trajectory correctionTraj = drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
-                    .lineToConstantHeading(new Vector2d(scorePosition.getX(), scorePosition.getY()))
+            correctionTraj = drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
+                    .lineToLinearHeading(new Pose2d(scorePosition.getX(), scorePosition.getY(), Math.toRadians(45)),
+                            SampleMecanumDrive.getVelocityConstraint(10, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                     .build();
             drive.followTrajectory(correctionTraj);
         }
+
         autoUtils.scorePiece(2);
-//        drive.followTrajectorySequence(moveToFirstPiece);
-//        drive.followTrajectorySequence(secondScore);
+
+        if (Objects.isNull(correctionTraj)) {
+            drive.followTrajectorySequence(moveToFirstPiece);
+        } else {
+            assert correctionTraj != null;
+            TrajectorySequence moveToFirstPieceCorrected = drive.trajectorySequenceBuilder(correctionTraj.end())
+                    .addTemporalMarker(0, () -> {
+                        Thread t1 = new Thread() {
+                            public void run() {
+                                autoUtils.verticalSlide(Utils.LiftState.GROUND);
+                            }
+                        };
+                        t1.start();
+                    })
+                    .splineToLinearHeading(new Pose2d(-48, -47, Math.toRadians(90)), Math.toRadians(90))
+                    .addDisplacementMarker(() -> {
+                        robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+                        robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
+                        autoUtils.armExtension(Utils.ArmState.EXTENDED);
+                    })
+                    .forward(1)
+                    .UNSTABLE_addTemporalMarkerOffset(2, () -> {
+                        autoUtils.armExtension(Utils.ArmState.IN);
+
+                    }) //perform intake transition
+                    .waitSeconds(2)
+                    .build();
+            drive.followTrajectorySequence(moveToFirstPieceCorrected);
+        }
+        autoUtils.intakeTransition();
+        drive.followTrajectorySequence(secondScore);
+
+        SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
+        correctionTraj = drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
+                .lineToLinearHeading(new Pose2d(scorePosition.getX(), scorePosition.getY(), Math.toRadians(45)),
+                        SampleMecanumDrive.getVelocityConstraint(10, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .build();
+
+        drive.followTrajectory(correctionTraj);
+
+        autoUtils.armFlip(Utils.ArmFlipState.GROUND, 1);
+        autoUtils.scorePiece(2);
 //        drive.followTrajectorySequence(moveToSecondPiece);
 //        drive.followTrajectorySequence(thirdScore); // and park
 //        drive.followTrajectorySequence(moveToThirdPiece);
 //        drive.followTrajectorySequence(fourthScore);
         //drive.followTrajectorySequence(moveToPark);
-        while(!getStopRequested()){
-
+        while (!getStopRequested()) {
+            SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
+            LLResult result = robot.limelight.getLatestResult();
+            telemetry.addData("XYH: ", "%.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h);
+            telemetry.addData("successfulLocalizations", autoUtils.getSuccessfulLocalizationCount());
+            telemetry.addData("Displacement", displacementFromTarget);
+            if (result != null) {
+                telemetry.addData("staleness", result.getStaleness());
+                telemetry.addData("validResult?", result.isValid());
+            } else {
+                telemetry.addLine("No data available");
+            }
+            telemetry.update();
         }
+        robot.limelight.close();
     }
 }

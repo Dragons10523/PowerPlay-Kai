@@ -190,17 +190,44 @@ public class AutoUtils {
 
     //Performs transition from intake to bucket
     public void intakeTransition() {
-        //flip arm up
-        armFlip(Utils.ArmFlipState.UP, .6);
-        //extake pixel into bucket
-        double startTime = time.seconds();
-        while (startTime + 0.35 > time.seconds()) {
+        double startTime;
+        //set arm position in
+        robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.80);
+        robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.23);
+        //set gate closed
+        robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.5);
+        //bucket pos
+        robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.37);
+        //retract vertical slide
+        Thread t1 = new Thread() {
+            @Override
+            public void run() {
+                double startTime = time.seconds();
+                while (startTime + 0.5 > time.seconds()) {
+                    robot.Motors.get(RobotClass.MOTORS.LIFT).setPower(-.3);
+                }
+                robot.Motors.get(RobotClass.MOTORS.LIFT).setPower(0);
+            }
+        };
+        t1.start();
+        //retract arm
+        startTime = time.seconds();
+        robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(50);
+        while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < 40
+                || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 60) {
+            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0.4);
+            if (startTime + 2 < time.seconds()) {
+                break;
+            }
+        }
+        robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.8);
+        robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        startTime = time.seconds();
+        while (startTime + 2 > time.seconds()) {
             robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
         }
-        //turn off intake
         robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0);
-
-        armFlip(Utils.ArmFlipState.GROUND, 1);
     }
 
     //Moves jointed arm to targe ArmFlipState
@@ -252,20 +279,24 @@ public class AutoUtils {
         setLiftMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         switch (liftState) {
             case HIGH:
-                int targetPos = -1300;
+                int targetPos = -1600;
                 setLiftTargetPos(targetPos);
                 while (currentPos > targetPos + 10 || currentPos < targetPos - 10) {
-                    currentPos = robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition();
+                    currentPos = -robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition();
                     //calculates powerOut based on difference between goal ticks / 300
                     double powerOut = (double) -(targetPos - currentPos) / 300.0;
                     telemetry.addData("powerOut", powerOut);
-                    telemetry.update();
+                    telemetry.addData("targetPos", targetPos);
+                    telemetry.addData("currentPos", currentPos);
+                    telemetry.addData("mode", robot.Motors.get(RobotClass.MOTORS.LIFT).getMode());
                     //Limits power out between -0.4 > x > 0.6
                     if (powerOut > 0) {
                         powerOut = Math.max(powerOut, 0.6);
                     } else {
                         powerOut = Math.min(powerOut, -0.4);
                     }
+                    telemetry.addData("actualPower", powerOut);
+                    telemetry.update();
                     setLiftPower(powerOut);
                     //Time out 3 seconds
                     if (startTime + 3 < time.seconds() || autoControl.isStopRequested()) {
@@ -282,16 +313,29 @@ public class AutoUtils {
                     }
                 }
                 setLiftPower(0);
+                robot.Motors.get(RobotClass.MOTORS.LIFT).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 break;
         }
     }
     public void scorePiece(double time){
         ElapsedTime elapsedTime = new ElapsedTime();
         double startTime = elapsedTime.seconds();
+        verticalSlide(Utils.LiftState.HIGH);
         while(startTime + time > elapsedTime.seconds()){
             robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.85);
         }
         robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.39);
+    }
+    public void armExtension(Utils.ArmState armState){
+        switch(armState){
+            case IN:
+                robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.80);
+                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.23);
+                break;
+            case EXTENDED:
+                robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.56);
+                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.47);
+        }
     }
     public void grabPiece(double time) {
         ElapsedTime elapsedTime = new ElapsedTime();
@@ -360,13 +404,20 @@ public class AutoUtils {
         if (result != null && result.isValid()) {
             Position pose2D = result.getBotpose_MT2().getPosition().toUnit(DistanceUnit.INCH);
             double[] stdDevMt2 = result.getStddevMt2();
-            if (stdDevMt2[0] + stdDevMt2[1] + stdDevMt2[2] < 1.0) { //xyz
+            if (stdDevMt2[0] + stdDevMt2[1] < 1.0) { //xy
                 robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(pose2D.toUnit(DistanceUnit.INCH).x, pose2D.toUnit(DistanceUnit.INCH).y, robot.getHeading()));
                 successfulLocalizationCount++;
+            }
+            else{
+                telemetry.addLine("stdDevMt2 > 1 in");
+                telemetry.addData("x", stdDevMt2[0]);
+                telemetry.addData("y", stdDevMt2[1]);
+                telemetry.addData("total",stdDevMt2[0] + stdDevMt2[1]);
             }
         } else {
             telemetry.addLine("No Data Available");
         }
+        telemetry.update();
     }
     public boolean inRange(double v1, double v2, double range){
         double lowerRange = v1 - range;
