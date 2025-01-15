@@ -56,7 +56,7 @@ public class AutoLeftRed extends AutoControl {
                 .addTemporalMarker(1, () -> {
                     Thread t1 = new Thread() {
                         public void run() {
-                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 1);
+                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
                             autoUtils.armExtension(Utils.ArmState.IN);
                         }
                     };
@@ -69,46 +69,7 @@ public class AutoLeftRed extends AutoControl {
                 .build();
         telemetry.addLine("firstScore success");
         telemetry.update();
-        TrajectorySequence moveToFirstPiece = drive.trajectorySequenceBuilder(firstScore.end())
-                .addTemporalMarker(0, () -> {
-                    Thread t1 = new Thread() {
-                        public void run() {
-                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
-                        }
-                    };
-                    t1.start();
-                })
-                .splineToLinearHeading(new Pose2d(-48, -47, Math.toRadians(90)), Math.toRadians(90))
-                .addDisplacementMarker(() -> {
-                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
-                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
-                    autoUtils.armExtension(Utils.ArmState.EXTENDED);
-                })
 
-                .forward(1)
-                .UNSTABLE_addTemporalMarkerOffset(2, () -> {
-                    autoUtils.armExtension(Utils.ArmState.IN);
-
-                }) //perform intake transition
-                .waitSeconds(2)
-                .build();
-        telemetry.addLine("firstPiece success");
-        telemetry.update();
-        TrajectorySequence secondScore = drive.trajectorySequenceBuilder(moveToFirstPiece.end())
-                .addTemporalMarker(1, () -> {
-                    Thread t1 = new Thread() {
-                        public void run() {
-                            autoUtils.armExtension(Utils.ArmState.IN);
-                        }
-                    };
-                    t1.start();
-                })
-                .setReversed(true)
-                .splineTo(new Vector2d(-54, -54), Math.toRadians(225))
-                .setReversed(false)
-                .build();
-        telemetry.addLine("secondScore success");
-        telemetry.update();
 //        TrajectorySequence moveToSecondPiece = drive.trajectorySequenceBuilder(secondScore.end())
 //                .forward(3)
 //                .splineToLinearHeading(new Pose2d(40, 34, Math.toRadians(335)), Math.toRadians(335))
@@ -236,65 +197,41 @@ public class AutoLeftRed extends AutoControl {
         }
         waitForStart();
 
-
+        //Score pre-loaded sample
         drive.followTrajectorySequence(firstScore);
+        //Ensure horizontal extension is IN
         autoUtils.armExtension(Utils.ArmState.IN);
+        //check displacement and re-position if inaccurate
         double displacementFromTarget = opticalSensorClass.getDisplacementFromTarget(scorePosition.getX(), scorePosition.getY());
-        Trajectory correctionTraj = null;
-        if (displacementFromTarget > 3) {
-            SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
-            correctionTraj = drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
-                    .lineToLinearHeading(new Pose2d(scorePosition.getX(), scorePosition.getY(), Math.toRadians(45)),
-                            SampleMecanumDrive.getVelocityConstraint(10, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                            SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                    .build();
-            drive.followTrajectory(correctionTraj);
-        }
-
+        if (displacementFromTarget > 3) {drive.followTrajectory(trajectoryHandler.lineToLinearHeadingScoreRed(5));}
+        //extend, score, retract
         autoUtils.scorePiece(2);
-
-        if (Objects.isNull(correctionTraj)) {
-            drive.followTrajectorySequence(moveToFirstPiece);
-        } else {
-            assert correctionTraj != null;
-            TrajectorySequence moveToFirstPieceCorrected = drive.trajectorySequenceBuilder(correctionTraj.end())
-                    .addTemporalMarker(0, () -> {
-                        Thread t1 = new Thread() {
-                            public void run() {
-                                autoUtils.verticalSlide(Utils.LiftState.GROUND);
-                            }
-                        };
-                        t1.start();
-                    })
-                    .splineToLinearHeading(new Pose2d(-48, -47, Math.toRadians(90)), Math.toRadians(90))
-                    .addDisplacementMarker(() -> {
-                        robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
-                        robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
-                        autoUtils.armExtension(Utils.ArmState.EXTENDED);
-                    })
-                    .forward(1)
-                    .UNSTABLE_addTemporalMarkerOffset(2, () -> {
-                        autoUtils.armExtension(Utils.ArmState.IN);
-
-                    }) //perform intake transition
-                    .waitSeconds(2)
-                    .build();
-            drive.followTrajectorySequence(moveToFirstPieceCorrected);
-        }
+        //move and grab piece
+        drive.followTrajectorySequence(trajectoryHandler.moveToFirstPieceRed());
+        //transition piece into bucket
         autoUtils.intakeTransition();
-        drive.followTrajectorySequence(secondScore);
+        //ensure piece is in bucket
 
-        SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
-        correctionTraj = drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
-                .lineToLinearHeading(new Pose2d(scorePosition.getX(), scorePosition.getY(), Math.toRadians(45)),
-                        SampleMecanumDrive.getVelocityConstraint(10, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
-                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .build();
+        double wiggleStartTime = time.seconds();
+        while(wiggleStartTime + 0.25 > time.seconds()){
+            robot.drivetrain.simpleDrive(-1);
+        }
+         wiggleStartTime = time.seconds();
+        while(wiggleStartTime + 0.1 > time.seconds()){
+            robot.drivetrain.simpleDrive(1);
+        }
+        robot.drivetrain.simpleDrive(0);
 
-        drive.followTrajectory(correctionTraj);
-
-        autoUtils.armFlip(Utils.ArmFlipState.GROUND, 1);
+        //move to score position
+        drive.followTrajectorySequence(trajectoryHandler.secondScoreRed());
+        //check displacement and re-position if inaccurate
+        displacementFromTarget = opticalSensorClass.getDisplacementFromTarget(scorePosition.getX(), scorePosition.getY());
+        if (displacementFromTarget > 3) {drive.followTrajectory(trajectoryHandler.lineToLinearHeadingScoreRed(5));}
+        //position arm down
+        autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+        //extend, score, retract
         autoUtils.scorePiece(2);
+
 //        drive.followTrajectorySequence(moveToSecondPiece);
 //        drive.followTrajectorySequence(thirdScore); // and park
 //        drive.followTrajectorySequence(moveToThirdPiece);

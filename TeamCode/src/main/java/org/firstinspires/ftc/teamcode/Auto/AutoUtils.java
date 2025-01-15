@@ -195,7 +195,7 @@ public class AutoUtils {
         robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.80);
         robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.23);
         //set gate closed
-        robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.5);
+        robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.8);
         //bucket pos
         robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.37);
         //retract vertical slide
@@ -235,9 +235,9 @@ public class AutoUtils {
         double startTime = time.seconds();
         switch (state) {
             case GROUND:
-                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(1210);
-                while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < 1210 - 10
-                        || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 1210 + 10) {
+                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(1190);
+                while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < 1190 - 10
+                        || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 1190 + 10) {
                     robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(power);
                     if (startTime + 2 < time.seconds()) {
@@ -325,6 +325,7 @@ public class AutoUtils {
             robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.85);
         }
         robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.39);
+        verticalSlide(Utils.LiftState.GROUND);
     }
     public void armExtension(Utils.ArmState armState){
         switch(armState){

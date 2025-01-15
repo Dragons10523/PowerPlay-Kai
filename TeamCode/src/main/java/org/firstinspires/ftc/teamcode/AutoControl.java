@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.Auto.OpticalSensor;
 import org.firstinspires.ftc.teamcode.Auto.AutoUtils;
+import org.firstinspires.ftc.teamcode.Auto.TrajectoryHandler;
 import org.firstinspires.ftc.teamcode.Camera.Limelight;
 import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.SampleMecanumDrive;
 
@@ -20,6 +21,7 @@ public class AutoControl extends LinearOpMode {
     public SampleMecanumDrive drive;
     public OpticalSensor opticalSensorClass;
     public Limelight limelightObj;
+    public TrajectoryHandler trajectoryHandler;
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -32,6 +34,7 @@ public class AutoControl extends LinearOpMode {
         robot = new RobotClass(hardwareMap);
         drive = new SampleMecanumDrive(hardwareMap);
         autoUtils = new AutoUtils(robot, telemetry);
+        trajectoryHandler = new TrajectoryHandler(robot, drive, autoUtils);
         opticalSensorClass = new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
         limelightObj = new Limelight(robot);
         robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

@@ -42,7 +42,8 @@ public abstract class AbstractOmniDrivetrain {
         Motors.get(RobotClass.MOTORS.BACK_RIGHT).setPower((rotY + rotX + turn) / denominator);
 
     }
-    public void mecanumDriveLocal(double leftY, double leftX, double turn){
+
+    public void mecanumDriveLocal(double leftY, double leftX, double turn) {
 
         double denominator = Math.max(Math.abs(leftX) + Math.abs(leftY) + Math.abs(turn), 1);
 
@@ -50,6 +51,13 @@ public abstract class AbstractOmniDrivetrain {
         Motors.get(RobotClass.MOTORS.BACK_LEFT).setPower((leftY - leftX - turn) / denominator);
         Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setPower((leftY - leftX + turn) / denominator);
         Motors.get(RobotClass.MOTORS.BACK_RIGHT).setPower((leftY + leftX + turn) / denominator);
+    }
+
+    public void simpleDrive(double power) {
+        Motors.get(RobotClass.MOTORS.FRONT_LEFT).setPower(power);
+        Motors.get(RobotClass.MOTORS.BACK_LEFT).setPower(power);
+        Motors.get(RobotClass.MOTORS.FRONT_RIGHT).setPower(power);
+        Motors.get(RobotClass.MOTORS.BACK_RIGHT).setPower(power);
     }
 
 }
