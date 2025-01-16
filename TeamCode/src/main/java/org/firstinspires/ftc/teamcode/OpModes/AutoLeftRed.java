@@ -70,38 +70,7 @@ public class AutoLeftRed extends AutoControl {
         telemetry.addLine("firstScore success");
         telemetry.update();
 
-//        TrajectorySequence moveToSecondPiece = drive.trajectorySequenceBuilder(secondScore.end())
-//                .forward(3)
-//                .splineToLinearHeading(new Pose2d(40, 34, Math.toRadians(335)), Math.toRadians(335))
-//                .strafeLeft(.5)
-//                .addDisplacementMarker(() -> {
-//
-//                    robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.54);
-//                    robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.64);
-//
-//                })
-//                .forward(1)
-//                .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-//                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
-//                })
-//                .UNSTABLE_addTemporalMarkerOffset(.25, () -> {
-//                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0);
-//
-//                    robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.67);
-//                    robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.52);
-//
-//                }) //perform intake transition
-//                .waitSeconds(.2)
-//                .addTemporalMarker(() -> {
-//                    Thread t4 = new Thread() {
-//                        public void run() {
-//                            autoUtils.intakeTransition();
-//                        }
-//                    };
-//                    t4.start();
-//                })
-//                .waitSeconds(1)
-//                .build();
+
 //        telemetry.addLine("secondPiece success");
 //        telemetry.update();
 //        TrajectorySequence thirdScore = drive.trajectorySequenceBuilder(moveToSecondPiece.end())
@@ -203,7 +172,9 @@ public class AutoLeftRed extends AutoControl {
         autoUtils.armExtension(Utils.ArmState.IN);
         //check displacement and re-position if inaccurate
         double displacementFromTarget = opticalSensorClass.getDisplacementFromTarget(scorePosition.getX(), scorePosition.getY());
-        if (displacementFromTarget > 3) {drive.followTrajectory(trajectoryHandler.lineToLinearHeadingScoreRed(5));}
+        if (displacementFromTarget > 3) {
+            drive.followTrajectory(trajectoryHandler.lineToLinearHeadingScoreRed(5));
+        }
         //extend, score, retract
         autoUtils.scorePiece(2);
         //move and grab piece
@@ -213,24 +184,58 @@ public class AutoLeftRed extends AutoControl {
         //ensure piece is in bucket
 
         double wiggleStartTime = time.seconds();
-        while(wiggleStartTime + 0.25 > time.seconds()){
+        while (wiggleStartTime + 0.25 > time.seconds()) {
             robot.drivetrain.simpleDrive(-1);
         }
-         wiggleStartTime = time.seconds();
-        while(wiggleStartTime + 0.1 > time.seconds()){
+        wiggleStartTime = time.seconds();
+        while (wiggleStartTime + 0.1 > time.seconds()) {
             robot.drivetrain.simpleDrive(1);
         }
         robot.drivetrain.simpleDrive(0);
 
         //move to score position
-        drive.followTrajectorySequence(trajectoryHandler.secondScoreRed());
+        drive.followTrajectorySequence(trajectoryHandler.scoreRed());
         //check displacement and re-position if inaccurate
         displacementFromTarget = opticalSensorClass.getDisplacementFromTarget(scorePosition.getX(), scorePosition.getY());
-        if (displacementFromTarget > 3) {drive.followTrajectory(trajectoryHandler.lineToLinearHeadingScoreRed(5));}
+        if (displacementFromTarget > 3) {
+            drive.followTrajectory(trajectoryHandler.lineToLinearHeadingScoreRed(5));
+        }
         //position arm down
         autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
         //extend, score, retract
         autoUtils.scorePiece(2);
+
+        drive.followTrajectorySequence(trajectoryHandler.moveToSecondPieceRed());
+
+        autoUtils.intakeTransition();
+
+        wiggleStartTime = time.seconds();
+        while (wiggleStartTime + 0.25 > time.seconds()) {
+            robot.drivetrain.simpleDrive(-1);
+        }
+        wiggleStartTime = time.seconds();
+        while (wiggleStartTime + 0.1 > time.seconds()) {
+            robot.drivetrain.simpleDrive(1);
+        }
+        robot.drivetrain.simpleDrive(0);
+
+        drive.followTrajectorySequence(trajectoryHandler.scoreRed());
+
+        displacementFromTarget = opticalSensorClass.getDisplacementFromTarget(scorePosition.getX(), scorePosition.getY());
+        if (displacementFromTarget > 3) {
+            drive.followTrajectory(trajectoryHandler.lineToLinearHeadingScoreRed(5));
+        }
+
+        //position arm down
+        autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+        //extend, score, retract
+        autoUtils.scorePiece(2);
+        //position arm up
+        autoUtils.armFlip(Utils.ArmFlipState.UP, 0.6);
+        //PARK
+        drive.followTrajectory(trajectoryHandler.splineToPark());
+        //position arm to touch bar for parking points
+        autoUtils.armFlip(Utils.ArmFlipState.MIDDLE, 0.2);
 
 //        drive.followTrajectorySequence(moveToSecondPiece);
 //        drive.followTrajectorySequence(thirdScore); // and park
