@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import android.annotation.SuppressLint;
 
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -22,245 +25,141 @@ public class AutoLeftBlue extends AutoControl {
     @SuppressLint("DefaultLocale")
     @Override
     public void runOpMode() throws InterruptedException {
-        super.runOpMode();
         telemetry.addLine("opMode started");
         telemetry.update();
-        super.initialize();
+        super.runOpMode();
         telemetry.addLine("opMode INIT");
         telemetry.update();
-
-        SparkFunOTOS.Pose2D pos = new SparkFunOTOS.Pose2D(0, 0, Math.toRadians(180));
-        robot.opticalSensor.setPosition(pos);
-
-        Pose2d scorePosition = new Pose2d(54, 54, Math.toRadians(225));
-
+        super.initialize();
+        telemetry.addLine("headingInit");
+        telemetry.update();
+        super.initialHeading(Math.toRadians(0), false);
+        double startTime = time.seconds();
+        do {
+            sleep(20);
+            telemetry.addLine("isLooping");
+            telemetry.addData("SuccessfulLocalizationCount", autoUtils.getSuccessfulLocalizationCount());
+            telemetry.update();
+            autoUtils.updateOpticalSensorToPoseEstimateCamera();
+            if (startTime + 5 < time.seconds() || isStarted()) {
+                break;
+            }
+        }
+        while (autoUtils.getSuccessfulLocalizationCount() < 20);
+        SparkFunOTOS.Pose2D pos = robot.opticalSensor.getPosition();
         double bucketScoreTime = 2;
-        SparkFunOTOS.Pose2D posAfterCameraReset = robot.opticalSensor.getPosition();
-        TrajectorySequence firstScore = drive.trajectorySequenceBuilder(new Pose2d(posAfterCameraReset.x, posAfterCameraReset.y, posAfterCameraReset.h))
-                .addTemporalMarker(0, () -> {
+        Pose2d scorePosition = new Pose2d(54, 54, Math.toRadians(225));
+        Pose2d startPos = new Pose2d(pos.x, pos.y, pos.h);
+        Trajectory moveToScoreBlue = drive.trajectoryBuilder(startPos)
+                .splineToConstantHeading(new Vector2d(30, 55), Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(54, 54, Math.toRadians(225)), Math.toRadians(45))
+                .build();
+
+        TrajectorySequence firstScore = drive.trajectorySequenceBuilder(startPos)
+                .addTemporalMarker(1, () -> {
                     Thread t1 = new Thread() {
                         public void run() {
-                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 1);
+                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+                            autoUtils.armExtension(Utils.ArmState.IN);
                         }
                     };
                     t1.start();
                 })
-                .addTemporalMarker(2, () -> {
-                    Thread t2 = new Thread() {
-                        public void run() {
-                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
-                        }
-                    };
-                    t2.start();
-                })//extend vertical slides and score
-                .splineToLinearHeading(scorePosition, Math.toRadians(225))
-                .addDisplacementMarker(() -> {
-                    Thread t3 = new Thread() {
-                        public void run() {
-                            double startTime = time.seconds();
-                            while (startTime + 2 > time.seconds()) {
-                                robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.77);
-                            }
-                            robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.39);
-                        }
-                    };
-                    t3.start();
-                })
-                .waitSeconds(bucketScoreTime)
-                .addTemporalMarker(() -> {
-                    Thread t1 = new Thread() {
-                        public void run() {
-                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
-                        }
-                    };
-                    t1.start();
-                }) //retract vertical slides
+                .addTrajectory(moveToScoreBlue)
                 .build();
         telemetry.addLine("firstScore success");
         telemetry.update();
-        TrajectorySequence moveToFirstPiece = drive.trajectorySequenceBuilder(firstScore.end())
-                .splineToLinearHeading(new Pose2d(30.5, 37, Math.toRadians(335)), Math.toRadians(335))
-                .addDisplacementMarker(() -> {
 
-                    robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.56);
-                    robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.64);
-                    Thread t1 = new Thread() {
-                        public void run(){
-
-                        }
-                    };
-                    t1.start();
-                })
-                .forward(1)
-                .waitSeconds(.2)
-                .addTemporalMarker(() -> {
-                    Thread t4 = new Thread() {
-                        public void run() {
-                            autoUtils.intakeTransition();
-                        }
-                    };
-                    t4.start();
-                })
-                .waitSeconds(1)
-                .build();
-        telemetry.addLine("firstPiece success");
-        telemetry.update();
-        TrajectorySequence secondScore = drive.trajectorySequenceBuilder(moveToFirstPiece.end())
-                .splineToLinearHeading(scorePosition, Math.toRadians(225))
-                .forward(1.5)
-                .addTemporalMarker(0.5, () -> {
-                    Thread t1 = new Thread() {
-                        public void run() {
-                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
-                        }
-                    };
-                    t1.start();
-                }) //extend vertical slides
-                .waitSeconds(bucketScoreTime)
-                .addTemporalMarker(() -> {
-                    Thread t1 = new Thread() {
-                        public void run() {
-                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
-                        }
-                    };
-                    t1.start();
-                }) //retract vertical slides
-                .build();
-        telemetry.addLine("secondScore success");
-        telemetry.update();
-//        TrajectorySequence moveToSecondPiece = drive.trajectorySequenceBuilder(secondScore.end())
-//                .forward(3)
-//                .splineToLinearHeading(new Pose2d(40, 34, Math.toRadians(335)), Math.toRadians(335))
-//                .strafeLeft(.5)
-//                .addDisplacementMarker(() -> {
-//
-//                    robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.54);
-//                    robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.64);
-//
-//                })
-//                .forward(1)
-//                .UNSTABLE_addTemporalMarkerOffset(.1, () -> {
-//                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
-//                })
-//                .UNSTABLE_addTemporalMarkerOffset(.25, () -> {
-//                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0);
-//
-//                    robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.67);
-//                    robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.52);
-//
-//                }) //perform intake transition
-//                .waitSeconds(.2)
-//                .addTemporalMarker(() -> {
-//                    Thread t4 = new Thread() {
-//                        public void run() {
-//                            autoUtils.intakeTransition();
-//                        }
-//                    };
-//                    t4.start();
-//                })
-//                .waitSeconds(1)
-//                .build();
-//        telemetry.addLine("secondPiece success");
-//        telemetry.update();
-//        TrajectorySequence thirdScore = drive.trajectorySequenceBuilder(moveToSecondPiece.end())
-//                .splineToLinearHeading(scorePosition, Math.toRadians(225))
-//                .back(.5)
-//                .addTemporalMarker(0.5, () -> {
-//                    Thread t1 = new Thread() {
-//                        public void run() {
-//                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
-//                        }
-//                    };
-//                    t1.start();
-//                }) //extend vertical slides
-//                .waitSeconds(bucketScoreTime)
-//                .addTemporalMarker(() -> {
-//                    Thread t1 = new Thread() {
-//                        public void run() {
-//                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
-//                        }
-//                    };
-//                    t1.start();
-//                }) //retract vertical slides
-//                .back(1)
-//                .build();
-//        telemetry.addLine("thirdScore success");
-//        telemetry.update();
-//        TrajectorySequence moveToThirdPiece = drive.trajectorySequenceBuilder(thirdScore.end())
-//                .addTemporalMarker(0, () -> {
-//                    Thread t1 = new Thread() {
-//                        public void run() {
-//                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
-//                        }
-//                    };
-//                    t1.start();
-//                })
-//                .splineToLinearHeading(new Pose2d(58, 26, 0), 0)
-//                .addDisplacementMarker(() -> {
-//                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0.75);
-//                })
-//                .forward(3)
-//                .addDisplacementMarker(() -> {
-//                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0);
-//                    Thread t2 = new Thread() {
-//                        public void run() {
-//                            autoUtils.intakeTransition();
-//                        }
-//                    };
-//                    t2.start();
-//                })
-//                .build();
-//        telemetry.addLine("thirdPiece success");
-//        telemetry.update();
-//        TrajectorySequence fourthScore = drive.trajectorySequenceBuilder(moveToThirdPiece.end())
-//                .forward(-12)
-//                .splineToLinearHeading(scorePosition, Math.toRadians(225))
-//                .forward(-2)
-//                .addDisplacementMarker(() -> {
-//                    Thread t1 = new Thread() {
-//                        public void run() {
-//                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
-//                        }
-//                    };
-//                    t1.start();
-//                })
-//                .waitSeconds(bucketScoreTime)
-//                .build();
-//        telemetry.addLine("fourthScore success");
-//        telemetry.update();
-//        TrajectorySequence moveToPark = drive.trajectorySequenceBuilder(firstScore.end())
-//                .waitSeconds(1.5)
-//                .addTemporalMarker(2, () -> {
-//                    autoUtils.armFlip(Utils.ArmFlipState.UP, .8);
-//                })
-//                .splineTo(new Vector2d(45, 13), Math.toRadians(180))
-//                .forward(20)
-//                .build();
-        telemetry.addLine("park success");
-        telemetry.update();
-        while (!isStarted()) {
+        while (!isStarted() && !isStopRequested()) {
             SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
+            LLResult result = robot.limelight.getLatestResult();
             telemetry.addData("XYH: ", "%.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h);
-            telemetry.addData("successFulCameraLocalization", autoUtils.getSuccessfulLocalizationCount());
-            telemetry.addLine();
+            telemetry.addData("successfulLocalizations", autoUtils.getSuccessfulLocalizationCount());
+            if (result != null) {
+                telemetry.addData("staleness", result.getStaleness());
+                telemetry.addData("validResult?", result.isValid());
+            } else {
+                telemetry.addLine("No data available");
+            }
             telemetry.update();
+
         }
         waitForStart();
 
+        //Score pre-loaded sample
         drive.followTrajectorySequence(firstScore);
-        //drive.followTrajectorySequence(moveToFirstPiece);
-        //drive.followTrajectorySequence(secondScore);
+        //Ensure horizontal extension is IN
+        autoUtils.armExtension(Utils.ArmState.IN);
+        //check displacement and re-position if inaccurate
+        double displacementFromTarget = opticalSensorClass.getDisplacementFromTarget(scorePosition.getX(), scorePosition.getY());
+        if (displacementFromTarget > 3) {
+            drive.followTrajectory(trajectoryHandler.lineToScoreBlue(5));
+            drive.turn(Math.toRadians(225));
+        }
+        //extend, score, retract
+        autoUtils.scorePiece(1);
+        //move and grab piece
+        drive.followTrajectorySequence(trajectoryHandler.moveToFirstPieceBlue());
+        //transition piece into bucket
+        autoUtils.intakeTransition();
+        //ensure piece is in bucket
+        autoUtils.sampleWiggle();
+        //move to score position
+        drive.followTrajectorySequence(trajectoryHandler.scoreBlue());
+        //check displacement and re-position if inaccurate
+        displacementFromTarget = opticalSensorClass.getDisplacementFromTarget(scorePosition.getX(), scorePosition.getY());
+        if (displacementFromTarget > 3) {
+            drive.followTrajectory(trajectoryHandler.lineToScoreBlue(5));
+            drive.turn(Math.toRadians(225));
+        }
+        //position arm down
+        autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+        //extend, score, retract
+        autoUtils.scorePiece(1);
+        //move and grab second piece
+        drive.followTrajectorySequence(trajectoryHandler.moveToSecondPieceBlue());
+        //transition piece into bucket
+        autoUtils.intakeTransition();
+        //ensure piece is in bucket
+        autoUtils.sampleWiggle();
+        //move to scoreBlue
+        drive.followTrajectorySequence(trajectoryHandler.scoreBlue());
+        //ensure accurate position
+        displacementFromTarget = opticalSensorClass.getDisplacementFromTarget(scorePosition.getX(), scorePosition.getY());
+        if (displacementFromTarget > 3) {
+            drive.followTrajectory(trajectoryHandler.lineToScoreBlue(5));
+            drive.turn(Math.toRadians(225));
+        }
+        //position arm down
+        autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+        //extend, score, retract
+        autoUtils.scorePiece(1);
+        //position arm up
+        autoUtils.armFlip(Utils.ArmFlipState.UP, 0.6);
+        //PARK
+        drive.followTrajectory(trajectoryHandler.splineToParkBlue());
+        //position arm to touch bar for parking points
+        autoUtils.armFlip(Utils.ArmFlipState.MIDDLE, 0.2);
+
 //        drive.followTrajectorySequence(moveToSecondPiece);
 //        drive.followTrajectorySequence(thirdScore); // and park
 //        drive.followTrajectorySequence(moveToThirdPiece);
 //        drive.followTrajectorySequence(fourthScore);
         //drive.followTrajectorySequence(moveToPark);
-
-        while (opModeIsActive()) {
+        while (!getStopRequested()) {
             SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
-            telemetry.addLine(String.format("XYH %.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h));
-
+            LLResult result = robot.limelight.getLatestResult();
+            telemetry.addData("XYH: ", "%.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h);
+            telemetry.addData("successfulLocalizations", autoUtils.getSuccessfulLocalizationCount());
+            telemetry.addData("Displacement", displacementFromTarget);
+            if (result != null) {
+                telemetry.addData("staleness", result.getStaleness());
+                telemetry.addData("validResult?", result.isValid());
+            } else {
+                telemetry.addLine("No data available");
+            }
             telemetry.update();
         }
+        robot.limelight.close();
     }
 }

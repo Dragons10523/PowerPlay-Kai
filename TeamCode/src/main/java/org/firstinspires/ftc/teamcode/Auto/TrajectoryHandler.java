@@ -41,6 +41,23 @@ public class TrajectoryHandler {
                 .waitSeconds(2)
                 .build();
     }
+    public TrajectorySequence moveToFirstPieceBlue() {
+        SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
+        return drive.trajectorySequenceBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
+                .splineToLinearHeading(new Pose2d(48, 47, Math.toRadians(270)), Math.toRadians(270))
+                .addDisplacementMarker(() -> {
+                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
+                    autoUtils.armExtension(Utils.ArmState.EXTENDED);
+                })
+                .forward(1)
+                .UNSTABLE_addTemporalMarkerOffset(2, () -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+
+                }) //perform intake transition
+                .waitSeconds(2)
+                .build();
+    }
 
     public TrajectorySequence scoreRed() {
         SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
@@ -55,6 +72,22 @@ public class TrajectoryHandler {
                 })
                 .setReversed(true)
                 .splineTo(new Vector2d(-54, -54), Math.toRadians(225))
+                .setReversed(false)
+                .build();
+    }
+    public TrajectorySequence scoreBlue() {
+        SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
+        return drive.trajectorySequenceBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
+                .addTemporalMarker(1, () -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.armExtension(Utils.ArmState.IN);
+                        }
+                    };
+                    t1.start();
+                })
+                .setReversed(true)
+                .splineTo(new Vector2d(54, 54), Math.toRadians(45))
                 .setReversed(false)
                 .build();
     }
@@ -75,11 +108,33 @@ public class TrajectoryHandler {
                 .waitSeconds(2)
                 .build();
     }
+    public TrajectorySequence moveToSecondPieceBlue() {
+        SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
+        return drive.trajectorySequenceBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
+                .splineToLinearHeading(new Pose2d(58.5, 47, Math.toRadians(270)), Math.toRadians(270))
+                .addDisplacementMarker(() -> {
+                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
+                    autoUtils.armExtension(Utils.ArmState.EXTENDED);
+                })
+                .forward(1)
+                .UNSTABLE_addTemporalMarkerOffset(2, () -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                })
+                .waitSeconds(2)
+                .build();
+    }
 
-    public Trajectory splineToPark() {
+    public Trajectory splineToParkRed() {
         SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
         return drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
                 .splineTo(new Vector2d(-25, -10), 0)
+                .build();
+    }
+    public Trajectory splineToParkBlue() {
+        SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
+        return drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
+                .splineTo(new Vector2d(25, 10), Math.toRadians(180))
                 .build();
     }
 
@@ -89,6 +144,12 @@ public class TrajectoryHandler {
                 .splineToLinearHeading(new Pose2d(-54, -54, Math.toRadians(45)), Math.toRadians(45))
                 .build();
     }
+    public Trajectory splineToLinearHeadingScoreBlue() {
+        SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
+        return drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
+                .splineToLinearHeading(new Pose2d(54, 54, Math.toRadians(225)), Math.toRadians(225))
+                .build();
+    }
 
     public Trajectory splineToScoreRed() {
         SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
@@ -96,11 +157,23 @@ public class TrajectoryHandler {
                 .splineTo(new Vector2d(-54, -54), Math.toRadians(45))
                 .build();
     }
+    public Trajectory splineToScoreBlue() {
+        SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
+        return drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
+                .splineTo(new Vector2d(54, 54), Math.toRadians(225))
+                .build();
+    }
 
     public Trajectory lineToScoreRed() {
         SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
         return drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
                 .lineTo(new Vector2d(-54, -54))
+                .build();
+    }
+    public Trajectory lineToScoreBlue() {
+        SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
+        return drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
+                .lineTo(new Vector2d(54, 54))
                 .build();
     }
 
@@ -112,6 +185,27 @@ public class TrajectoryHandler {
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .build();
     }
+    public Trajectory lineToLinearHeadingScoreBlue(double max_VELOCITY) {
+        SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
+        return drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
+                .lineToLinearHeading(new Pose2d(54, 54, Math.toRadians(225)),
+                        SampleMecanumDrive.getVelocityConstraint(max_VELOCITY, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .build();
+    }
+    public Trajectory lineToScoreRed(double max_VELOCITY){
+        SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
+        return drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
+                .lineTo(new Vector2d(-54, -54))
+                .build();
+    }
+    public Trajectory lineToScoreBlue(double max_VELOCITY){
+        SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
+        return drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
+                .lineTo(new Vector2d(54, 54))
+                .build();
+    }
+
 
     public Trajectory splineToVector(Vector2d vec, double endHeading_RADIANS) {
         SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();

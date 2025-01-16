@@ -187,6 +187,19 @@ public class AutoUtils {
         robot.Motors.get(RobotClass.MOTORS.BACK_LEFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
+    public void sampleWiggle(){
+       double wiggleStartTime = time.seconds();
+        while (wiggleStartTime + 0.25 > time.seconds()) {
+            robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-0.75);
+            robot.drivetrain.simpleDrive(-1);
+        }
+        wiggleStartTime = time.seconds();
+        while (wiggleStartTime + 0.1 > time.seconds()) {
+            robot.drivetrain.simpleDrive(1);
+        }
+        robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0);
+        robot.drivetrain.simpleDrive(0);
+    }
 
     //Performs transition from intake to bucket
     public void intakeTransition() {
@@ -216,28 +229,26 @@ public class AutoUtils {
         while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < 40
                 || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 60) {
             robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0.4);
+            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0.6);
             if (startTime + 2 < time.seconds()) {
                 break;
             }
         }
         robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.8);
         robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        startTime = time.seconds();
-        while (startTime + 2 > time.seconds()) {
-            robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
-        }
-        robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0);
+        robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+        //ENDS WITH INTAKE SPINNING
     }
 
-    //Moves jointed arm to targe ArmFlipState
+    //Moves jointed arm to target ArmFlipState
     public void armFlip(Utils.ArmFlipState state, double power) {
         double startTime = time.seconds();
         switch (state) {
             case GROUND:
-                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(1190);
-                while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < 1190 - 10
-                        || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 1190 + 10) {
+                int targetPos = 1170;
+                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(targetPos);
+                while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < targetPos - 10
+                        || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > targetPos + 10) {
                     robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_TO_POSITION);
                     robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(power);
                     if (startTime + 2 < time.seconds()) {
@@ -276,12 +287,13 @@ public class AutoUtils {
     public void verticalSlide(Utils.LiftState liftState) {
         double startTime = time.seconds();
         int currentPos = robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition();
+        int previousPos = 0;
         setLiftMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         switch (liftState) {
             case HIGH:
                 int targetPos = -1600;
                 setLiftTargetPos(targetPos);
-                while (currentPos > targetPos + 10 || currentPos < targetPos - 10) {
+                while (currentPos > targetPos + 10 || currentPos < targetPos - 10 && !autoControl.isStopRequested()) {
                     currentPos = -robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition();
                     //calculates powerOut based on difference between goal ticks / 300
                     double powerOut = (double) -(targetPos - currentPos) / 300.0;
@@ -299,9 +311,13 @@ public class AutoUtils {
                     telemetry.update();
                     setLiftPower(powerOut);
                     //Time out 3 seconds
-                    if (startTime + 3 < time.seconds() || autoControl.isStopRequested()) {
+                    if (startTime + 1.5 < time.seconds() || autoControl.isStopRequested()) {
                         break;
                     }
+                    if(previousPos == currentPos && startTime + 0.3 < time.seconds()){
+                        break;
+                    }
+                    previousPos = currentPos;
                 }
                 setLiftPower(0.2);
                 break;
@@ -321,7 +337,7 @@ public class AutoUtils {
         ElapsedTime elapsedTime = new ElapsedTime();
         double startTime = elapsedTime.seconds();
         verticalSlide(Utils.LiftState.HIGH);
-        while(startTime + time > elapsedTime.seconds()){
+        while(startTime + time > elapsedTime.seconds() && !autoControl.isStopRequested()){
             robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.85);
         }
         robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.39);
