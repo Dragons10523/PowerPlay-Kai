@@ -52,22 +52,25 @@ public class AutoLeftRed extends AutoControl {
         double bucketScoreTime = 2;
         Pose2d scorePosition = new Pose2d(-54, -54, Math.toRadians(45));
         Pose2d startPos = new Pose2d(pos.x, pos.y, pos.h);
-        Trajectory moveToScoreRed = drive.trajectoryBuilder(startPos)
-                .splineToConstantHeading(new Vector2d(-30, -55), Math.toRadians(180))
-                .splineToLinearHeading(new Pose2d(-54, -54, Math.toRadians(45)), Math.toRadians(225))
-                .build();
 
         TrajectorySequence firstScore = drive.trajectorySequenceBuilder(startPos)
                 .addTemporalMarker(1, () -> {
                     Thread t1 = new Thread() {
                         public void run() {
-                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
-                            autoUtils.armExtension(Utils.ArmState.IN);
+                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.3);
                         }
                     };
                     t1.start();
                 })
-                .addTrajectory(moveToScoreRed)
+                .addTemporalMarker(1.5, ()->{
+                    Thread t1 = new Thread(){
+                        public void run(){
+                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
+                        }
+                    };
+                    t1.start();
+                })
+                .lineToSplineHeading(new Pose2d(-54, -54, Math.toRadians(45)))
                 .build();
         telemetry.addLine("firstScore success");
         telemetry.update();
@@ -91,58 +94,32 @@ public class AutoLeftRed extends AutoControl {
 
         //Score pre-loaded sample
         drive.followTrajectorySequence(firstScore);
-        //Ensure horizontal extension is IN
-        autoUtils.armExtension(Utils.ArmState.IN);
         //check displacement and re-position if inaccurate
         double displacementFromTarget = opticalSensorClass.getDisplacementFromTarget(scorePosition.getX(), scorePosition.getY());
         if (displacementFromTarget > 3) {
-            drive.followTrajectory(trajectoryHandler.lineToScoreRed(5));
-            drive.turn(Math.toRadians(45));
+            drive.followTrajectory(trajectoryHandler.lineToLinearHeadingScoreRed(5));
         }
-        //extend, score, retract
+        //score
         autoUtils.scorePiece(1);
-        //move and grab piece
+        //retract lift, move, and grab piece
         drive.followTrajectorySequence(trajectoryHandler.moveToFirstPieceRed());
         //transition piece into bucket
         autoUtils.intakeTransition();
-        //ensure piece is in bucket
-        autoUtils.sampleWiggle();
-        //move to score position
+        //move to score position and extend lift
         drive.followTrajectorySequence(trajectoryHandler.scoreRed());
-        //check displacement and re-position if inaccurate
-        displacementFromTarget = opticalSensorClass.getDisplacementFromTarget(scorePosition.getX(), scorePosition.getY());
-        if (displacementFromTarget > 3) {
-            drive.followTrajectory(trajectoryHandler.lineToScoreRed(5));
-            drive.turn(Math.toRadians(45));
-        }
-        //position arm down
-        autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
-        //extend, score, retract
+        //score
         autoUtils.scorePiece(1);
-        //move and grab second piece
+        //retract lift, move, and grab second piece
         drive.followTrajectorySequence(trajectoryHandler.moveToSecondPieceRed());
         //transition piece into bucket
         autoUtils.intakeTransition();
-        //ensure piece is in bucket
-        autoUtils.sampleWiggle();
         //move to scoreRed
         drive.followTrajectorySequence(trajectoryHandler.scoreRed());
-        //ensure accurate position
-        displacementFromTarget = opticalSensorClass.getDisplacementFromTarget(scorePosition.getX(), scorePosition.getY());
-        if (displacementFromTarget > 3) {
-            drive.followTrajectory(trajectoryHandler.lineToScoreRed(5));
-            drive.turn(Math.toRadians(45));
-        }
-        //position arm down
-        autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
-        //extend, score, retract
+        //score
         autoUtils.scorePiece(1);
-        //position arm up
-        autoUtils.armFlip(Utils.ArmFlipState.UP, 0.6);
         //PARK
         drive.followTrajectory(trajectoryHandler.splineToParkRed());
         //position arm to touch bar for parking points
-        autoUtils.armFlip(Utils.ArmFlipState.MIDDLE, 0.2);
 
 //        drive.followTrajectorySequence(moveToSecondPiece);
 //        drive.followTrajectorySequence(thirdScore); // and park

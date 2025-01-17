@@ -38,6 +38,7 @@ public class AutoControl extends LinearOpMode {
         opticalSensorClass = new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
         limelightObj = new Limelight(robot);
         robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
     public void simpleInit(){
         robot = new RobotClass(hardwareMap);

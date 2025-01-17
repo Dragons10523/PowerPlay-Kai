@@ -50,10 +50,6 @@ public class AutoLeftBlue extends AutoControl {
         double bucketScoreTime = 2;
         Pose2d scorePosition = new Pose2d(54, 54, Math.toRadians(225));
         Pose2d startPos = new Pose2d(pos.x, pos.y, pos.h);
-        Trajectory moveToScoreBlue = drive.trajectoryBuilder(startPos)
-                .splineToConstantHeading(new Vector2d(30, 55), Math.toRadians(0))
-                .splineToLinearHeading(new Pose2d(54, 54, Math.toRadians(225)), Math.toRadians(45))
-                .build();
 
         TrajectorySequence firstScore = drive.trajectorySequenceBuilder(startPos)
                 .addTemporalMarker(1, () -> {
@@ -65,7 +61,8 @@ public class AutoLeftBlue extends AutoControl {
                     };
                     t1.start();
                 })
-                .addTrajectory(moveToScoreBlue)
+                .lineToLinearHeading(new Pose2d(startPos.getX() + 10, startPos.getY() - 5, Math.toRadians(270)))
+                .splineToLinearHeading(new Pose2d(54, 54, Math.toRadians(225)), Math.toRadians(45))
                 .build();
         telemetry.addLine("firstScore success");
         telemetry.update();
@@ -93,8 +90,7 @@ public class AutoLeftBlue extends AutoControl {
         //check displacement and re-position if inaccurate
         double displacementFromTarget = opticalSensorClass.getDisplacementFromTarget(scorePosition.getX(), scorePosition.getY());
         if (displacementFromTarget > 3) {
-            drive.followTrajectory(trajectoryHandler.lineToScoreBlue(5));
-            drive.turn(Math.toRadians(225));
+            drive.followTrajectory(trajectoryHandler.lineToLinearHeadingScoreBlue(5));
         }
         //extend, score, retract
         autoUtils.scorePiece(1);

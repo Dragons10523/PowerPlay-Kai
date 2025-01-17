@@ -229,7 +229,7 @@ public class AutoUtils {
         while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < 40
                 || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 60) {
             robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0.6);
+            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0.8);
             if (startTime + 2 < time.seconds()) {
                 break;
             }
@@ -238,6 +238,7 @@ public class AutoUtils {
         robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
         //ENDS WITH INTAKE SPINNING
+        sampleWiggle();
     }
 
     //Moves jointed arm to target ArmFlipState
@@ -245,7 +246,7 @@ public class AutoUtils {
         double startTime = time.seconds();
         switch (state) {
             case GROUND:
-                int targetPos = 1170;
+                int targetPos = 1160;
                 robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(targetPos);
                 while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < targetPos - 10
                         || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > targetPos + 10) {
@@ -255,6 +256,7 @@ public class AutoUtils {
                         break;
                     }
                 }
+
                 break;
             case UP:
                 robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(0);
@@ -279,6 +281,7 @@ public class AutoUtils {
                 }
                 break;
         }
+        robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0);
     }
 
@@ -335,13 +338,12 @@ public class AutoUtils {
     }
     public void scorePiece(double time){
         ElapsedTime elapsedTime = new ElapsedTime();
-        double startTime = elapsedTime.seconds();
         verticalSlide(Utils.LiftState.HIGH);
+        double startTime = elapsedTime.seconds();
         while(startTime + time > elapsedTime.seconds() && !autoControl.isStopRequested()){
             robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.85);
         }
         robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.39);
-        verticalSlide(Utils.LiftState.GROUND);
     }
     public void armExtension(Utils.ArmState armState){
         switch(armState){
@@ -350,8 +352,8 @@ public class AutoUtils {
                 robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.23);
                 break;
             case EXTENDED:
-                robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.56);
-                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.47);
+                robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.65);
+                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.38);
         }
     }
     public void grabPiece(double time) {
