@@ -18,6 +18,9 @@ public class TrajectoryHandler {
     SampleMecanumDrive drive;
     AutoUtils autoUtils;
     ElapsedTime time = new ElapsedTime();
+    Pose2d scorePosition = new Pose2d(-54, -54, Math.toRadians(45));
+    final double bucketScoreTime = 1.0;
+    final double intakeTransitionTime = 1.5;
 
     public TrajectoryHandler(RobotClass robot, SampleMecanumDrive drive, AutoUtils autoUtils) {
         this.robot = robot;
@@ -25,10 +28,34 @@ public class TrajectoryHandler {
         this.autoUtils = autoUtils;
 
     }
+    public TrajectorySequence firstScore(Pose2d pos){
+        return drive.trajectorySequenceBuilder(pos)
+                .addTemporalMarker(1, () -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+                        }
+                    };
+                    t1.start();
+                })
+                .addTemporalMarker(1.5, ()->{
+                    Thread t1 = new Thread(){
+                        public void run(){
+                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
+                        }
+                    };
+                    t1.start();
+                })
+                .lineToSplineHeading(scorePosition)
+                .addDisplacementMarker(()->{
+                    autoUtils.scorePiece(bucketScoreTime);
+                })
+                .waitSeconds(bucketScoreTime)
+                .build();
+    }
 
-    public TrajectorySequence moveToFirstPieceRed() {
-        SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
-        return drive.trajectorySequenceBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
+    public TrajectorySequence moveToFirstPieceRed(Pose2d pos) {
+        return drive.trajectorySequenceBuilder(pos)
                 .addTemporalMarker(0, () -> {
                     Thread t1 = new Thread() {
                         public void run() {
@@ -37,14 +64,14 @@ public class TrajectoryHandler {
                     };
                     t1.start();
                 })
-                .splineToLinearHeading(new Pose2d(-48, -47, Math.toRadians(90)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(-46, -47, Math.toRadians(90)), Math.toRadians(90))
                 .addDisplacementMarker(() -> {
                     robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
                     robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
-                    Thread t1 = new Thread(){
-                        public void run(){
+                    Thread t1 = new Thread() {
+                        public void run() {
                             double startTime = time.seconds();
-                            while(startTime + 1 > time.seconds()){
+                            while (startTime + 1 > time.seconds()) {
                                 autoUtils.armExtension(Utils.ArmState.EXTENDED);
                             }
                         }
@@ -53,10 +80,20 @@ public class TrajectoryHandler {
 
                 })
                 .forward(1)
-                .UNSTABLE_addTemporalMarkerOffset(1, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
                     autoUtils.armExtension(Utils.ArmState.IN);
 
                 }) //perform intake transition
+                .waitSeconds(1.5)
+                .addTemporalMarker(() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.intakeTransition();
+                        }
+                    };
+                    t1.start();
+                })
+                .waitSeconds(intakeTransitionTime)
                 .build();
     }
 
@@ -78,9 +115,8 @@ public class TrajectoryHandler {
                 .build();
     }
 
-    public TrajectorySequence scoreRed() {
-        SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
-        return drive.trajectorySequenceBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
+    public TrajectorySequence scoreRed(Pose2d pos) {
+        return drive.trajectorySequenceBuilder(pos)
                 .addTemporalMarker(1, () -> {
                     Thread t1 = new Thread() {
                         public void run() {
@@ -98,10 +134,11 @@ public class TrajectoryHandler {
                     };
                     t1.start();
                 })
-                .setReversed(true)
-                .splineTo(new Vector2d(-54, -54), Math.toRadians(225))
-                .setReversed(false)
-                .waitSeconds(1)
+                .lineToLinearHeading(new Pose2d(-54, -54, Math.toRadians(45)))
+                .addDisplacementMarker(() -> {
+                    autoUtils.scorePiece(bucketScoreTime);
+                })
+                .waitSeconds(bucketScoreTime)
                 .build();
     }
 
@@ -122,22 +159,40 @@ public class TrajectoryHandler {
                 .build();
     }
 
-    public TrajectorySequence moveToSecondPieceRed() {
-        SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
-        return drive.trajectorySequenceBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
-                .addTemporalMarker(() -> {
+    public TrajectorySequence moveToSecondPieceRed(Pose2d pos) {
+        return drive.trajectorySequenceBuilder(pos)
+                .addTemporalMarker(0, () -> {
                     autoUtils.verticalSlide(Utils.LiftState.GROUND);
                 })
-                .splineToLinearHeading(new Pose2d(-58.5, -47, Math.toRadians(90)), Math.toRadians(90))
-                .addDisplacementMarker(() -> {
+                .splineToLinearHeading(new Pose2d(-58.5, -49, Math.toRadians(90)), Math.toRadians(90))
+                .UNSTABLE_addTemporalMarkerOffset(1, () -> {
                     robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
                     robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
-                    autoUtils.armExtension(Utils.ArmState.EXTENDED);
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            double startTime = time.seconds();
+                            while (startTime + 1 > time.seconds()) {
+                                autoUtils.armExtension(Utils.ArmState.EXTENDED);
+                            }
+                        }
+                    };
+                    t1.start();
+
                 })
                 .forward(1)
-                .UNSTABLE_addTemporalMarkerOffset(1, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
                     autoUtils.armExtension(Utils.ArmState.IN);
                 })
+                .waitSeconds(1.5)
+                .addTemporalMarker(() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.intakeTransition();
+                        }
+                    };
+                    t1.start();
+                })
+                .waitSeconds(intakeTransitionTime)
                 .build();
     }
 

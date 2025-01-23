@@ -187,8 +187,9 @@ public class AutoUtils {
         robot.Motors.get(RobotClass.MOTORS.BACK_LEFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         robot.Motors.get(RobotClass.MOTORS.BACK_RIGHT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
-    public void sampleWiggle(){
-       double wiggleStartTime = time.seconds();
+
+    public void sampleWiggle() {
+        double wiggleStartTime = time.seconds();
         while (wiggleStartTime + 0.25 > time.seconds()) {
             robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-0.75);
             robot.drivetrain.simpleDrive(-1);
@@ -203,16 +204,24 @@ public class AutoUtils {
 
     //Performs transition from intake to bucket
     public void intakeTransition() {
-        double startTime;
+
         //set arm position in
-        robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.80);
-        robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.23);
+        Thread t1 = new Thread(){
+            public void run(){
+                double startTime = time.seconds();
+                while(startTime + 3 > time.seconds()){
+                    robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.80);
+                    robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.23);
+                }
+            }
+        };
+        t1.start();
         //set gate closed
-        robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.8);
+        robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.4);
         //bucket pos
         robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.37);
         //retract vertical slide
-        Thread t1 = new Thread() {
+        Thread t2 = new Thread() {
             @Override
             public void run() {
                 double startTime = time.seconds();
@@ -222,59 +231,71 @@ public class AutoUtils {
                 robot.Motors.get(RobotClass.MOTORS.LIFT).setPower(0);
             }
         };
-        t1.start();
+        t2.start();
         //retract arm
-        startTime = time.seconds();
-        robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(50);
-        while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < 40
-                || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 60) {
-            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0.8);
-            if (startTime + 2 < time.seconds()) {
-                break;
-            }
+        armFlip(Utils.ArmFlipState.UP, 0.6);
+        double startTime = time.seconds();
+        while(startTime + 0.3 > time.seconds()){
+            robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
         }
         robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.8);
-        robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
         //ENDS WITH INTAKE SPINNING
         sampleWiggle();
     }
 
     //Moves jointed arm to target ArmFlipState
     public void armFlip(Utils.ArmFlipState state, double power) {
-        double startTime = time.seconds();
+        double startTime;
+        int targetPos;
+        int currentPos;
+        int distanceToTarget;
         switch (state) {
             case GROUND:
-                int targetPos = 1160;
-                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(targetPos);
-                while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < targetPos - 10
-                        || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > targetPos + 10) {
-                    robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(power);
+                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                targetPos = 3870;
+                currentPos = robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition();
+                distanceToTarget = targetPos - currentPos;
+                startTime = time.seconds();
+                while (Math.abs(distanceToTarget) > 20) {
+                    currentPos = robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition();
+                    distanceToTarget = targetPos - currentPos;
+                    double powerOut = (double) distanceToTarget / 1000;
+                    powerOut = powerOut > 0 ? Math.max(0.2, Math.min(power, powerOut)) : Math.min(-0.2, Math.max(-power, powerOut));
+                    robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(powerOut);
                     if (startTime + 2 < time.seconds()) {
                         break;
                     }
                 }
-
                 break;
             case UP:
-                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(0);
-                while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < -10
-                        || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 10) {
-                    robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(power);
+                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                targetPos = 0;
+                currentPos = robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition();
+                distanceToTarget = targetPos - currentPos;
+                startTime = time.seconds();
+                while (Math.abs(distanceToTarget) > 20) {
+                    currentPos = robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition();
+                    distanceToTarget = targetPos - currentPos;
+                    double powerOut = (double) distanceToTarget / 1000;
+                    powerOut = powerOut > 0 ? Math.max(0.2, Math.max(power, powerOut)) : Math.min(-0.2, Math.min(-power, powerOut));
+                    robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(powerOut);
                     if (startTime + 2 < time.seconds()) {
                         break;
                     }
                 }
                 break;
             case MIDDLE:
-                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setTargetPosition(400);
-                while (robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() < 400 - 10
-                        || robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition() > 400 + 10) {
-                    robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(power);
+                robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                targetPos = 1000;
+                currentPos = robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition();
+                distanceToTarget = targetPos - currentPos;
+                startTime = time.seconds();
+                while (Math.abs(distanceToTarget) > 20) {
+                    currentPos = robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition();
+                    distanceToTarget = targetPos - currentPos;
+                    double powerOut = (double) distanceToTarget / 1000;
+                    powerOut = powerOut > 0 ? Math.max(0.2, Math.max(power, powerOut)) : Math.min(-0.2, Math.min(-power, powerOut));
+                    robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(powerOut);
                     if (startTime + 2 < time.seconds()) {
                         break;
                     }
@@ -317,7 +338,7 @@ public class AutoUtils {
                     if (startTime + 1.5 < time.seconds() || autoControl.isStopRequested()) {
                         break;
                     }
-                    if(previousPos == currentPos && startTime + 0.3 < time.seconds()){
+                    if (previousPos == currentPos && startTime + 0.3 < time.seconds()) {
                         break;
                     }
                     previousPos = currentPos;
@@ -336,17 +357,19 @@ public class AutoUtils {
                 break;
         }
     }
-    public void scorePiece(double time){
+
+    public void scorePiece(double time) {
         ElapsedTime elapsedTime = new ElapsedTime();
         verticalSlide(Utils.LiftState.HIGH);
         double startTime = elapsedTime.seconds();
-        while(startTime + time > elapsedTime.seconds() && !autoControl.isStopRequested()){
+        while (startTime + time > elapsedTime.seconds() && !autoControl.isStopRequested()) {
             robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.85);
         }
         robot.Servos.get(RobotClass.SERVOS.BUCKET).setPosition(0.39);
     }
-    public void armExtension(Utils.ArmState armState){
-        switch(armState){
+
+    public void armExtension(Utils.ArmState armState) {
+        switch (armState) {
             case IN:
                 robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.80);
                 robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.23);
@@ -356,6 +379,7 @@ public class AutoUtils {
                 robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.38);
         }
     }
+
     public void grabPiece(double time) {
         ElapsedTime elapsedTime = new ElapsedTime();
         double startTime = elapsedTime.seconds();
@@ -426,19 +450,19 @@ public class AutoUtils {
             if (stdDevMt2[0] + stdDevMt2[1] < 1.0) { //xy
                 robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(pose2D.toUnit(DistanceUnit.INCH).x, pose2D.toUnit(DistanceUnit.INCH).y, robot.getHeading()));
                 successfulLocalizationCount++;
-            }
-            else{
+            } else {
                 telemetry.addLine("stdDevMt2 > 1 in");
                 telemetry.addData("x", stdDevMt2[0]);
                 telemetry.addData("y", stdDevMt2[1]);
-                telemetry.addData("total",stdDevMt2[0] + stdDevMt2[1]);
+                telemetry.addData("total", stdDevMt2[0] + stdDevMt2[1]);
             }
         } else {
             telemetry.addLine("No Data Available");
         }
         telemetry.update();
     }
-    public boolean inRange(double v1, double v2, double range){
+
+    public boolean inRange(double v1, double v2, double range) {
         double lowerRange = v1 - range;
         double upperRange = v1 + range;
 

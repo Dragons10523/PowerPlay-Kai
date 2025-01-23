@@ -37,6 +37,5 @@ public class TestOpMode extends AutoControl {
     public void runOpMode() throws InterruptedException {
         super.simpleInit();
         waitForStart();
-        autoUtils.verticalSlide(Utils.LiftState.HIGH);
     }
 }

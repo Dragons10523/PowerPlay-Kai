@@ -284,11 +284,11 @@ public class Utils {
             switch (servoState) {
                 case OPEN:
                     servoState = ServoState.CLOSED;
-                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.8);
+                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.4);
                     break;
                 case CLOSED:
                     servoState = ServoState.OPEN;
-                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.4);
+                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.8);
                     break;
             }
         }
