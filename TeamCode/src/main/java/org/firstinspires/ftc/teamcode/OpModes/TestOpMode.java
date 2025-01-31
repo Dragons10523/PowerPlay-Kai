@@ -34,40 +34,48 @@ import java.util.List;
 
 @TeleOp
 public class TestOpMode extends AutoControl {
+    ElapsedTime time = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
+        telemetry.addLine("opMode started");
+        telemetry.update();
         super.runOpMode();
+        telemetry.addLine("opMode INIT");
+        telemetry.update();
         super.initialize();
+        telemetry.addLine("headingInit");
+        telemetry.update();
         super.initialHeading(Math.toRadians(180), false);
-
-        ElapsedTime time = new ElapsedTime();
-        waitForStart();
-        int didCameraUpdate = 0;
-        double range = 0;
-        double[] stdDevMt2 = {0, 0};
-        Position pose2D = new Position();
-        SparkFunOTOS.Pose2D pos_Sensor;
-        while (opModeIsActive()) {
-            LLResult result = robot.limelight.getLatestResult();
-            pos_Sensor = robot.opticalSensor.getPosition();
-            robot.limelight.updateRobotOrientation(Math.toDegrees(robot.getHeading()));
-
-            if (result != null && result.isValid()) {
-                pose2D = result.getBotpose_MT2().getPosition();
-                stdDevMt2 = result.getStddevMt2();
-
-                if (stdDevMt2[0] * 39.37 + stdDevMt2[1] * 39.37 < 1.0) {
-                    didCameraUpdate++;
-                }
-            } else {
-                telemetry.addLine("result is not valid");
+        double startTime = time.seconds();
+        do {
+            sleep(20);
+            telemetry.addLine("isLooping");
+            telemetry.addData("SuccessfulLocalizationCount", autoUtils.getSuccessfulLocalizationCount());
+            telemetry.update();
+            autoUtils.updateOpticalSensorToPoseEstimateCamera();
+            if (startTime + 5 < time.seconds() || isStarted()) {
+                break;
             }
+        }
+        while (autoUtils.getSuccessfulLocalizationCount() < 20);
+        SparkFunOTOS.Pose2D pos = robot.opticalSensor.getPosition();
+        Pose2d startPos = new Pose2d(pos.x, pos.y, pos.h);
+        while(opModeIsActive()){
+            telemetry.addData("startPos", "xyh %.3f %.3f %.3f", startPos.getX(), startPos.getY(), startPos.getHeading());
+            SparkFunOTOS.Pose2D sensorPos = robot.opticalSensor.getPosition();
+            LLResult result = robot.limelight.getLatestResult();
+            robot.limelight.updateRobotOrientation(sensorPos.h);
+            if(result != null && result.isValid()){
+                Pose3D botPoseMt2 = result.getBotpose_MT2();
+                Position cameraPos = botPoseMt2.getPosition();
+                telemetry.addData("cameraPos", "xy %.3f %.3f", cameraPos.x, cameraPos.y);
 
-            telemetry.addData("range", range);
-            telemetry.addData("stdDevMt2", stdDevMt2[0] * 39.37 + stdDevMt2[1] * 39.37);
-            telemetry.addData("didCameraUpdate", didCameraUpdate);
-            telemetry.addData("cameraPos", "xy %.3f %.3f", pose2D.toUnit(DistanceUnit.INCH).x, pose2D.toUnit(DistanceUnit.INCH).y);
-            telemetry.addData("sensorPos", "xyh %.3f %.3f %.3f", pos_Sensor.x, pos_Sensor.y, pos_Sensor.h);
+                telemetry.addData("differenceCameraToOtos", "xy %.3f %.3f", cameraPos.x - sensorPos.x, cameraPos.y - sensorPos.y);
+            }
+            else{
+                telemetry.addLine("No Data Available");
+            }
+            telemetry.addData("sensorPos", "xy %.3f %.3f", sensorPos.x, sensorPos.y);
             telemetry.update();
 
         }
