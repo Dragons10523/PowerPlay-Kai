@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import android.annotation.SuppressLint;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -39,13 +40,10 @@ public class AutoLeftRed extends AutoControl {
         }
         while (autoUtils.getSuccessfulLocalizationCount() < 20);
         SparkFunOTOS.Pose2D pos = robot.opticalSensor.getPosition();
+
         Pose2d startPos = new Pose2d(pos.x, pos.y, pos.h);
 
-        TrajectorySequence firstScore = trajectoryHandler.firstScore(startPos);
-        TrajectorySequence moveToFirstPieceRed = trajectoryHandler.moveToFirstPieceRed(firstScore.end());
-        TrajectorySequence scoreFirstPieceRed = trajectoryHandler.scoreRed(moveToFirstPieceRed.end());
-        TrajectorySequence moveToSecondPiece = trajectoryHandler.moveToSecondPieceRed(scoreFirstPieceRed.end());
-        TrajectorySequence scoreSecondPieceRed = trajectoryHandler.scoreRed(moveToSecondPiece.end());
+        TrajectorySequence auto_Left_Red = trajectoryHandler.auto_Left_Red(startPos);
 
         while (!isStarted() && !isStopRequested()) {
             SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
@@ -61,20 +59,8 @@ public class AutoLeftRed extends AutoControl {
             telemetry.update();
         }
         waitForStart();
-        //Score pre-loaded sample
-        drive.followTrajectorySequence(firstScore);
-        //retract lift, move, and grab piece
-        drive.followTrajectorySequence(moveToFirstPieceRed);
-        //move to score position and extend lift
-        drive.followTrajectorySequence(scoreFirstPieceRed);
-        robot.drivetrain.simpleDrive(0);
-        //retract lift, move, and grab second piece
-        drive.followTrajectorySequence(moveToSecondPiece);
-        //move to scoreRed and score
-        drive.followTrajectorySequence(scoreSecondPieceRed);
-        //PARK
-        drive.followTrajectory(trajectoryHandler.splineToParkRed());
-        //position arm to touch bar for parking points
+
+        drive.followTrajectorySequence(auto_Left_Red);
 
         while (!getStopRequested()) {
             SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();

@@ -63,18 +63,13 @@ import static org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.DriveCo
 import static org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.DriveConstants.kStatic;
 import static org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.DriveConstants.kV;
 
-/*
- * Simple mecanum drive hardware implementation for REV hardware.
- */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(0.7, 0.6, 0.25);
-
+    public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(5, 0, 1);
 
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(5, 1, 0);
 
     public static double LATERAL_MULTIPLIER = 2.3;
-
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
     public static double OMEGA_WEIGHT = 1;
@@ -100,7 +95,7 @@ public class SampleMecanumDrive extends MecanumDrive {
 
 
         follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID_AXIAL, TRANSLATIONAL_PID_AXIAL, HEADING_PID,
-                new Pose2d(0.4, 0.4, Math.toRadians(2.0)), 0.5);
+                new Pose2d(0.4, 0.4, Math.toRadians(4.0)), 0.75);
 
         LynxModuleUtil.ensureMinimumFirmwareVersion(hardwareMap);
 
@@ -148,7 +143,6 @@ public class SampleMecanumDrive extends MecanumDrive {
 
 
         setLocalizer(new Localizer() {
-            LLResult previousResult = null;
             @NonNull
             @Override
             public Pose2d getPoseEstimate() {
@@ -157,25 +151,11 @@ public class SampleMecanumDrive extends MecanumDrive {
                 robot.limelight.updateRobotOrientation(Math.toDegrees(robot.getHeading()));
 
                 if (result != null && result.isValid()) {
-                    Position pose2D = result.getBotpose_MT2().getPosition().toUnit(DistanceUnit.INCH);
+                    Position pose2D = result.getBotpose_MT2().getPosition();
                     double[] stdDevMt2 = result.getStddevMt2();
-                    List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-                    Pose3D targetPoseCameraSpace = null;
 
-                    double range = 0;
-                    for(LLResultTypes.FiducialResult fiducialResult : fiducialResults){
-                        targetPoseCameraSpace = fiducialResult.getTargetPoseCameraSpace();
-
-                        Position targetPos = targetPoseCameraSpace.getPosition().toUnit(DistanceUnit.INCH);
-
-                        range = Math.sqrt((Math.pow((pos_Sensor.x - targetPos.x), 2)) + Math.pow((pos_Sensor.y - targetPos.y),2));
-                    }
-                    if(stdDevMt2[0] + stdDevMt2[1] + stdDevMt2[2] < 1.0){ //xyz
-                        if(targetPoseCameraSpace != null){
-                            if(range < 45){
-                                robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(pose2D.toUnit(DistanceUnit.INCH).x, pose2D.toUnit(DistanceUnit.INCH).y, robot.getHeading()));
-                            }
-                        }
+                    if(stdDevMt2[0] * 39.37 + stdDevMt2[1]  * 39.37 < 1.0){ //xyz
+                        //robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(pose2D.toUnit(DistanceUnit.INCH).x, pose2D.toUnit(DistanceUnit.INCH).y, pos_Sensor.h));
                     }
                 }
                 return new Pose2d(pos_Sensor.x, pos_Sensor.y, pos_Sensor.h);

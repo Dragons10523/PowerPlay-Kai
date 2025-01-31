@@ -87,7 +87,7 @@ public class RobotClass {
         imu = hwmap.get(IMU.class, "imu");
         //initMotorsProto();
         initMotorsComp();
-        new Utils(this);
+
         drivetrain = new MecanumDrive(Motors, this);
         limelight = hwmap.get(Limelight3A.class, "limelight");
 

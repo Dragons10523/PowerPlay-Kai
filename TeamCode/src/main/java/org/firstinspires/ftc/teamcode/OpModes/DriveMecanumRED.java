@@ -15,8 +15,7 @@ import java.util.Locale;
 public class DriveMecanumRED extends Control {
     @Override
     public void start() {
-        robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(0.80);
-        robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(0.23);
+        utils.armExtension(Utils.ArmState.IN);
         robot.Motors.get(RobotClass.MOTORS.LIFT).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
@@ -27,7 +26,6 @@ public class DriveMecanumRED extends Control {
         double leftY = -gamepad1.left_stick_y;
         double leftX = gamepad1.left_stick_x;
         double turn = gamepad1.left_trigger - gamepad1.right_trigger;
-        float[] hsvValues = colorSensorClassObj.getHsvValues();
 
         double liftPower = gamepad2.dpad_down ? -1 : 0;
         liftPower += gamepad2.dpad_up ? 1 : 0;
@@ -37,12 +35,6 @@ public class DriveMecanumRED extends Control {
         telemetry.addData("liftMode", Utils.liftMode);
         telemetry.addData("armState", Utils.armState);
         telemetry.addData("heading", robot.getHeading());
-        telemetry.addData("liftPos", robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition());
-        telemetry.addData("liftMode", robot.Motors.get(RobotClass.MOTORS.LIFT).getMode());
-        telemetry.addData("armPos", robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getCurrentPosition());
-        telemetry.addData("armMode", robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).getMode());
-        telemetry.addData("Distance (cm)",
-                String.format(Locale.US, "%.02f", robot.distanceSensor.getDistance(DistanceUnit.CM)));
         telemetry.addData("currentVoltage", robot.voltageSensor.getVoltage());
         telemetry.update();
 

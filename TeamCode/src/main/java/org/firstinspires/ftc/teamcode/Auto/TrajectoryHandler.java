@@ -18,9 +18,12 @@ public class TrajectoryHandler {
     SampleMecanumDrive drive;
     AutoUtils autoUtils;
     ElapsedTime time = new ElapsedTime();
-    Pose2d scorePosition = new Pose2d(-54, -54, Math.toRadians(45));
-    final double bucketScoreTime = 1.0;
-    final double intakeTransitionTime = 1.5;
+    Pose2d scorePositionRed = new Pose2d(-55.5, -55.5, Math.toRadians(45));
+    Pose2d scorePositionBlue = new Pose2d(55.5, 55.5, Math.toRadians(225));
+    final double bucketScoreTime = 0.9;
+    final double intakeTransitionTime = 1.4;
+    final double armRetractTime = 0.8;
+    final double extensionTime = 0.7;
 
     public TrajectoryHandler(RobotClass robot, SampleMecanumDrive drive, AutoUtils autoUtils) {
         this.robot = robot;
@@ -28,29 +31,427 @@ public class TrajectoryHandler {
         this.autoUtils = autoUtils;
 
     }
-    public TrajectorySequence firstScore(Pose2d pos){
-        return drive.trajectorySequenceBuilder(pos)
-                .addTemporalMarker(1, () -> {
-                    Thread t1 = new Thread() {
-                        public void run() {
+    public TrajectorySequence auto_Left_Red(Pose2d startPos){
+        return drive.trajectorySequenceBuilder(startPos)
+                .addTemporalMarker(0, () -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(1, ()->{
+                    Thread t1 = new Thread(){
+                        public void run(){
                             autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
                         }
                     };
-                    t1.start();
-                })
-                .addTemporalMarker(1.5, ()->{
-                    Thread t1 = new Thread(){
+                    Thread t2 = new Thread(){
                         public void run(){
                             autoUtils.verticalSlide(Utils.LiftState.HIGH);
                         }
                     };
                     t1.start();
+                    double startTime = time.seconds();
+                    while(startTime + 0.2 > time.seconds()){
+                        boolean isWaiting = true;
+                    }
+                    t2.start();
                 })
-                .lineToSplineHeading(scorePosition)
-                .addDisplacementMarker(()->{
+                .lineToSplineHeading(scorePositionRed)
+                .addTemporalMarker(()->{
                     autoUtils.scorePiece(bucketScoreTime);
                 })
                 .waitSeconds(bucketScoreTime)
+                .addTemporalMarker(() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
+                        }
+                    };
+                    t1.start();
+                })
+                .splineToLinearHeading(new Pose2d(-48, -47, Math.toRadians(90)), Math.toRadians(90))
+                .addDisplacementMarker(() -> {
+                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
+                    autoUtils.armExtension(Utils.ArmState.EXTENDED);
+
+                })
+                .forward(1)
+                .UNSTABLE_addTemporalMarkerOffset(extensionTime, () -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+
+                }) //perform intake transition
+                .waitSeconds(armRetractTime)
+                .addTemporalMarker(() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.intakeTransition();
+                        }
+                    };
+                    t1.start();
+                })
+                .waitSeconds(intakeTransitionTime)
+                .addTemporalMarker(() -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                    Thread t1 = new Thread(){
+                        public void run(){
+                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+                        }
+                    };
+                    Thread t2 = new Thread(){
+                        public void run(){
+                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
+                        }
+                    };
+                    t1.start();
+                    double startTime = time.seconds();
+                    while(startTime + 0.2 > time.seconds()){
+                        boolean isWaiting = true;
+                    }
+                    t2.start();
+                })
+                .lineToLinearHeading(new Pose2d(-55.5, -55.5, Math.toRadians(45)))
+                .addTemporalMarker(() -> {
+                    autoUtils.scorePiece(bucketScoreTime);
+                })
+                .waitSeconds(bucketScoreTime)
+                .addTemporalMarker(()->{
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
+                        }
+                    };
+                    t1.start();
+                })
+                .splineToLinearHeading(new Pose2d(-58, -47, Math.toRadians(90)), Math.toRadians(90))
+                .addDisplacementMarker(() -> {
+                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
+                    autoUtils.armExtension(Utils.ArmState.EXTENDED);
+
+                })
+                .forward(1)
+                .UNSTABLE_addTemporalMarkerOffset(extensionTime, () -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                }) //perform intake transition
+                .waitSeconds(armRetractTime)
+                .addTemporalMarker(() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.intakeTransition();
+                        }
+                    };
+                    t1.start();
+                })
+                .waitSeconds(intakeTransitionTime)
+                .addTemporalMarker(() -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                    Thread t1 = new Thread(){
+                        public void run(){
+                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+                        }
+                    };
+                    Thread t2 = new Thread(){
+                        public void run(){
+                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
+                        }
+                    };
+                    t1.start();
+                    double startTime = time.seconds();
+                    while(startTime + 0.2 > time.seconds()){
+                        boolean isWaiting = true;
+                    }
+                    t2.start();
+                })
+                .lineToLinearHeading(new Pose2d(-55.5, -55.5, Math.toRadians(45)))
+                .addTemporalMarker(() -> {
+                    autoUtils.scorePiece(bucketScoreTime);
+                })
+                .waitSeconds(bucketScoreTime)
+                .addTemporalMarker(() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
+                        }
+                    };
+                    t1.start();
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                })
+                .splineToLinearHeading(new Pose2d(-56,-43, Math.toRadians(125)), Math.toRadians(180))
+                .addDisplacementMarker(() -> {
+                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
+                    autoUtils.armExtension(Utils.ArmState.EXTENDED);
+
+                })
+                .back(1)
+                .UNSTABLE_addTemporalMarkerOffset(extensionTime, () -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                }) //perform intake transition
+                .waitSeconds(armRetractTime)
+                .addTemporalMarker(() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.intakeTransition();
+                        }
+                    };
+                    t1.start();
+                })
+                .waitSeconds(intakeTransitionTime)
+                .addTemporalMarker(() -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                    Thread t1 = new Thread(){
+                        public void run(){
+                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+                        }
+                    };
+                    Thread t2 = new Thread(){
+                        public void run(){
+                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
+                        }
+                    };
+                    t1.start();
+                    double startTime = time.seconds();
+                    while(startTime + 0.2 > time.seconds()){
+                        boolean isWaiting = true;
+                    }
+                    t2.start();
+                })
+                .lineToLinearHeading(new Pose2d(-55.5, -55.5, Math.toRadians(45)))
+                .addTemporalMarker(() -> {
+                    autoUtils.scorePiece(bucketScoreTime);
+                })
+                .waitSeconds(bucketScoreTime)
+                .addTemporalMarker(() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
+                            autoUtils.armFlip(Utils.ArmFlipState.UP, 0.6);
+                        }
+                    };
+                    t1.start();
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                })
+                .build();
+    }
+    public TrajectorySequence auto_Left_Blue(Pose2d startPos){
+        return drive.trajectorySequenceBuilder(startPos)
+                .addTemporalMarker(0, () -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(1, ()->{
+                    Thread t1 = new Thread(){
+                        public void run(){
+                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+                        }
+                    };
+                    Thread t2 = new Thread(){
+                        public void run(){
+                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
+                        }
+                    };
+                    t1.start();
+                    double startTime = time.seconds();
+                    while(startTime + 0.2 > time.seconds()){
+                        boolean isWaiting = true;
+                    }
+                    t2.start();
+                })
+                .lineToSplineHeading(scorePositionBlue)
+                .addTemporalMarker(()->{
+                    autoUtils.scorePiece(bucketScoreTime);
+                })
+                .waitSeconds(bucketScoreTime)
+                .addTemporalMarker(() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
+                        }
+                    };
+                    t1.start();
+                })
+                .splineToLinearHeading(new Pose2d(48, 47, Math.toRadians(270)), Math.toRadians(270))
+                .addDisplacementMarker(() -> {
+                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
+                    autoUtils.armExtension(Utils.ArmState.EXTENDED);
+
+                })
+                .forward(1)
+                .UNSTABLE_addTemporalMarkerOffset(extensionTime, () -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+
+                }) //perform intake transition
+                .waitSeconds(armRetractTime)
+                .addTemporalMarker(() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.intakeTransition();
+                        }
+                    };
+                    t1.start();
+                })
+                .waitSeconds(intakeTransitionTime)
+                .addTemporalMarker(() -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                    Thread t1 = new Thread(){
+                        public void run(){
+                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+                        }
+                    };
+                    Thread t2 = new Thread(){
+                        public void run(){
+                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
+                        }
+                    };
+                    t1.start();
+                    double startTime = time.seconds();
+                    while(startTime + 0.2 > time.seconds()){
+                        boolean isWaiting = true;
+                    }
+                    t2.start();
+                })
+                .lineToLinearHeading(new Pose2d(55.5, 55.5, Math.toRadians(225)))
+                .addTemporalMarker(() -> {
+                    autoUtils.scorePiece(bucketScoreTime);
+                })
+                .waitSeconds(bucketScoreTime)
+                .addTemporalMarker(()->{
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
+                        }
+                    };
+                    t1.start();
+                })
+                .splineToLinearHeading(new Pose2d(58, 47, Math.toRadians(270)), Math.toRadians(270))
+                .addDisplacementMarker(() -> {
+                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
+                    autoUtils.armExtension(Utils.ArmState.EXTENDED);
+
+                })
+                .forward(1)
+                .UNSTABLE_addTemporalMarkerOffset(extensionTime, () -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                }) //perform intake transition
+                .waitSeconds(armRetractTime)
+                .addTemporalMarker(() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.intakeTransition();
+                        }
+                    };
+                    t1.start();
+                })
+                .waitSeconds(intakeTransitionTime)
+                .addTemporalMarker(() -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                    Thread t1 = new Thread(){
+                        public void run(){
+                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+                        }
+                    };
+                    Thread t2 = new Thread(){
+                        public void run(){
+                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
+                        }
+                    };
+                    t1.start();
+                    double startTime = time.seconds();
+                    while(startTime + 0.2 > time.seconds()){
+                        boolean isWaiting = true;
+                    }
+                    t2.start();
+                })
+                .lineToLinearHeading(new Pose2d(55.5, 55.5, Math.toRadians(225)))
+                .addTemporalMarker(() -> {
+                    autoUtils.scorePiece(bucketScoreTime);
+                })
+                .waitSeconds(bucketScoreTime)
+                .addTemporalMarker(() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
+                        }
+                    };
+                    t1.start();
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                })
+                .splineToLinearHeading(new Pose2d(56,43, Math.toRadians(305)), Math.toRadians(0))
+                .addDisplacementMarker(() -> {
+                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+                    robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
+                    autoUtils.armExtension(Utils.ArmState.EXTENDED);
+
+                })
+                .back(3)
+                .UNSTABLE_addTemporalMarkerOffset(extensionTime, () -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                }) //perform intake transition
+                .waitSeconds(armRetractTime)
+                .addTemporalMarker(() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.intakeTransition();
+                        }
+                    };
+                    t1.start();
+                })
+                .waitSeconds(intakeTransitionTime)
+                .addTemporalMarker(() -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                    Thread t1 = new Thread(){
+                        public void run(){
+                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+                        }
+                    };
+                    Thread t2 = new Thread(){
+                        public void run(){
+                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
+                        }
+                    };
+                    t1.start();
+                    double startTime = time.seconds();
+                    while(startTime + 0.2 > time.seconds()){
+                        boolean isWaiting = true;
+                    }
+                    t2.start();
+                })
+                .lineToLinearHeading(new Pose2d(55.5, 55.5, Math.toRadians(225)))
+                .addTemporalMarker(() -> {
+                    autoUtils.scorePiece(bucketScoreTime);
+                })
+                .waitSeconds(bucketScoreTime)
+                .addTemporalMarker(() -> {
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
+                            autoUtils.armFlip(Utils.ArmFlipState.UP, 0.6);
+                        }
+                    };
+                    t1.start();
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                })
+                .build();
+    }
+    public Trajectory firstScoreRed(Pose2d pos){
+        return drive.trajectoryBuilder(pos)
+                .addTemporalMarker(0, () -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                })
+                .addTemporalMarker(1, ()->{
+                    Thread t1 = new Thread(){
+                        public void run(){
+                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
+                        }
+                    };
+                    t1.start();
+                })
+                .lineToSplineHeading(scorePositionRed)
+                .addDisplacementMarker(()->{
+                    autoUtils.scorePiece(bucketScoreTime);
+                })
+                //.waitSeconds(bucketScoreTime)
                 .build();
     }
 
@@ -64,27 +465,19 @@ public class TrajectoryHandler {
                     };
                     t1.start();
                 })
-                .splineToLinearHeading(new Pose2d(-46, -47, Math.toRadians(90)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(-47.5, -47, Math.toRadians(90)), Math.toRadians(90))
                 .addDisplacementMarker(() -> {
                     robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
                     robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
-                    Thread t1 = new Thread() {
-                        public void run() {
-                            double startTime = time.seconds();
-                            while (startTime + 1 > time.seconds()) {
-                                autoUtils.armExtension(Utils.ArmState.EXTENDED);
-                            }
-                        }
-                    };
-                    t1.start();
+                    autoUtils.armExtension(Utils.ArmState.EXTENDED);
 
                 })
                 .forward(1)
-                .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(extensionTime, () -> {
                     autoUtils.armExtension(Utils.ArmState.IN);
 
                 }) //perform intake transition
-                .waitSeconds(1.5)
+                .waitSeconds(armRetractTime)
                 .addTemporalMarker(() -> {
                     Thread t1 = new Thread() {
                         public void run() {
@@ -115,26 +508,38 @@ public class TrajectoryHandler {
                 .build();
     }
 
-    public TrajectorySequence scoreRed(Pose2d pos) {
+    public TrajectorySequence scoreFirstPieceRed(Pose2d pos) {
         return drive.trajectorySequenceBuilder(pos)
-                .addTemporalMarker(1, () -> {
+                .addTemporalMarker(0, () -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
                     Thread t1 = new Thread() {
                         public void run() {
-                            autoUtils.armExtension(Utils.ArmState.IN);
                             autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
-                        }
-                    };
-                    t1.start();
-                })
-                .addTemporalMarker(1.5, () -> {
-                    Thread t1 = new Thread() {
-                        public void run() {
                             autoUtils.verticalSlide(Utils.LiftState.HIGH);
                         }
                     };
                     t1.start();
                 })
-                .lineToLinearHeading(new Pose2d(-54, -54, Math.toRadians(45)))
+                .lineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(45)))
+                .addTemporalMarker(() -> {
+                    autoUtils.scorePiece(bucketScoreTime);
+                })
+                .waitSeconds(bucketScoreTime)
+                .build();
+    }
+    public TrajectorySequence scoreSecondPieceRed(Pose2d pos) {
+        return drive.trajectorySequenceBuilder(pos)
+                .addTemporalMarker(0, () -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
+                    Thread t1 = new Thread() {
+                        public void run() {
+                            autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+                            autoUtils.verticalSlide(Utils.LiftState.HIGH);
+                        }
+                    };
+                    t1.start();
+                })
+                .lineToLinearHeading(new Pose2d(-55, -55, Math.toRadians(45)))
                 .addDisplacementMarker(() -> {
                     autoUtils.scorePiece(bucketScoreTime);
                 })
@@ -146,44 +551,40 @@ public class TrajectoryHandler {
         SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
         return drive.trajectorySequenceBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
                 .addTemporalMarker(1, () -> {
-                    Thread t1 = new Thread() {
-                        public void run() {
-                            autoUtils.armExtension(Utils.ArmState.IN);
-                        }
-                    };
-                    t1.start();
+                    autoUtils.armExtension(Utils.ArmState.IN);
                 })
                 .setReversed(true)
                 .splineTo(new Vector2d(54, 54), Math.toRadians(45))
                 .setReversed(false)
                 .build();
     }
-
-    public TrajectorySequence moveToSecondPieceRed(Pose2d pos) {
+    public TrajectorySequence moveToSecondPieceRedFix(Pose2d pos){
         return drive.trajectorySequenceBuilder(pos)
-                .addTemporalMarker(0, () -> {
+                .addTemporalMarker(()->{
                     autoUtils.verticalSlide(Utils.LiftState.GROUND);
                 })
-                .splineToLinearHeading(new Pose2d(-58.5, -49, Math.toRadians(90)), Math.toRadians(90))
-                .UNSTABLE_addTemporalMarkerOffset(1, () -> {
+                .lineToLinearHeading(new Pose2d(-57.5, -50, Math.toRadians(90)))
+                .build();
+    }
+
+    public TrajectorySequence secondPieceGrabRed(Pose2d pos) {
+        return drive.trajectorySequenceBuilder(pos)
+                .addTemporalMarker(()->{
+                    autoUtils.verticalSlide(Utils.LiftState.GROUND);
+                })
+                .lineToLinearHeading(new Pose2d(-57.5, -50, Math.toRadians(90)))
+                .addTemporalMarker( () -> {
                     robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
                     robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
-                    Thread t1 = new Thread() {
-                        public void run() {
-                            double startTime = time.seconds();
-                            while (startTime + 1 > time.seconds()) {
-                                autoUtils.armExtension(Utils.ArmState.EXTENDED);
-                            }
-                        }
-                    };
-                    t1.start();
-
+                    autoUtils.armExtension(Utils.ArmState.EXTENDED);
                 })
+                .waitSeconds(1)
                 .forward(1)
-                .UNSTABLE_addTemporalMarkerOffset(1.5, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(extensionTime, () -> {
                     autoUtils.armExtension(Utils.ArmState.IN);
-                })
-                .waitSeconds(1.5)
+
+                }) //perform intake transition
+                .waitSeconds(armRetractTime)
                 .addTemporalMarker(() -> {
                     Thread t1 = new Thread() {
                         public void run() {
@@ -199,7 +600,7 @@ public class TrajectoryHandler {
     public TrajectorySequence moveToSecondPieceBlue() {
         SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
         return drive.trajectorySequenceBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
-                .splineToLinearHeading(new Pose2d(58.5, 47, Math.toRadians(270)), Math.toRadians(270))
+                .splineToLinearHeading(new Pose2d(57, 47, Math.toRadians(270)), Math.toRadians(270))
                 .addDisplacementMarker(() -> {
                     robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
                     robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
@@ -217,10 +618,9 @@ public class TrajectoryHandler {
         SparkFunOTOS.Pose2D currentPos = robot.opticalSensor.getPosition();
         return drive.trajectoryBuilder(new Pose2d(currentPos.x, currentPos.y, currentPos.h))
                 .addTemporalMarker(0, () -> {
+                    autoUtils.armExtension(Utils.ArmState.IN);
                     Thread t1 = new Thread() {
                         public void run() {
-                            autoUtils.verticalSlide(Utils.LiftState.GROUND);
-                            autoUtils.armExtension(Utils.ArmState.IN);
                             autoUtils.armFlip(Utils.ArmFlipState.UP, 0.6);
                         }
                     };

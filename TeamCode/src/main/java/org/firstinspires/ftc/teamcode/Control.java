@@ -18,7 +18,7 @@ public class Control extends OpMode {
     @Override
     public void init() {
         robot = new RobotClass(hardwareMap);
-        utils = new Utils(robot);
+        utils = new Utils(robot, telemetry);
         drive = new SampleMecanumDrive(hardwareMap);
         new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
         colorSensorClassObj = new ColorSensorClass(robot.colorSensor);
