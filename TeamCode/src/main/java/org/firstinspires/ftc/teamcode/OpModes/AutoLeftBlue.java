@@ -2,20 +2,15 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 
 import android.annotation.SuppressLint;
-
-import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-
+import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.AutoControl;
-import org.firstinspires.ftc.teamcode.RobotClass;
 import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.Utils;
-
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name = "Auto_Left_Blue")
 public class AutoLeftBlue extends AutoControl {
@@ -49,7 +44,7 @@ public class AutoLeftBlue extends AutoControl {
 
         Pose2d startPos = new Pose2d(pos.x, pos.y, pos.h);
 
-        TrajectorySequence auto_Left_Blue = trajectoryHandler.auto_Left_Blue(startPos);
+        TrajectorySequence auto_Left_Blue = trajectoryHandler.auto_Left(Utils.FieldSide.BLUE_LEFT, startPos);
 
         while (!isStarted() && !isStopRequested()) {
             SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();

@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.AutoControl;
 import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.Utils;
 
 @Autonomous(name = "Auto_Left_Red")
 public class AutoLeftRed extends AutoControl {
@@ -43,7 +44,7 @@ public class AutoLeftRed extends AutoControl {
 
         Pose2d startPos = new Pose2d(pos.x, pos.y, pos.h);
 
-        TrajectorySequence auto_Left_Red = trajectoryHandler.auto_Left_Red(startPos);
+        TrajectorySequence auto_Left_Red = trajectoryHandler.auto_Left(Utils.FieldSide.RED_LEFT, startPos);
 
         while (!isStarted() && !isStopRequested()) {
             SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();

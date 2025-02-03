@@ -43,41 +43,18 @@ public class TestOpMode extends AutoControl {
         telemetry.addLine("opMode INIT");
         telemetry.update();
         super.initialize();
-        telemetry.addLine("headingInit");
-        telemetry.update();
-        super.initialHeading(Math.toRadians(180), false);
+        waitForStart();
+        autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
+        autoUtils.armExtension(Utils.ArmState.EXTENDED);
+
+        sleep(2000);
+
         double startTime = time.seconds();
-        do {
-            sleep(20);
-            telemetry.addLine("isLooping");
-            telemetry.addData("SuccessfulLocalizationCount", autoUtils.getSuccessfulLocalizationCount());
-            telemetry.update();
-            autoUtils.updateOpticalSensorToPoseEstimateCamera();
-            if (startTime + 5 < time.seconds() || isStarted()) {
-                break;
-            }
-        }
-        while (autoUtils.getSuccessfulLocalizationCount() < 20);
-        SparkFunOTOS.Pose2D pos = robot.opticalSensor.getPosition();
-        Pose2d startPos = new Pose2d(pos.x, pos.y, pos.h);
+        autoUtils.intakeTransition();
+        double intakeTransitionTime = time.seconds() - startTime;
         while(opModeIsActive()){
-            telemetry.addData("startPos", "xyh %.3f %.3f %.3f", startPos.getX(), startPos.getY(), startPos.getHeading());
-            SparkFunOTOS.Pose2D sensorPos = robot.opticalSensor.getPosition();
-            LLResult result = robot.limelight.getLatestResult();
-            robot.limelight.updateRobotOrientation(sensorPos.h);
-            if(result != null && result.isValid()){
-                Pose3D botPoseMt2 = result.getBotpose_MT2();
-                Position cameraPos = botPoseMt2.getPosition();
-                telemetry.addData("cameraPos", "xy %.3f %.3f", cameraPos.x, cameraPos.y);
-
-                telemetry.addData("differenceCameraToOtos", "xy %.3f %.3f", cameraPos.x - sensorPos.x, cameraPos.y - sensorPos.y);
-            }
-            else{
-                telemetry.addLine("No Data Available");
-            }
-            telemetry.addData("sensorPos", "xy %.3f %.3f", sensorPos.x, sensorPos.y);
+            telemetry.addData("intakeTransitionTime", intakeTransitionTime);
             telemetry.update();
-
         }
     }
 }
