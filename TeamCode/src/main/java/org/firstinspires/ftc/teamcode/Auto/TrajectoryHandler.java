@@ -67,7 +67,7 @@ public class TrajectoryHandler {
                     };
                     t1.start();
                 })
-                .splineToLinearHeading(new Pose2d(-48, -47, Math.toRadians(90)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(-46.5, -47, Math.toRadians(90)), Math.toRadians(90))
                 .addDisplacementMarker(() -> {
                     robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
                     robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
@@ -121,7 +121,7 @@ public class TrajectoryHandler {
                     };
                     t1.start();
                 })
-                .splineToLinearHeading(new Pose2d(-58, -47, Math.toRadians(90)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(-56.5, -47, Math.toRadians(90)), Math.toRadians(90))
                 .addDisplacementMarker(() -> {
                     robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
                     robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
@@ -268,7 +268,7 @@ public class TrajectoryHandler {
                     };
                     t1.start();
                 })
-                .splineToLinearHeading(new Pose2d(48, 47, Math.toRadians(270)), Math.toRadians(270))
+                .splineToLinearHeading(new Pose2d(46.5, 47, Math.toRadians(270)), Math.toRadians(270))
                 .addDisplacementMarker(() -> {
                     robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
                     robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
@@ -322,7 +322,7 @@ public class TrajectoryHandler {
                     };
                     t1.start();
                 })
-                .splineToLinearHeading(new Pose2d(58, 47, Math.toRadians(270)), Math.toRadians(270))
+                .splineToLinearHeading(new Pose2d(56.5, 47, Math.toRadians(270)), Math.toRadians(270))
                 .addDisplacementMarker(() -> {
                     robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
                     robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);

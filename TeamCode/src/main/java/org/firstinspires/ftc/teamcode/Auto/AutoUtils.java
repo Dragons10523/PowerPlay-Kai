@@ -306,7 +306,7 @@ public class AutoUtils {
         setLiftMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         switch (liftState) {
             case HIGH:
-                int targetPos = -1650;
+                int targetPos = -1600;
                 setLiftTargetPos(targetPos);
                 while (currentPos > targetPos + 10 || currentPos < targetPos - 10 && !autoControl.isStopRequested()) {
                     currentPos = -robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition();
@@ -318,7 +318,7 @@ public class AutoUtils {
                     telemetry.addData("mode", robot.Motors.get(RobotClass.MOTORS.LIFT).getMode());
                     //Limits power out between -0.4 > x > 0.6
                     if (powerOut > 0) {
-                        powerOut = Math.max(powerOut, 0.6);
+                        powerOut = Math.max(powerOut, 0.5);
                     } else {
                         powerOut = Math.min(powerOut, -0.4);
                     }
@@ -351,7 +351,7 @@ public class AutoUtils {
 
     public void scorePiece(double time) {
         ElapsedTime elapsedTime = new ElapsedTime();
-        if(robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition() > -1600){
+        if(robot.Motors.get(RobotClass.MOTORS.LIFT).getCurrentPosition() > -1500){
             verticalSlide(Utils.LiftState.HIGH);
         }
         double startTime = elapsedTime.seconds();
@@ -448,9 +448,6 @@ public class AutoUtils {
                     return heading_RADIANS / pullCount;
                 }
 
-            } else {
-                telemetry.addLine("No Data Available");
-                telemetry.update();
             }
             if (startTime + 5 < time.seconds()) {
                 break;
