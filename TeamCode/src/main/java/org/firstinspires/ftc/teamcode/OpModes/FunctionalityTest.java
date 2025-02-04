@@ -37,8 +37,8 @@ public class FunctionalityTest extends AutoControl {
             telemetry.addLine("functionality Testing:");
             telemetry.addLine("Press A to test SENSORS      Press START to test BUCKET");
             telemetry.addLine("Press B to test INTAKE       Press BACK to test ARM_EXTENSION");
-            telemetry.addLine("Press X to test ARM_FLIP");
-            telemetry.addLine("Press Y to test LIFT");
+            telemetry.addLine("Press X to test ARM_FLIP     Press Y to test LIFT");
+            telemetry.update();
             if (gamepad1.a) {
                 telemetry.clear();
                 sleep(500);
