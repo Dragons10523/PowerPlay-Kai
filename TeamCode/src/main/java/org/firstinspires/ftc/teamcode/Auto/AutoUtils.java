@@ -476,7 +476,6 @@ public class AutoUtils {
         } else {
             telemetry.addLine("No Data Available");
         }
-        telemetry.update();
     }
 
     public boolean inRange(double v1, double v2, double range) {

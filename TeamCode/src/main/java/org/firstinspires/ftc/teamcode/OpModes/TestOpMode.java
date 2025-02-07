@@ -43,18 +43,27 @@ public class TestOpMode extends AutoControl {
         telemetry.addLine("opMode INIT");
         telemetry.update();
         super.initialize();
-        waitForStart();
-        autoUtils.armFlip(Utils.ArmFlipState.GROUND, 0.6);
-        autoUtils.armExtension(Utils.ArmState.EXTENDED);
-
-        sleep(2000);
-
+        telemetry.addLine("headingInit");
+        telemetry.update();
+        super.initialHeading(Math.toRadians(0), true);
         double startTime = time.seconds();
-        autoUtils.intakeTransition();
-        double intakeTransitionTime = time.seconds() - startTime;
-        while(opModeIsActive()){
-            telemetry.addData("intakeTransitionTime", intakeTransitionTime);
+        do {
+            sleep(20);
+            telemetry.addLine("isLooping");
+            telemetry.addData("SuccessfulLocalizationCount", autoUtils.getSuccessfulLocalizationCount());
+            autoUtils.updateOpticalSensorToPoseEstimateCamera();
             telemetry.update();
+            if (startTime + 5 < time.seconds() || isStarted()) {
+                break;
+            }
         }
+        while (autoUtils.getSuccessfulLocalizationCount() < 20);
+        SparkFunOTOS.Pose2D pos = robot.opticalSensor.getPosition();
+
+        Pose2d startPos = new Pose2d(pos.x, pos.y, pos.h);
+
+        waitForStart();
+
+        drive.followTrajectory(drive.trajectoryBuilder(startPos).splineTo(new Vector2d(pos.x + 10, pos.y - 10), Math.toRadians(270)).build());
     }
 }

@@ -48,16 +48,13 @@ public class AutoControl extends LinearOpMode {
     public void initialHeading(double heading_RADIANS, boolean doCheckHeading){
         if(doCheckHeading){
             double testHeading = autoUtils.getCameraHeading();
-            if(autoUtils.inRange(testHeading, heading_RADIANS, Math.PI/2)){
+            if(autoUtils.inRange(testHeading, heading_RADIANS, Math.PI/8)){
                 robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(0,0, testHeading));
             }
         }
         else{
             robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(0,0, heading_RADIANS));
         }
-
-    }
-    public void end(){
 
     }
 }
