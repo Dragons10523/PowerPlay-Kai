@@ -29,20 +29,34 @@ public class AutoLeftBlue extends AutoControl {
         telemetry.update();
         super.initialHeading(Math.toRadians(0), false);
         double startTime = time.seconds();
+        double averagePosX = 0, totalPosX = 0;
+        double averagePosY = 0, totalPosY = 0;
+        SparkFunOTOS.Pose2D pos;
         do {
             sleep(20);
+            double successfulLocalizationCount = autoUtils.getSuccessfulLocalizationCount();
             telemetry.addLine("isLooping");
-            telemetry.addData("SuccessfulLocalizationCount", autoUtils.getSuccessfulLocalizationCount());
+            telemetry.addData("SuccessfulLocalizationCount", successfulLocalizationCount);
             telemetry.update();
-            autoUtils.updateOpticalSensorToPoseEstimateCamera();
+            boolean successfulLocalization = autoUtils.updateOpticalSensorToPoseEstimateCamera();
+            pos = robot.opticalSensor.getPosition();
+            if(successfulLocalization){
+                totalPosX += pos.x;
+                totalPosY += pos.y;
+            }
+            if(successfulLocalizationCount != 0){
+                averagePosX = totalPosX / successfulLocalizationCount;
+                averagePosY = totalPosY / successfulLocalizationCount;
+            }
+
             if (startTime + 5 < time.seconds() || isStarted()) {
                 break;
             }
         }
         while (autoUtils.getSuccessfulLocalizationCount() < 20);
-        SparkFunOTOS.Pose2D pos = robot.opticalSensor.getPosition();
 
-        Pose2d startPos = new Pose2d(pos.x, pos.y, pos.h);
+
+        Pose2d startPos = new Pose2d(averagePosX, averagePosY, pos.h);
 
         TrajectorySequence auto_Left_Blue = trajectoryHandler.auto_Left(Utils.FieldSide.BLUE_LEFT, startPos);
 

@@ -456,7 +456,7 @@ public class AutoUtils {
         return 0;
     }
 
-    public void updateOpticalSensorToPoseEstimateCamera() {
+    public boolean updateOpticalSensorToPoseEstimateCamera() {
         LLResult result = robot.limelight.getLatestResult();
         SparkFunOTOS.Pose2D pos_Sensor = robot.opticalSensor.getPosition();
         robot.limelight.updateRobotOrientation(Math.toDegrees(robot.getHeading()));
@@ -467,6 +467,7 @@ public class AutoUtils {
             if (stdDevMt2[0] + stdDevMt2[1] < 1.0) { //xy
                 robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(pose2D.toUnit(DistanceUnit.INCH).x, pose2D.toUnit(DistanceUnit.INCH).y, robot.getHeading()));
                 successfulLocalizationCount++;
+                return true;
             } else {
                 telemetry.addLine("stdDevMt2 > 1 in");
                 telemetry.addData("x", stdDevMt2[0]);
@@ -475,7 +476,9 @@ public class AutoUtils {
             }
         } else {
             telemetry.addLine("No Data Available");
+            return false;
         }
+        return false;
     }
 
     public boolean inRange(double v1, double v2, double range) {

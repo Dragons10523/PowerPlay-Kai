@@ -146,18 +146,7 @@ public class SampleMecanumDrive extends MecanumDrive {
             @NonNull
             @Override
             public Pose2d getPoseEstimate() {
-                LLResult result = robot.limelight.getLatestResult();
                 SparkFunOTOS.Pose2D pos_Sensor = robot.opticalSensor.getPosition();
-                robot.limelight.updateRobotOrientation(Math.toDegrees(robot.getHeading()));
-
-                if (result != null && result.isValid()) {
-                    Position pose2D = result.getBotpose_MT2().getPosition();
-                    double[] stdDevMt2 = result.getStddevMt2();
-
-                    if(stdDevMt2[0] * 39.37 + stdDevMt2[1]  * 39.37 < 1.0){ //xyz
-                        //robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(pose2D.toUnit(DistanceUnit.INCH).x, pose2D.toUnit(DistanceUnit.INCH).y, pos_Sensor.h));
-                    }
-                }
                 return new Pose2d(pos_Sensor.x, pos_Sensor.y, pos_Sensor.h);
 
             }
