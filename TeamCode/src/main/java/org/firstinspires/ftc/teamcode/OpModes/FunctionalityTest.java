@@ -22,8 +22,6 @@ import java.util.Map;
 @TeleOp
 public class FunctionalityTest extends AutoControl {
     ElapsedTime time = new ElapsedTime();
-    Map<RobotClass.MOTORS, DcMotorEx> Motors = robot.Motors;
-
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry.addLine("opMode starting");
@@ -35,70 +33,86 @@ public class FunctionalityTest extends AutoControl {
         waitForStart();
         while (opModeIsActive()) {
             telemetry.addLine("functionality Testing:");
-            telemetry.addLine("Press A to test SENSORS      Press START to test BUCKET");
-            telemetry.addLine("Press B to test INTAKE       Press BACK to test ARM_EXTENSION");
-            telemetry.addLine("Press X to test ARM_FLIP     Press Y to test LIFT");
+            telemetry.addLine("Press A to test SENSORS");
+            telemetry.addLine("Press START to test BUCKET");
+            telemetry.addLine("Press B to test INTAKE");
+            telemetry.addLine("Press BACK to test ARM_EXTENSION");
+            telemetry.addLine("Press X to test ARM_FLIP");
+            telemetry.addLine("Press Y to test LIFT");
             telemetry.update();
             if (gamepad1.a) {
                 telemetry.clear();
                 sleep(500);
                 testSensors();
+                telemetry.clear();
+                sleep(500);
             }
             if (gamepad1.b) {
                 telemetry.clear();
                 sleep(500);
                 testIntake();
+                telemetry.clear();
+                sleep(500);
             }
             if (gamepad1.x) {
                 telemetry.clear();
                 sleep(500);
                 testArmFlip();
+                telemetry.clear();
+                sleep(500);
             }
             if (gamepad1.y) {
                 telemetry.clear();
                 sleep(500);
                 testLift();
+                telemetry.clear();
+                sleep(500);
             }
             if (gamepad1.start) {
                 telemetry.clear();
                 sleep(500);
                 testBucket();
+                telemetry.clear();
+                sleep(500);
             }
             if (gamepad1.back) {
                 telemetry.clear();
                 sleep(500);
                 testArmExtension();
+                telemetry.clear();
+                sleep(500);
             }
         }
     }
 
-
     public boolean testMotor(DcMotorEx motor) {
         double startPosition = motor.getCurrentPosition();
+        motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         int failureCount = 0;
         double startTime = time.seconds();
-        while (opModeIsActive() && failureCount < 100) {
+        while (opModeIsActive()) {
             telemetry.addLine("testing " + motor.getDeviceName());
             telemetry.addData("startPos", startPosition);
             telemetry.addData("currentPos", motor.getCurrentPosition());
-            telemetry.addData("failureCount", failureCount);
             telemetry.update();
             if (time.milliseconds() % 1000 > 500) {
-                motor.setPower(-0.3);
+                motor.setPower(-0.7);
             } else {
-                motor.setPower(0.3);
+                motor.setPower(0.7);
             }
-            if (startPosition == motor.getCurrentPosition()) {
-                failureCount++;
+            if (startPosition != motor.getCurrentPosition()) {
+                motor.setPower(0);
+                return true;
             }
             if (startTime + 1.0 < time.seconds()) {
                 motor.setPower(0);
-                return true;
+                return false;
             }
         }
         motor.setPower(0);
         return false;
     }
+
 
     public void testSensors() {
         while (opModeIsActive() && !gamepad1.a) {
@@ -121,7 +135,7 @@ public class FunctionalityTest extends AutoControl {
     public void testArmFlip() {
         telemetry.addLine("Testing armFlip");
         telemetry.update();
-        boolean armFlipSuccess = testMotor(Motors.get(RobotClass.MOTORS.ARM_FLIP));
+        boolean armFlipSuccess = testMotor(robot.Motors.get(RobotClass.MOTORS.ARM_FLIP));
         if (!armFlipSuccess) {
             while (opModeIsActive() && !gamepad1.a) {
                 telemetry.addLine("armFlip FAILURE");
@@ -138,7 +152,7 @@ public class FunctionalityTest extends AutoControl {
     }
 
     public void testLift() {
-        boolean liftSuccess = testMotor(Motors.get(RobotClass.MOTORS.LIFT));
+        boolean liftSuccess = testMotor(robot.Motors.get(RobotClass.MOTORS.LIFT));
         if (!liftSuccess) {
             while (opModeIsActive() && !gamepad1.a) {
                 telemetry.addLine("lift FAILURE");
@@ -156,18 +170,18 @@ public class FunctionalityTest extends AutoControl {
 
     public void testIntake() {
         while (opModeIsActive() && !gamepad1.a) {
-            telemetry.addLine("testing intakeServo, intakeGate");
+            telemetry.addLine("testing intakeServo and intakeGate");
             telemetry.addLine("Press A to exit");
             telemetry.update();
             if (time.seconds() % 2 > 1) {
                 robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-0.75);
-                robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.75);
+                robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0);
             } else {
                 robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0.75);
                 robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.75);
             }
-
         }
+        robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(0);
         telemetry.clear();
     }
 

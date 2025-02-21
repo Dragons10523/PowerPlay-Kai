@@ -35,6 +35,7 @@ import java.util.List;
 @TeleOp
 public class TestOpMode extends AutoControl {
     ElapsedTime time = new ElapsedTime();
+
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry.addLine("opMode started");
@@ -62,8 +63,24 @@ public class TestOpMode extends AutoControl {
 
         Pose2d startPos = new Pose2d(pos.x, pos.y, pos.h);
 
+        while (!isStarted() && !isStopRequested()) {
+            SparkFunOTOS.Pose2D pose2D = robot.opticalSensor.getPosition();
+            LLResult result = robot.limelight.getLatestResult();
+            telemetry.addData("XYH: ", "%.3f %.3f %.3f", pose2D.x, pose2D.y, pose2D.h);
+            telemetry.addData("successfulLocalizations", autoUtils.getSuccessfulLocalizationCount());
+            if (result != null) {
+                telemetry.addData("staleness", result.getStaleness());
+                telemetry.addData("validResult?", result.isValid());
+            } else {
+                telemetry.addLine("No data available");
+            }
+            telemetry.update();
+        }
+
         waitForStart();
 
-        drive.followTrajectory(drive.trajectoryBuilder(startPos).splineTo(new Vector2d(pos.x + 10, pos.y - 10), Math.toRadians(270)).build());
+        while (opModeIsActive()) {
+            autoUtils.intakeTransition();
+        }
     }
 }

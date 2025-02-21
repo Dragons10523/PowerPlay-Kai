@@ -20,8 +20,6 @@ public class Control extends OpMode {
         robot = new RobotClass(hardwareMap);
         utils = new Utils(robot, telemetry);
         drive = new SampleMecanumDrive(hardwareMap);
-        new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
-        colorSensorClassObj = new ColorSensorClass(robot.colorSensor);
         robot.opticalSensor.setPosition(new SparkFunOTOS.Pose2D(0,0, Math.toRadians(180)));
         robot.limelight.pipelineSwitch(0);
         robot.limelight.setPollRateHz(100);

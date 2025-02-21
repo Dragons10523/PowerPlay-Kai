@@ -19,9 +19,9 @@ public class TrajectoryHandler {
     AutoUtils autoUtils;
     ElapsedTime time = new ElapsedTime();
     final double bucketScoreTime = 0.9;
-    final double intakeTransitionTime = 1.4;
-    final double armRetractTime = 0.4;
-    final double extensionTime = 0.7;
+    final double intakeTransitionTime = 2.2;
+    final double armRetractTime = 0.6;
+    final double extensionTime = 0.9;
     final double armMoveOutWayOfLiftTime = 0.2;
 
     public TrajectoryHandler(RobotClass robot, SampleMecanumDrive drive, AutoUtils autoUtils) {
@@ -33,15 +33,19 @@ public class TrajectoryHandler {
     public TrajectorySequence auto_Left(Utils.FieldSide fieldSide, Pose2d startPos){
         int inverseSide;
         double inverseHeading;
+        Pose2d scorePosition;
         if(fieldSide == Utils.FieldSide.RED_LEFT){
             inverseSide = -1;
             inverseHeading = 180.0;
+             scorePosition = new Pose2d(55 * inverseSide, 55 * inverseSide, Math.toRadians(230 - inverseHeading));
+
         }
         else{
             inverseSide = 1;
             inverseHeading = 0.0;
+            scorePosition = new Pose2d(55 * inverseSide, 55 * inverseSide, Math.toRadians(225 - inverseHeading));
+
         }
-        Pose2d scorePosition = new Pose2d(55.5 * inverseSide, 55.5 * inverseSide, Math.toRadians(225 - inverseHeading));
         return drive.trajectorySequenceBuilder(startPos)
                 .addTemporalMarker(0, () -> autoUtils.armExtension(Utils.ArmState.IN))
                 .UNSTABLE_addTemporalMarkerOffset(1, ()->{
@@ -52,17 +56,17 @@ public class TrajectoryHandler {
                     };
                     Thread t2 = new Thread(){
                         public void run(){
+                            double startTime = time.seconds();
+                            while(startTime + armMoveOutWayOfLiftTime > time.seconds()){
+                                boolean isWaiting = true;
+                            }
                             autoUtils.verticalSlide(Utils.LiftState.HIGH);
                         }
                     };
                     t1.start();
-                    double startTime = time.seconds();
-                    while(startTime + armMoveOutWayOfLiftTime > time.seconds()){
-                        boolean isWaiting = true;
-                    }
                     t2.start();
                 })
-                .lineToSplineHeading(scorePosition)
+                .splineToSplineHeading(scorePosition, Math.toRadians(90 - inverseHeading))
                 .addTemporalMarker(()-> autoUtils.scorePiece(bucketScoreTime))
                 .waitSeconds(bucketScoreTime)
                 .addTemporalMarker(() -> {
@@ -73,7 +77,7 @@ public class TrajectoryHandler {
                     };
                     t1.start();
                 })
-                .splineToLinearHeading(new Pose2d(46.5 * inverseSide, 47 * inverseSide, Math.toRadians(270 - inverseHeading)), Math.toRadians(270 - inverseHeading))
+                .splineToLinearHeading(new Pose2d(47 * inverseSide, 47 * inverseSide, Math.toRadians(270 - inverseHeading)), Math.toRadians(270 - inverseHeading))
                 .addDisplacementMarker(() -> {
                     robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
                     robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
@@ -101,14 +105,14 @@ public class TrajectoryHandler {
                     };
                     Thread t2 = new Thread(){
                         public void run(){
+                            double startTime = time.seconds();
+                            while(startTime + armMoveOutWayOfLiftTime > time.seconds()){
+                                boolean isWaiting = true;
+                            }
                             autoUtils.verticalSlide(Utils.LiftState.HIGH);
                         }
                     };
                     t1.start();
-                    double startTime = time.seconds();
-                    while(startTime + armMoveOutWayOfLiftTime > time.seconds()){
-                        boolean isWaiting = true;
-                    }
                     t2.start();
                 })
                 .lineToLinearHeading(scorePosition)
@@ -122,7 +126,7 @@ public class TrajectoryHandler {
                     };
                     t1.start();
                 })
-                .splineToLinearHeading(new Pose2d(56.5 * inverseSide, 47 * inverseSide, Math.toRadians(270 - inverseHeading)), Math.toRadians(270 - inverseHeading))
+                .splineToLinearHeading(new Pose2d(57 * inverseSide, 47 * inverseSide, Math.toRadians(270 - inverseHeading)), Math.toRadians(270 - inverseHeading))
                 .addDisplacementMarker(() -> {
                     robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
                     robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
@@ -150,17 +154,17 @@ public class TrajectoryHandler {
                     };
                     Thread t2 = new Thread(){
                         public void run(){
+                            double startTime = time.seconds();
+                            while(startTime + armMoveOutWayOfLiftTime > time.seconds()){
+                                boolean isWaiting = true;
+                            }
                             autoUtils.verticalSlide(Utils.LiftState.HIGH);
                         }
                     };
                     t1.start();
-                    double startTime = time.seconds();
-                    while(startTime + armMoveOutWayOfLiftTime > time.seconds()){
-                        boolean isWaiting = true;
-                    }
                     t2.start();
                 })
-                .lineToLinearHeading(new Pose2d(55.5 * inverseSide, 55.5 * inverseSide, Math.toRadians(225 - inverseSide)))
+                .lineToLinearHeading(scorePosition)
                 .addTemporalMarker(() -> autoUtils.scorePiece(bucketScoreTime))
                 .waitSeconds(bucketScoreTime)
                 .addTemporalMarker(() -> {
@@ -172,7 +176,7 @@ public class TrajectoryHandler {
                     t1.start();
                     autoUtils.armExtension(Utils.ArmState.IN);
                 })
-                .splineToLinearHeading(new Pose2d(56 * inverseSide,43 * inverseSide, Math.toRadians(305 - inverseHeading)), Math.toRadians(0 + inverseHeading))
+                .splineToLinearHeading(new Pose2d(56 * inverseSide,43 * inverseSide, Math.toRadians(305 - inverseHeading)), Math.toRadians(0 - inverseHeading))
                 .addDisplacementMarker(() -> {
                     robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
                     robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
@@ -225,6 +229,9 @@ public class TrajectoryHandler {
                     t1.start();
                     autoUtils.armExtension(Utils.ArmState.IN);
                 })
+                .splineToSplineHeading(new Pose2d(40 * inverseSide, 20 * inverseSide, Math.toRadians(180 + inverseHeading)), Math.toRadians(90 + inverseHeading))
+                .splineToSplineHeading(new Pose2d(20 * inverseSide, 10 * inverseSide, Math.toRadians(180 + inverseHeading)), Math.toRadians(0 + inverseHeading))
+
                 .build();
     }
 

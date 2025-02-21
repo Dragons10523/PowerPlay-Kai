@@ -42,8 +42,6 @@ public class RobotClass {
     public final IMU imu;
     public SparkFunOTOS opticalSensor;
     public VoltageSensor voltageSensor;
-    public ColorSensor colorSensor;
-    public DistanceSensor distanceSensor;
     HardwareMap hwmap;
     public static enum SERVOS{
         ARM_LEFT,
@@ -51,6 +49,7 @@ public class RobotClass {
         BUCKET,
         INTAKE_SERVO,
         SPECIMEN_GRABBER,
+        SPECIMEN_ARM
     }
     public static enum CR_SERVOS{
         INTAKE,
@@ -111,9 +110,6 @@ public class RobotClass {
     }
     public void initMotorsComp(){
 
-        colorSensor = hwmap.get(ColorSensor.class, "sensor_color_distance");
-        distanceSensor = hwmap.get(DistanceSensor.class, "sensor_color_distance");
-
         liftLeft = hwmap.get(DcMotor.class, "liftLeft");
         //SparkMini Servo port 0 Control
         liftRight = hwmap.get(DcMotor.class, "liftRight");
@@ -132,6 +128,8 @@ public class RobotClass {
         //port 3 expansion
         Servos.put(SERVOS.SPECIMEN_GRABBER, hwmap.get(Servo.class, "specimenGrabber"));
         //port 4 expansion
+        Servos.put(SERVOS.SPECIMEN_ARM, hwmap.get(Servo.class, "specimenArm"));
+        //port ? Control
         CR_Servos.put(CR_SERVOS.INTAKE, hwmap.get(CRServo.class, "intake"));
         //port 5 expansion
 
@@ -149,7 +147,6 @@ public class RobotClass {
         liftRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         Motors.get(MOTORS.LIFT).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        Motors.get(MOTORS.LIFT).setDirection(DcMotorSimple.Direction.REVERSE);
         Motors.get(MOTORS.LIFT).setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         Motors.get(MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

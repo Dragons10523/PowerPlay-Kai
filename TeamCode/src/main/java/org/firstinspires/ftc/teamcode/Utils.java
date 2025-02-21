@@ -24,6 +24,11 @@ public class Utils {
         OPEN,
         CLOSED
     }
+    public enum SpecimenArmState{
+        RAISED,
+        WALL,
+        GROUND
+    }
 
     public enum ArmFlipState {
         UP,
@@ -58,6 +63,7 @@ public class Utils {
     public static LiftMode liftMode = LiftMode.LIFT;
     public static ArmState armState = ArmState.IN;
     public static ServoState servoState = ServoState.OPEN;
+    public static SpecimenArmState specimenArmState = SpecimenArmState.GROUND;
     public static boolean slowMode = false;
     ElapsedTime elapsedTime = new ElapsedTime();
     double timeWhenPressed = 0;
@@ -175,13 +181,13 @@ public class Utils {
     }
 
     public void extendAndRetractArm(double armPower) {
-        if (armPower > 0 && timeAtLastCall + Math.abs(10 / armPower) < elapsedTime.milliseconds()) {
+        if (armPower > 0 && timeAtLastCall + Math.abs(2 / armPower) < elapsedTime.milliseconds()) {
             timeAtLastCall = elapsedTime.milliseconds();
             if (index != arm_rightPos.length - 1) {
                 index++;
             }
         }
-        if (armPower < 0 && timeAtLastCall + Math.abs(10 / armPower) < elapsedTime.milliseconds()) {
+        if (armPower < 0 && timeAtLastCall + Math.abs(2 / armPower) < elapsedTime.milliseconds()) {
             timeAtLastCall = elapsedTime.milliseconds();
             if (index != 0) {
                 index--;
@@ -191,21 +197,40 @@ public class Utils {
         robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(arm_leftPos[index]);
         robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(arm_rightPos[index]);
     }
-
-    boolean firstPressOverRide = true;
-    boolean overRideArmLimiter = false;
-
-    public void flipArm(double power, boolean button) {
-        if (!button) {
-            firstPressOverRide = true;
-            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    public void flipArm(double power) {
+        robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(power);
+    }
+    boolean firstPressSpecimenArm = true;
+    public void specimenArm(double power){
+        if(power == 0){
+            firstPressSpecimenArm = true;
         }
-        if (button && firstPressOverRide) {
-            firstPressOverRide = false;
-            robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        if(power > 0 && firstPressSpecimenArm){
+            firstPressSpecimenArm = false;
+            switch(specimenArmState){
+                case GROUND:
+                    specimenArmState = SpecimenArmState.WALL;
+                    robot.Servos.get(RobotClass.SERVOS.SPECIMEN_ARM).setPosition(.5);
+                    break;
+                case WALL:
+                    specimenArmState = SpecimenArmState.RAISED;
+                    robot.Servos.get(RobotClass.SERVOS.SPECIMEN_ARM).setPosition(0);
+                    break;
+            }
         }
-        robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(power / 2);
-
+        if(power < 0 && firstPressSpecimenArm){
+            firstPressSpecimenArm = false;
+            switch(specimenArmState){
+                case RAISED:
+                    specimenArmState = SpecimenArmState.WALL;
+                    robot.Servos.get(RobotClass.SERVOS.SPECIMEN_ARM).setPosition(.5);
+                    break;
+                case WALL:
+                    specimenArmState = SpecimenArmState.GROUND;
+                    robot.Servos.get(RobotClass.SERVOS.SPECIMEN_ARM).setPosition(1);
+                    break;
+            }
+        }
     }
 
     public void powerIntake(double power) {

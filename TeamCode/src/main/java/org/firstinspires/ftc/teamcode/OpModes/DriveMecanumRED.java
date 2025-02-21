@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Utils;
 import java.util.Arrays;
 import java.util.Locale;
 
-@TeleOp
+@TeleOp(name = "DriveMecanum")
 public class DriveMecanumRED extends Control {
     @Override
     public void start() {
@@ -29,6 +29,9 @@ public class DriveMecanumRED extends Control {
 
         double liftPower = gamepad2.dpad_down ? -1 : 0;
         liftPower += gamepad2.dpad_up ? 1 : 0;
+        double specimenPower = gamepad2.dpad_left ? -1 : 0;
+        specimenPower += gamepad2.dpad_right ? 1 : 0;
+
         double armPower = gamepad2.left_trigger - gamepad2.right_trigger;
 
         telemetry.addData("driveMode", Utils.driveMode);
@@ -47,11 +50,12 @@ public class DriveMecanumRED extends Control {
         utils.switchLiftMode(gamepad2.start);
         utils.switchDriveMode(gamepad1.start);
         utils.extendAndRetractArm(-gamepad2.right_stick_y);
-        utils.flipArm(armPower, gamepad2.y);
+        utils.flipArm(armPower);
         utils.flipBucket(gamepad2.b);
         utils.intakeServo(gamepad2.x);
-        utils.specimenGrab(gamepad2.left_bumper);
-        utils.intakeTransition(gamepad2.right_bumper);
+        utils.specimenGrab(gamepad2.y);
+        utils.specimenArm(specimenPower);
+
         utils.powerIntake(gamepad2.left_stick_y);
 //        if (robot.distanceSensor.getDistance(DistanceUnit.CM) < 5) {
 //            if (robot.colorSensor.blue() > robot.colorSensor.red() && robot.colorSensor.alpha() > 160 && robot.colorSensor.blue() > 1000) {
