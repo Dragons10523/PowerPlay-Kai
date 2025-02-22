@@ -18,10 +18,10 @@ public class TrajectoryHandler {
     SampleMecanumDrive drive;
     AutoUtils autoUtils;
     ElapsedTime time = new ElapsedTime();
-    final double bucketScoreTime = 0.9;
-    final double intakeTransitionTime = 2.2;
-    final double armRetractTime = 0.6;
-    final double extensionTime = 0.9;
+    final double bucketScoreTime = 0.8;
+    final double intakeTransitionTime = 1.6;
+    final double armRetractTime = 0.9;
+    final double extensionTime = 0.5;
     final double armMoveOutWayOfLiftTime = 0.2;
 
     public TrajectoryHandler(RobotClass robot, SampleMecanumDrive drive, AutoUtils autoUtils) {
@@ -37,7 +37,7 @@ public class TrajectoryHandler {
         if(fieldSide == Utils.FieldSide.RED_LEFT){
             inverseSide = -1;
             inverseHeading = 180.0;
-             scorePosition = new Pose2d(55 * inverseSide, 55 * inverseSide, Math.toRadians(230 - inverseHeading));
+             scorePosition = new Pose2d(55.5 * inverseSide, 55.5 * inverseSide, Math.toRadians(225 - inverseHeading));
 
         }
         else{
@@ -77,11 +77,24 @@ public class TrajectoryHandler {
                     };
                     t1.start();
                 })
-                .splineToLinearHeading(new Pose2d(47 * inverseSide, 47 * inverseSide, Math.toRadians(270 - inverseHeading)), Math.toRadians(270 - inverseHeading))
+                .splineToLinearHeading(new Pose2d(47.3 * inverseSide, 46 * inverseSide, Math.toRadians(270 - inverseHeading)), Math.toRadians(270 - inverseHeading))
                 .addDisplacementMarker(() -> {
-                    robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
                     robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);
                     autoUtils.armExtension(Utils.ArmState.EXTENDED);
+                    Thread t1 = new Thread(){
+                        public void run(){
+                            double startTime = time.seconds();
+                            while(startTime + 0.6 > time.seconds()){
+                                robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+                            }
+                            startTime = time.seconds();
+                            while(startTime + 0.2 > time.seconds()){
+                                robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(.3);
+                            }
+                            robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+                        }
+                    };
+                    t1.start();
 
                 })
                 .forward(1)
@@ -126,7 +139,7 @@ public class TrajectoryHandler {
                     };
                     t1.start();
                 })
-                .splineToLinearHeading(new Pose2d(57 * inverseSide, 47 * inverseSide, Math.toRadians(270 - inverseHeading)), Math.toRadians(270 - inverseHeading))
+                .splineToLinearHeading(new Pose2d(57.3 * inverseSide, 46 * inverseSide, Math.toRadians(270 - inverseHeading)), Math.toRadians(270 - inverseHeading))
                 .addDisplacementMarker(() -> {
                     robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
                     robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(.4);

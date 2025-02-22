@@ -67,7 +67,7 @@ import static org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.DriveCo
 public class SampleMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID_AXIAL = new PIDCoefficients(5, 0, 1);
 
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(5, 1, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(7, 0, 0);
 
     public static double LATERAL_MULTIPLIER = 2.3;
     public static double VX_WEIGHT = 1;

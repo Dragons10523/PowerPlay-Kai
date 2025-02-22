@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 public class AutoUtils {
     ElapsedTime time = new ElapsedTime();
@@ -27,15 +28,17 @@ public class AutoUtils {
     public static final double INCHES_PER_METER = 39.37;
     public static final double TICKS_PER_INCH = CPR_OUTPUT_SHAFT_20TO1 / WHEEL_CIRCUMFERENCE_INCH;
 
+    BooleanSupplier isStopRequested;
+
     final int highBasketHeightEncoder = 1750;
     Telemetry telemetry;
     AutoControl autoControl;
 
-    public AutoUtils(RobotClass robot, Telemetry telemetry) {
+    public AutoUtils(RobotClass robot, Telemetry telemetry, BooleanSupplier isStopRequested) {
         this.robot = robot;
         this.telemetry = telemetry;
-        //aprilTagPipeline = new AprilTagPipeline(robot.webcamName, telemetry);
         autoControl = new AutoControl();
+        this.isStopRequested = isStopRequested;
     }
 
     Map<RobotClass.MOTORS, Double> wheelSpeeds = new HashMap<>();
@@ -224,11 +227,20 @@ public class AutoUtils {
         };
         t2.start();
         //retract arm
-
-        armFlip(Utils.ArmFlipState.UP, 0.6);
-
-        robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+        Thread t3 = new Thread() {
+            @Override
+            public void run() {
+                armFlip(Utils.ArmFlipState.UP, 0.6);
+            }
+        };
+        t3.start();
+        double startTime = time.seconds();
+        while (startTime + 0.5 > time.seconds()) {
+            boolean isWaiting = true;
+        }
         robot.Servos.get(RobotClass.SERVOS.INTAKE_SERVO).setPosition(0.8);
+        robot.CR_Servos.get(RobotClass.CR_SERVOS.INTAKE).setPower(-.75);
+
         //ENDS WITH INTAKE SPINNING
         sampleWiggle();
     }
@@ -283,12 +295,12 @@ public class AutoUtils {
                     telemetry.addData("distanceToTarget", distanceToTarget);
                     telemetry.addData("currentPos", currentPos);
                     telemetry.update();
-                    if (startTime + 2 < time.seconds()) {
+                    if (startTime + 1 < time.seconds()) {
                         break;
                     }
                 }
                 startTime = time.seconds();
-                while(startTime + 0.2 > time.seconds()){
+                while (startTime + 0.2 > time.seconds()) {
                     robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(-.4);
                 }
                 robot.Motors.get(RobotClass.MOTORS.ARM_FLIP).setPower(0);
@@ -345,7 +357,7 @@ public class AutoUtils {
                     telemetry.update();
                     setLiftPower(powerOut);
                     //Time out 3 seconds
-                    if (startTime + 1.5 < time.seconds() || autoControl.isStopRequested()) {
+                    if (startTime + 2 < time.seconds() || autoControl.isStopRequested()) {
                         break;
                     }
                     if (previousPos == currentPos && startTime + 0.3 < time.seconds()) {
@@ -384,13 +396,8 @@ public class AutoUtils {
         public void run() {
             double startTime = time.seconds();
             while (startTime + 2 > time.seconds() && !isInterrupted()) {
-                if (time.milliseconds() % 200 <= 100) {
-                    robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(Utils.arm_leftPos[0]);
-                    robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(Utils.arm_rightPos[0]);
-                } else {
-                    robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(Utils.arm_leftPos[1]);
-                    robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(Utils.arm_rightPos[1]);
-                }
+                robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(Utils.arm_leftPos[0]);
+                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(Utils.arm_rightPos[0]);
             }
         }
     };
@@ -398,15 +405,8 @@ public class AutoUtils {
         public void run() {
             double startTime = time.seconds();
             while (startTime + 2 > time.seconds() && !isInterrupted()) {
-                if (time.milliseconds() % 200 <= 100) {
-                    robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(Utils.arm_leftPos[Utils.arm_leftPos.length - 1]);
-                    robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(Utils.arm_rightPos[Utils.arm_rightPos.length - 1]);
-
-                } else {
-                    robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(Utils.arm_leftPos[Utils.arm_leftPos.length - 2]);
-                    robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(Utils.arm_rightPos[Utils.arm_rightPos.length - 2]);
-
-                }
+                robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(Utils.arm_leftPos[Utils.arm_leftPos.length - 1]);
+                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(Utils.arm_rightPos[Utils.arm_rightPos.length - 1]);
             }
         }
     };
@@ -414,21 +414,24 @@ public class AutoUtils {
     public void armExtension(Utils.ArmState armState) {
         switch (armState) {
             case IN:
-                if (outThread.isAlive()) {
-                    outThread.interrupt();
-                }
-                if (!inThread.isAlive()) {
-                    inThread.start();
-                }
-
+//                if (outThread.isAlive()) {
+//                    outThread.interrupt();
+//                }
+//                if (!inThread.isAlive()) {
+//                    inThread.start();
+//                }
+                robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(Utils.arm_leftPos[0]);
+                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(Utils.arm_rightPos[0]);
                 break;
             case EXTENDED:
-                if (inThread.isAlive()) {
-                    inThread.interrupt();
-                }
-                if (!outThread.isAlive()) {
-                    outThread.start();
-                }
+//                if (inThread.isAlive()) {
+//                    inThread.interrupt();
+//                }
+//                if (!outThread.isAlive()) {
+//                    outThread.start();
+//                }
+                robot.Servos.get(RobotClass.SERVOS.ARM_LEFT).setPosition(Utils.arm_leftPos[Utils.arm_leftPos.length - 1]);
+                robot.Servos.get(RobotClass.SERVOS.ARM_RIGHT).setPosition(Utils.arm_rightPos[Utils.arm_rightPos.length - 1]);
                 break;
         }
     }

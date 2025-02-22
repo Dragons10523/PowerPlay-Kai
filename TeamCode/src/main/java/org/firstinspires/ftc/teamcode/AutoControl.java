@@ -15,6 +15,8 @@ import org.firstinspires.ftc.teamcode.Auto.TrajectoryHandler;
 import org.firstinspires.ftc.teamcode.Camera.Limelight;
 import org.firstinspires.ftc.teamcode.Susbsystem.RoadRunner.drive.SampleMecanumDrive;
 
+import java.util.function.BooleanSupplier;
+
 public class AutoControl extends LinearOpMode {
     public RobotClass robot;
     public AutoUtils autoUtils;
@@ -22,6 +24,12 @@ public class AutoControl extends LinearOpMode {
     public OpticalSensor opticalSensorClass;
     public Limelight limelightObj;
     public TrajectoryHandler trajectoryHandler;
+    BooleanSupplier isStopRequested = new BooleanSupplier() {
+        @Override
+        public boolean getAsBoolean() {
+            return isStopRequested();
+        }
+    };
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -33,7 +41,7 @@ public class AutoControl extends LinearOpMode {
     public void initialize(){
         robot = new RobotClass(hardwareMap);
         drive = new SampleMecanumDrive(hardwareMap);
-        autoUtils = new AutoUtils(robot, telemetry);
+        autoUtils = new AutoUtils(robot, telemetry, isStopRequested);
         trajectoryHandler = new TrajectoryHandler(robot, drive, autoUtils);
         opticalSensorClass = new OpticalSensor(OpticalSensor.RobotType.COMPETITION, robot);
         limelightObj = new Limelight(robot);
@@ -42,7 +50,7 @@ public class AutoControl extends LinearOpMode {
     }
     public void simpleInit(){
         robot = new RobotClass(hardwareMap);
-        autoUtils = new AutoUtils(robot, telemetry);
+        autoUtils = new AutoUtils(robot, telemetry, isStopRequested);
     }
 
     public void initialHeading(double heading_RADIANS, boolean doCheckHeading){
